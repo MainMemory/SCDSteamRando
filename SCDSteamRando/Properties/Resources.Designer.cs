@@ -68,6 +68,15 @@ namespace SCDSteamRando.Properties {
         /////-------Aliases-------//
         ///#alias 4: TYPE_ACTFINISH
         ///
+        ///// Function declarations
+        ///#function ActFinish_NextStage
+        ///
+        ///function ActFinish_NextStage
+        ///	switch Stage.ListPos
+        /////REPLACE
+        ///	endswitch
+        ///endfunction
+        ///
         ///
         ///sub ObjectMain
         ///	switch Object.State
@@ -76,14 +85,7 @@ namespace SCDSteamRando.Properties {
         ///		Object.Value1=1168
         ///		Object.Value2=1255
         ///		Object.Value3=1319
-        ///		Object.Value4=1402
-        ///		Object.State=1
-        ///		switch Stage.Minutes
-        ///		case 0
-        ///			if Stage.Seconds&lt;30
-        ///				Object.Value5=50000
-        ///			else
-        ///				if Stage.Seconds&lt;4 [rest of string was truncated]&quot;;.
+        ///		Obje [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ActFinish_template {
             get {
@@ -113,6 +115,19 @@ namespace SCDSteamRando.Properties {
         internal static string LoadSaveMenu_template {
             get {
                 return ResourceManager.GetString("LoadSaveMenu_template", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name=Randomizer
+        ///Description=Randomizes the level order.
+        ///Author=MainMemory
+        ///TxtScripts=true
+        ///.
+        /// </summary>
+        internal static string mod_ini {
+            get {
+                return ResourceManager.GetString("mod_ini", resourceCulture);
             }
         }
         
