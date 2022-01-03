@@ -42,6 +42,7 @@ namespace SCDSteamRando
 			settings.MaxBackJump = (int)maxBackJump.Value;
 			settings.MaxForwJump = (int)maxForwJump.Value;
 			settings.RandomMusic = randomMusic.Checked;
+			settings.Save();
 		}
 
 		private void randomSeed_CheckedChanged(object sender, EventArgs e)
