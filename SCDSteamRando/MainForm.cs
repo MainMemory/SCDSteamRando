@@ -945,7 +945,7 @@ namespace SCDSteamRando
 			if (stage.Clear != -1 && !path.Contains(stage.Clear))
 			{
 				path.Push(stage.Clear);
-				if (stage.Clear != stagecount)
+				if (stage.Clear == stagecount)
 				{
 					if (shortestPath == null || path.Count < shortestPath.Length)
 					{
@@ -962,7 +962,7 @@ namespace SCDSteamRando
 			if (stage.Past != -1 && !path.Contains(stage.Past))
 			{
 				path.Push(stage.Past);
-				if (stage.Past != stagecount)
+				if (stage.Past == stagecount)
 				{
 					if (shortestPath == null || path.Count < shortestPath.Length)
 					{
@@ -979,7 +979,7 @@ namespace SCDSteamRando
 			if (stage.Future != -1 && !path.Contains(stage.Future))
 			{
 				path.Push(stage.Future);
-				if (stage.Future != stagecount)
+				if (stage.Future == stagecount)
 				{
 					if (shortestPath == null || path.Count < shortestPath.Length)
 					{

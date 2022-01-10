@@ -236,6 +236,7 @@ sub ObjectDraw
 				endif
 				Stage.ActiveList=PRESENTATION_STAGE
 			else
+				Stage.ListPos=TempValue0
 				Fade_Colour=208
 				Fade_Colour<<=16
 				TempValue0=255

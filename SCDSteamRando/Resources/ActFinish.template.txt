@@ -333,6 +333,7 @@ sub ObjectMain
 				if TempValue0==70
 					CallFunction(ActFinish_LoadEnding)
 				else
+					Stage.ListPos=TempValue0
 					if Options.GameMode==1
 						ArrayPos1=Options.SaveSlot
 						ArrayPos1<<=3
@@ -415,6 +416,7 @@ sub ObjectMain
 				if TempValue0==70
 					CallFunction(ActFinish_LoadEnding)
 				else
+					Stage.ListPos=TempValue0
 					if Options.GameMode==1
 						ArrayPos1=Options.SaveSlot
 						ArrayPos1<<=3
