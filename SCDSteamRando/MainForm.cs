@@ -145,6 +145,7 @@ namespace SCDSteamRando
 			}
 			stageids[stagecount] = stagecount;
 			settings.Mode = modeSelector.SelectedIndex;
+			bool timewarp = true;
 			switch (modeSelector.SelectedIndex)
 			{
 				case 0: // stages + warps
@@ -303,40 +304,6 @@ namespace SCDSteamRando
 									break;
 							}
 						}
-						System.Text.StringBuilder sb = new System.Text.StringBuilder();
-						for (int i = 0; i < stagecount; i++)
-						{
-							sb.AppendLine($"\tcase {i}");
-							sb.AppendLine($"\t\tTempValue0={stages[i].Clear}");
-							sb.AppendLine("\t\tbreak");
-						}
-						File.WriteAllText(Path.Combine(path, @"Data\Scripts\Global\ActFinish.txt"), Properties.Resources.ActFinish_template.Replace("//REPLACE", sb.ToString()));
-						sb.Clear();
-						for (int i = 0; i < stagecount; i++)
-						{
-							Stage stg = stages[i];
-							if (stg.Past == -1 && stg.Future == -1)
-								continue;
-							sb.AppendLine($"\t\t\tcase {i}");
-							if (stg.Past != -1 && stg.Future != -1)
-							{
-								sb.AppendLine("\t\t\t\tif Warp.Destination==1");
-								sb.AppendLine($"\t\t\t\t\tTempValue0={stg.Past}");
-								sb.AppendLine("\t\t\t\telse");
-								sb.AppendLine($"\t\t\t\t\tTempValue0={stg.Future}");
-								sb.AppendLine("\t\t\t\tendif");
-							}
-							else if (stg.Future != -1)
-							{
-								sb.AppendLine($"\t\t\t\tTempValue0={stg.Future}");
-							}
-							else if (stg.Past != -1)
-							{
-								sb.AppendLine($"\t\t\t\tTempValue0={stg.Past}");
-							}
-							sb.AppendLine("\t\t\t\tbreak");
-						}
-						File.WriteAllText(Path.Combine(path, @"Data\Scripts\Global\TimeWarp.txt"), Properties.Resources.TimeWarp_template.Replace("//REPLACE", sb.ToString()));
 					}
 					break;
 				case 1: // rounds
@@ -403,23 +370,7 @@ namespace SCDSteamRando
 							stages[(rounds[i] * 10) + 8].Clear = rounds[i + 1] * 10;
 							stages[(rounds[i] * 10) + 9].Clear = rounds[i + 1] * 10;
 						}
-						System.Text.StringBuilder sb = new System.Text.StringBuilder();
-						for (int i = 0; i < stagecount; i++)
-						{
-							sb.AppendLine($"\tcase {i}");
-							if (i % 10 > 3 && i % 10 < 8)
-							{
-								sb.AppendLine($"\t\tif Good_Future_Count==2");
-								sb.AppendLine($"\t\t\tTempValue0={stages[i].ClearGF}");
-								sb.AppendLine($"\t\telse");
-								sb.AppendLine($"\t\t\tTempValue0={stages[i].Clear}");
-								sb.AppendLine($"\t\tendif");
-							}
-							else
-								sb.AppendLine($"\t\tTempValue0={stages[i].Clear}");
-							sb.AppendLine("\t\tbreak");
-						}
-						File.WriteAllText(Path.Combine(path, @"Data\Scripts\Global\ActFinish.txt"), Properties.Resources.ActFinish_template.Replace("//REPLACE", sb.ToString()));
+						timewarp = false;
 					}
 					break;
 				case 2: // acts
@@ -516,29 +467,7 @@ namespace SCDSteamRando
 						}
 						stages[stageids[stagecount - 2]].Clear = stagecount;
 						stages[stageids[stagecount - 1]].Clear = stagecount;
-						string tmp = Properties.Resources.LoadSaveMenu_template;
-						tmp = tmp.Replace("//REPLACE1", $"SaveRAM[ArrayPos1]={stageids[0] + 1}");
-						tmp = tmp.Replace("//REPLACE2", $"Stage.ListPos={stageids[0]}");
-						File.WriteAllText(Path.Combine(path, @"Data\Scripts\Menu\LoadSaveMenu.txt"), tmp);
-						System.Text.StringBuilder sb = new System.Text.StringBuilder();
-						for (int i = 0; i < stagecount; i++)
-						{
-							Stage stg = stages[i];
-							int stgno = i % 10;
-							sb.AppendLine($"\tcase {i}");
-							if (stgno > 3 && stgno < 8)
-							{
-								sb.AppendLine($"\t\tif Good_Future_Count==2");
-								sb.AppendLine($"\t\t\tTempValue0={stg.ClearGF}");
-								sb.AppendLine($"\t\telse");
-								sb.AppendLine($"\t\t\tTempValue0={stg.Clear}");
-								sb.AppendLine($"\t\tendif");
-							}
-							else
-								sb.AppendLine($"\t\tTempValue0={stg.Clear}");
-							sb.AppendLine("\t\tbreak");
-						}
-						File.WriteAllText(Path.Combine(path, @"Data\Scripts\Global\ActFinish.txt"), Properties.Resources.ActFinish_template.Replace("//REPLACE", sb.ToString()));
+						timewarp = false;
 					}
 					break;
 				case 3: // time periods
@@ -609,162 +538,57 @@ namespace SCDSteamRando
 						}
 						stages[stageids[stagecount - 2]].Clear = stagecount;
 						stages[stageids[stagecount - 1]].Clear = stagecount;
-						System.Text.StringBuilder sb = new System.Text.StringBuilder();
-						for (int i = 0; i < stagecount; i++)
-						{
-							Stage stg = stages[i];
-							int stgno = i % 10;
-							sb.AppendLine($"\tcase {i}");
-							if (stgno > 3 && stgno < 8)
-							{
-								sb.AppendLine($"\t\tif Good_Future_Count==2");
-								sb.AppendLine($"\t\t\tTempValue0={stg.ClearGF}");
-								sb.AppendLine($"\t\telse");
-								sb.AppendLine($"\t\t\tTempValue0={stg.Clear}");
-								sb.AppendLine($"\t\tendif");
-							}
-							else
-								sb.AppendLine($"\t\tTempValue0={stg.Clear}");
-							sb.AppendLine("\t\tbreak");
-						}
-						File.WriteAllText(Path.Combine(path, @"Data\Scripts\Global\ActFinish.txt"), Properties.Resources.ActFinish_template.Replace("//REPLACE", sb.ToString()));
-						sb.Clear();
-						for (int i = 0; i < stagecount; i++)
-						{
-							Stage stg = stages[i];
-							if (stg.Past == -1 && stg.Future == -1)
-								continue;
-							sb.AppendLine($"\t\t\tcase {i}");
-							if (stg.GoodFuture != -1)
-							{
-								sb.AppendLine("\t\t\t\tif Warp.Destination==1");
-								sb.AppendLine($"\t\t\t\t\tTempValue0={stg.Past}");
-								sb.AppendLine("\t\t\t\telse");
-								sb.AppendLine("\t\t\t\t\tif Transporter_Destroyed==1");
-								sb.AppendLine($"\t\t\t\t\t\tTempValue0={stg.GoodFuture}");
-								sb.AppendLine("\t\t\t\t\telse");
-								sb.AppendLine($"\t\t\t\t\t\tTempValue0={stg.Future}");
-								sb.AppendLine("\t\t\t\t\tendif");
-								sb.AppendLine("\t\t\t\tendif");
-							}
-							else if (stg.Future != -1)
-							{
-								sb.AppendLine($"\t\t\t\tTempValue0={stg.Future}");
-							}
-							else if (stg.Past != -1)
-							{
-								sb.AppendLine($"\t\t\t\tTempValue0={stg.Past}");
-							}
-							sb.AppendLine("\t\t\t\tbreak");
-						}
-						File.WriteAllText(Path.Combine(path, @"Data\Scripts\Global\TimeWarp.txt"), Properties.Resources.TimeWarp_template.Replace("//REPLACE", sb.ToString()));
 					}
 					break;
 				case 4: // branching paths
 					{
 						List<int> stagepool = new List<int>(stageids.Take(stagecount));
 						List<int> curset = new List<int>() { r.Next(stagecount) };
+						stagepool.Remove(curset[0]);
+						List<int> ids2 = new List<int>() { curset[0] };
 						while (stagepool.Count > 0)
 						{
+							List<int> newset = new List<int>();
 							for (int i = 0; i < curset.Count; i++)
 							{
-								stageids[stagecount - stagepool.Count + i] = curset[i];
 								Stage stg = stages[curset[i]];
+								stg.Clear = GetStageFromLists(r, newset, stagepool, stagepool.Count / 6);
+								if (!newset.Contains(stg.Clear))
+									newset.Add(stg.Clear);
 								switch (curset[i] % 10)
 								{
 									case 0:
 									case 4:
-										if (stagepool.Count < 3)
-										{
-											MessageBox.Show(this, "Randomization failed! Please try again with a different seed.", "Randomization Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
-											return;
-										}
-										do { stg.Past = GetStageFromLists(r, curset, stagepool, stagepool.Count / 6); }
-										while (stg.Past == curset[i]);
-										if (!curset.Contains(stg.Past))
-											curset.Add(stg.Past);
-										do { stg.Future = GetStageFromLists(r, curset, stagepool, stagepool.Count / 6); }
-										while (stg.Future == stg.Past || stg.Future == curset[i]);
-										if (!curset.Contains(stg.Future))
-											curset.Add(stg.Future);
+										stg.Past = GetStageFromLists(r, newset, stagepool, stagepool.Count / 6);
+										if (!newset.Contains(stg.Past))
+											newset.Add(stg.Past);
+										stg.Future = GetStageFromLists(r, newset, stagepool, stagepool.Count / 6);
+										if (!newset.Contains(stg.Future))
+											newset.Add(stg.Future);
 										break;
 									case 1:
 									case 5:
-										if (stagepool.Count < 2)
-										{
-											MessageBox.Show(this, "Randomization failed! Please try again with a different seed.", "Randomization Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
-											return;
-										}
-										do { stg.Future = GetStageFromLists(r, curset, stagepool, stagepool.Count / 6); }
-										while (stg.Future == curset[i]);
-										if (!curset.Contains(stg.Future))
-											curset.Add(stg.Future);
+										stg.Future = GetStageFromLists(r, newset, stagepool, stagepool.Count / 6);
+										if (!newset.Contains(stg.Future))
+											newset.Add(stg.Future);
 										break;
 									case 2:
 									case 3:
 									case 6:
 									case 7:
-										if (stagepool.Count < 2)
-										{
-											MessageBox.Show(this, "Randomization failed! Please try again with a different seed.", "Randomization Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
-											return;
-										}
-										do { stg.Past = GetStageFromLists(r, curset, stagepool, stagepool.Count / 6); }
-										while (stg.Past == curset[i]);
-										if (!curset.Contains(stg.Past))
-											curset.Add(stg.Past);
+										stg.Past = GetStageFromLists(r, newset, stagepool, stagepool.Count / 6);
+										if (!newset.Contains(stg.Past))
+											newset.Add(stg.Past);
 										break;
 								}
 							}
-							stagepool.RemoveAll(a => curset.Contains(a));
-							if (stagepool.Count > 0)
-							{
-								List<int> newset = new List<int>();
-								foreach (int item in curset)
-								{
-									stages[item].Clear = GetStageFromLists(r, newset, stagepool, 2);
-									if (!newset.Contains(stages[item].Clear))
-										newset.Add(stages[item].Clear);
-								}
-								curset = newset;
-							}
+							stagepool.RemoveAll(a => newset.Contains(a));
+							curset = newset;
+							ids2.AddRange(newset);
 						}
 						foreach (int item in curset)
 							stages[item].Clear = stagecount;
-						System.Text.StringBuilder sb = new System.Text.StringBuilder();
-						for (int i = 0; i < stagecount; i++)
-						{
-							sb.AppendLine($"\tcase {i}");
-							sb.AppendLine($"\t\tTempValue0={stages[i].Clear}");
-							sb.AppendLine("\t\tbreak");
-						}
-						File.WriteAllText(Path.Combine(path, @"Data\Scripts\Global\ActFinish.txt"), Properties.Resources.ActFinish_template.Replace("//REPLACE", sb.ToString()));
-						sb.Clear();
-						for (int i = 0; i < stagecount; i++)
-						{
-							Stage stg = stages[i];
-							if (stg.Past == -1 && stg.Future == -1)
-								continue;
-							sb.AppendLine($"\t\t\tcase {i}");
-							if (stg.Past != -1 && stg.Future != -1)
-							{
-								sb.AppendLine("\t\t\t\tif Warp.Destination==1");
-								sb.AppendLine($"\t\t\t\t\tTempValue0={stg.Past}");
-								sb.AppendLine("\t\t\t\telse");
-								sb.AppendLine($"\t\t\t\t\tTempValue0={stg.Future}");
-								sb.AppendLine("\t\t\t\tendif");
-							}
-							else if (stg.Future != -1)
-							{
-								sb.AppendLine($"\t\t\t\tTempValue0={stg.Future}");
-							}
-							else if (stg.Past != -1)
-							{
-								sb.AppendLine($"\t\t\t\tTempValue0={stg.Past}");
-							}
-							sb.AppendLine("\t\t\t\tbreak");
-						}
-						File.WriteAllText(Path.Combine(path, @"Data\Scripts\Global\TimeWarp.txt"), Properties.Resources.TimeWarp_template.Replace("//REPLACE", sb.ToString()));
+						ids2.CopyTo(stageids);
 					}
 					break;
 			}
@@ -773,6 +597,63 @@ namespace SCDSteamRando
 			tmpstr = tmpstr.Replace("//REPLACE2", $"Stage.ListPos={stageids[0]}");
 			File.WriteAllText(Path.Combine(path, @"Data\Scripts\Menu\LoadSaveMenu.txt"), tmpstr);
 			File.WriteAllText(Path.Combine(path, @"Data\Scripts\R8\Amy.txt"), Properties.Resources.Amy);
+			System.Text.StringBuilder sb = new System.Text.StringBuilder();
+			for (int i = 0; i < stagecount; i++)
+			{
+				Stage stg = stages[i];
+				int stgno = i % 10;
+				sb.AppendLine($"\tcase {i}");
+				if (stg.ClearGF != -1)
+				{
+					sb.AppendLine($"\t\tif Good_Future_Count==2");
+					sb.AppendLine($"\t\t\tTempValue0={stg.ClearGF}");
+					sb.AppendLine($"\t\telse");
+					sb.AppendLine($"\t\t\tTempValue0={stg.Clear}");
+					sb.AppendLine($"\t\tendif");
+				}
+				else
+					sb.AppendLine($"\t\tTempValue0={stg.Clear}");
+				sb.AppendLine("\t\tbreak");
+			}
+			File.WriteAllText(Path.Combine(path, @"Data\Scripts\Global\ActFinish.txt"), Properties.Resources.ActFinish_template.Replace("//REPLACE", sb.ToString()));
+			if (timewarp)
+			{
+				sb.Clear();
+				for (int i = 0; i < stagecount; i++)
+				{
+					Stage stg = stages[i];
+					if (stg.Past == -1 && stg.Future == -1)
+						continue;
+					sb.AppendLine($"\t\t\tcase {i}");
+					if (stg.Past != -1 && stg.Future != -1)
+					{
+						sb.AppendLine("\t\t\t\tif Warp.Destination==1");
+						sb.AppendLine($"\t\t\t\t\tTempValue0={stg.Past}");
+						sb.AppendLine("\t\t\t\telse");
+						if (stg.GoodFuture != -1)
+						{
+							sb.AppendLine("\t\t\t\t\tif Transporter_Destroyed==1");
+							sb.AppendLine($"\t\t\t\t\t\tTempValue0={stg.GoodFuture}");
+							sb.AppendLine("\t\t\t\t\telse");
+							sb.AppendLine($"\t\t\t\t\t\tTempValue0={stg.Future}");
+							sb.AppendLine("\t\t\t\t\tendif");
+						}
+						else
+							sb.AppendLine($"\t\t\t\t\tTempValue0={stg.Future}");
+						sb.AppendLine("\t\t\t\tendif");
+					}
+					else if (stg.Future != -1)
+					{
+						sb.AppendLine($"\t\t\t\tTempValue0={stg.Future}");
+					}
+					else if (stg.Past != -1)
+					{
+						sb.AppendLine($"\t\t\t\tTempValue0={stg.Past}");
+					}
+					sb.AppendLine("\t\t\t\tbreak");
+				}
+				File.WriteAllText(Path.Combine(path, @"Data\Scripts\Global\TimeWarp.txt"), Properties.Resources.TimeWarp_template.Replace("//REPLACE", sb.ToString()));
+			}
 			if (randomMusic.Checked)
 			{
 				Dictionary<string, string> scriptFiles = new Dictionary<string, string>();
