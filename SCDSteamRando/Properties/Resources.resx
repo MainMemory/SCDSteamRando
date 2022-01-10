@@ -121,6 +121,9 @@
   <data name="ActFinish_template" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ActFinish.template.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
+  <data name="Amy" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Amy.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
   <data name="LoadSaveMenu_template" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\LoadSaveMenu.template.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>

@@ -94,6 +94,34 @@ namespace SCDSteamRando.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to //------------Sonic CD AmyRose Script-------------//
+        /////--------Scripted by Christian Whitehead &apos;The Taxman&apos;--------//
+        /////-------Unpacked By Rubberduckycooly&apos;s Script Unpacker-------//
+        ///
+        /////-------Aliases-------//
+        ///#alias 61: TYPE_AMYROSE
+        ///
+        ///
+        ///sub ObjectMain
+        ///	switch Object.State
+        ///	case 0
+        ///		Object.Frame=Object.Value0
+        ///		Object.Frame&gt;&gt;=2
+        ///		Object.Value0++
+        ///		Object.Value0%=24
+        ///		Object.XPos+=81920
+        ///		ObjectTileGrip(0,0,19,0)
+        ///		TempValue0=Object[-1].XPos
+        ///		TempValue0-=6291456
+        ///		if Object.XPos&gt;TempValue0        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Amy {
+            get {
+                return ResourceManager.GetString("Amy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to //------------Sonic CD LoadSaveMenu Script-------------//
         /////--------Scripted by Christian Whitehead &apos;The Taxman&apos;--------//
         /////-------Unpacked By Rubberduckycooly&apos;s Script Unpacker-------//

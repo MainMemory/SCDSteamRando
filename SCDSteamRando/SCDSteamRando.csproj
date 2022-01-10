@@ -81,5 +81,8 @@
     <None Include="Resources\mod.ini" />
     <None Include="Resources\TimeWarp.template.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Amy.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

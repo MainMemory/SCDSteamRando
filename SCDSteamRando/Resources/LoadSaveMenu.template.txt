@@ -782,7 +782,7 @@ sub ObjectMain
 			ArrayPos1++
 			SaveRAM[ArrayPos1]=0
 			ArrayPos1++
-			SaveRAM[ArrayPos1]=1
+			//REPLACE1
 			ArrayPos1++
 			SaveRAM[ArrayPos1]=0
 			ArrayPos1++
@@ -810,7 +810,7 @@ sub ObjectMain
 			LampPost.Check=0
 			Stage.ActiveList=REGULAR_STAGE
 			ArrayPos0=Object.Value1
-//REPLACE
+			//REPLACE2
 			Stage.PlayerListPos=Object[+ArrayPos0].Value3
 			LoadStage()
 			if Stage.PlayerListPos==0
