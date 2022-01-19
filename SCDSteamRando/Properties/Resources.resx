@@ -124,13 +124,28 @@
   <data name="Amy" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Amy.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
+  <data name="FuturePost_template" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FuturePost.template.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="GoalPost" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\GoalPost.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
   <data name="LoadSaveMenu_template" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\LoadSaveMenu.template.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
   <data name="mod_ini" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\mod.ini;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
+  <data name="PastPost" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\PastPost.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="SpecialRing_template" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\SpecialRing.template.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
   <data name="TimeWarp_template" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\TimeWarp.template.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="Water_template" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Water.template.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
 </root>

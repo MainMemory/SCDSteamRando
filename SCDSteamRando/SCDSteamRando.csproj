@@ -35,7 +35,13 @@
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>SonicCD.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="RSDKv3">
+      <HintPath>..\RSDKv3.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -69,6 +75,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -83,6 +90,22 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Amy.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\SpecialRing.template.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\FuturePost.template.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\GoalPost.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PastPost.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Water.template.txt" />
+    <Content Include="SonicCD.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

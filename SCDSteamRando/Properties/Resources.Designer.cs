@@ -70,6 +70,7 @@ namespace SCDSteamRando.Properties {
         ///
         ///// Function declarations
         ///#function ActFinish_NextStage
+        ///#function ActFinish_LoadEnding
         ///
         ///function ActFinish_NextStage
         ///	switch Stage.ListPos
@@ -77,15 +78,10 @@ namespace SCDSteamRando.Properties {
         ///	endswitch
         ///endfunction
         ///
-        ///
-        ///sub ObjectMain
-        ///	switch Object.State
-        ///	case 0
-        ///		Object.XPos=-799
-        ///		Object.Value1=1168
-        ///		Object.Value2=1255
-        ///		Object.Value3=1319
-        ///		Obje [rest of string was truncated]&quot;;.
+        ///function ActFinish_LoadEnding
+        ///	if Options.GameMode==2
+        ///		TimeAttack.Result=Stage.Seconds
+        ///		TimeAttack.R [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ActFinish_template {
             get {
@@ -118,6 +114,60 @@ namespace SCDSteamRando.Properties {
         internal static string Amy {
             get {
                 return ResourceManager.GetString("Amy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to //------------Sonic CD FuturePost Script-------------//
+        /////--------Scripted by Christian Whitehead &apos;The Taxman&apos;--------//
+        /////-------Unpacked By Rubberduckycooly&apos;s Script Unpacker-------//
+        ///
+        /////-------Aliases-------//
+        ///#alias 16: TYPE_FUTUREPOST
+        ///
+        ///#function FuturePost_CheckLevel
+        ///
+        ///function FuturePost_CheckLevel
+        ///	TempValue0=0
+        ///	switch Stage.ListPos
+        /////REPLACE
+        ///		TempValue0=1
+        ///	endswitch
+        ///endfunction
+        ///
+        ///sub ObjectPlayerInteraction
+        ///	if Object.State==0
+        ///		if Player.CollisionPlane==Object.Value1
+        ///			PlayerObj [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string FuturePost_template {
+            get {
+                return ResourceManager.GetString("FuturePost_template", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to //------------Sonic CD Goal Post Script-------------//
+        /////--------Scripted by Christian Whitehead &apos;The Taxman&apos;--------//
+        /////-------Unpacked By Rubberduckycooly&apos;s Script Unpacker-------//
+        ///
+        /////-------Aliases-------//
+        ///#alias 19: TYPE_GOALPOST
+        ///
+        ///sub ObjectMain
+        ///	if Object.State==0
+        ///		TempValue0=Object.YPos
+        ///		TempValue0+=6291456
+        ///		if Player.YPos&lt;TempValue0
+        ///			if Player.XPos&gt;Object.XPos
+        ///				Stage.NewXBoundary1=Object.XPos
+        ///				Stage.NewXBoundary1&gt;&gt;=16
+        ///				Stage.NewXBoundary1-=160
+        ///				CallFunction(FutureP [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string GoalPost {
+            get {
+                return ResourceManager.GetString("GoalPost", resourceCulture);
             }
         }
         
@@ -160,6 +210,56 @@ namespace SCDSteamRando.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to //------------Sonic CD PastPost Script-------------//
+        /////--------Scripted by Christian Whitehead &apos;The Taxman&apos;--------//
+        /////-------Unpacked By Rubberduckycooly&apos;s Script Unpacker-------//
+        ///
+        /////-------Aliases-------//
+        ///#alias 17: TYPE_PASTPOST
+        ///
+        ///
+        ///sub ObjectPlayerInteraction
+        ///	if Object.State==0
+        ///		if Player.CollisionPlane==Object.Value1
+        ///			PlayerObjectCollision(C_TOUCH,-8,-24,8,32)
+        ///			if CheckResult==1
+        ///				Warp.Destination=1
+        ///				Object.State=1
+        ///				Object.Priority=1
+        ///				Object.Frame=1
+        ///				PlaySfx(13,0) [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string PastPost {
+            get {
+                return ResourceManager.GetString("PastPost", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to //------------Sonic CD Special Ring Script-------------//
+        /////--------Scripted by Christian Whitehead &apos;The Taxman&apos;--------//
+        /////-------Unpacked By Rubberduckycooly&apos;s Script Unpacker-------//
+        ///
+        /////-------Aliases-------//
+        ///#alias 20: TYPE_SPECIALRING
+        ///#alias Player.Value0:Player.Rings
+        ///
+        ///sub ObjectMain
+        ///	if Object.State==0
+        ///		if Player.Rings&gt;49
+        ///			PlayerObjectCollision(C_TOUCH,-16,-16,16,16)
+        ///			if CheckResult==1
+        ///				Object[0].Type=TypeName[BlankObject]
+        ///				Object[1].Type=TypeName[BlankObject]
+        ///				Player.C [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string SpecialRing_template {
+            get {
+                return ResourceManager.GetString("SpecialRing_template", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to //------------Sonic CD TimeWarp Script-------------//
         /////--------Scripted by Christian Whitehead &apos;The Taxman&apos;--------//
         /////-------Unpacked By Rubberduckycooly&apos;s Script Unpacker-------//
@@ -183,6 +283,34 @@ namespace SCDSteamRando.Properties {
         internal static string TimeWarp_template {
             get {
                 return ResourceManager.GetString("TimeWarp_template", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to //------------Sonic CD Water Script-------------//
+        /////--------Scripted by Christian Whitehead &apos;The Taxman&apos;--------//
+        /////-------Unpacked By Rubberduckycooly&apos;s Script Unpacker-------//
+        ///
+        /////-------Aliases-------//
+        ///#alias 36: TYPE_WATER
+        ///
+        ///// Function declarations
+        ///#function Water_CreateAirBubble
+        ///#function Water_CreateCountBubble
+        ///#function Water_Function49
+        ///#function Water_Function50
+        ///
+        ///function Water_CreateAirBubble
+        ///	if Object.Value1&gt;0
+        ///		Object.Value1--
+        ///		if Object.Value2&gt;0
+        ///			Object.Value2--
+        ///		else
+        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Water_template {
+            get {
+                return ResourceManager.GetString("Water_template", resourceCulture);
             }
         }
     }

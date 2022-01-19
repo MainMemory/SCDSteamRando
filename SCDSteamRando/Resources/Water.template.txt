@@ -1,0 +1,465 @@
+//------------Sonic CD Water Script-------------//
+//--------Scripted by Christian Whitehead 'The Taxman'--------//
+//-------Unpacked By Rubberduckycooly's Script Unpacker-------//
+
+//-------Aliases-------//
+#alias 36: TYPE_WATER
+
+// Function declarations
+#function Water_CreateAirBubble
+#function Water_CreateCountBubble
+#function Water_Function49
+#function Water_Function50
+
+function Water_CreateAirBubble
+	if Object.Value1>0
+		Object.Value1--
+		if Object.Value2>0
+			Object.Value2--
+		else
+			CreateTempObject(TypeName[AirBubble],2,Player.XPos,Player.YPos)
+			Object[TempObjectPos].DrawOrder=4
+			Object[TempObjectPos].Value3=-34816
+			if Player.Direction==FACING_RIGHT
+				Object[TempObjectPos].XPos+=393216
+			else
+				Object[TempObjectPos].XPos-=393216
+				Object[TempObjectPos].Value1=256
+			endif
+			Object[TempObjectPos].Value2=Object[TempObjectPos].XPos
+			Object.Value2=512
+		endif
+	else
+		Rand(TempValue0,3)
+		if TempValue0==1
+			Rand(Object.Value2,16)
+			Object.Value2+=8
+		else
+			Object.Value2=512
+		endif
+		Object.Value1=60
+		CreateTempObject(TypeName[AirBubble],2,Player.XPos,Player.YPos)
+		Object[TempObjectPos].DrawOrder=4
+		Object[TempObjectPos].Value3=-34816
+		if Player.Direction==FACING_RIGHT
+			Object[TempObjectPos].XPos+=393216
+		else
+			Object[TempObjectPos].XPos-=393216
+			Object[TempObjectPos].Value1=256
+		endif
+		Object[TempObjectPos].Value2=Object[TempObjectPos].XPos
+	endif
+endfunction
+
+
+function Water_CreateCountBubble
+	CreateTempObject(TypeName[CountdownBubble],TempValue0,Player.XPos,Player.YPos)
+	Object[TempObjectPos].DrawOrder=4
+	Object[TempObjectPos].Value3=-34816
+	if Player.Direction==FACING_RIGHT
+		Object[TempObjectPos].XPos+=393216
+	else
+		Object[TempObjectPos].XPos-=393216
+		Object[TempObjectPos].Value1=256
+	endif
+	Object[TempObjectPos].Value2=Object[TempObjectPos].XPos
+endfunction
+
+
+function Water_Function49
+	Stage[ArrayPos0].DeformationData1=1
+	ArrayPos0++
+	Stage[ArrayPos0].DeformationData1=1
+	ArrayPos0++
+	Stage[ArrayPos0].DeformationData1=2
+	ArrayPos0++
+	Stage[ArrayPos0].DeformationData1=2
+	ArrayPos0++
+	Stage[ArrayPos0].DeformationData1=3
+	ArrayPos0++
+	Stage[ArrayPos0].DeformationData1=3
+	ArrayPos0++
+	Stage[ArrayPos0].DeformationData1=3
+	ArrayPos0++
+	Stage[ArrayPos0].DeformationData1=3
+	ArrayPos0++
+	Stage[ArrayPos0].DeformationData1=2
+	ArrayPos0++
+	Stage[ArrayPos0].DeformationData1=2
+	ArrayPos0++
+	Stage[ArrayPos0].DeformationData1=1
+	ArrayPos0++
+	Stage[ArrayPos0].DeformationData1=1
+	ArrayPos0++
+endfunction
+
+
+function Water_Function50
+	Stage[ArrayPos0].DeformationData1=-1
+	ArrayPos0++
+	Stage[ArrayPos0].DeformationData1=-1
+	ArrayPos0++
+	Stage[ArrayPos0].DeformationData1=-2
+	ArrayPos0++
+	Stage[ArrayPos0].DeformationData1=-2
+	ArrayPos0++
+	Stage[ArrayPos0].DeformationData1=-3
+	ArrayPos0++
+	Stage[ArrayPos0].DeformationData1=-3
+	ArrayPos0++
+	Stage[ArrayPos0].DeformationData1=-3
+	ArrayPos0++
+	Stage[ArrayPos0].DeformationData1=-3
+	ArrayPos0++
+	Stage[ArrayPos0].DeformationData1=-2
+	ArrayPos0++
+	Stage[ArrayPos0].DeformationData1=-2
+	ArrayPos0++
+	Stage[ArrayPos0].DeformationData1=-1
+	ArrayPos0++
+	Stage[ArrayPos0].DeformationData1=-1
+	ArrayPos0++
+endfunction
+
+
+sub ObjectMain
+	Player.WaterStream=0
+	if Object.YPos<Stage.NewWaterLevel
+		Object.YPos+=65536
+	endif
+	if Object.YPos>Stage.NewWaterLevel
+		Object.YPos-=65536
+	endif
+	TempValue0=Oscillation
+	TempValue0<<=2
+	Sin(Stage.WaterLevel,TempValue0)
+	Stage.WaterLevel<<=9
+	Stage.WaterLevel+=Object.YPos
+	if Player.GravityStrength==14336
+		if Player.YPos>Object.YPos
+			if Player.State!=PlayerObject_Death
+				Player.YVelocity>>=2
+				if Object.YPos<Stage.NewWaterLevel
+					Player.YVelocity+=65536
+				endif
+				if Player.State==PlayerObject_HandleTailsFlight
+					StopSfx(24)
+					StopSfx(25)
+				endif
+				Player.XVelocity>>=1
+				Player.Speed>>=1
+				Player.TopSpeed>>=1
+				Player.Acceleration>>=1
+				Player.Deceleration>>=1
+				Player.AirAcceleration>>=1
+				Player.AirDeceleration>>=1
+				Player.GravityStrength=4096
+				Player.JumpStrength=229376
+				Player.JumpCap=-131072
+				CreateTempObject(TypeName[WaterSplash],0,Player.XPos,Stage.WaterLevel)
+				Object[TempObjectPos].DrawOrder=4
+				PlayStageSfx(Object.Value3,0)
+				Object.Value1=52
+				Player.AirTimer=0
+			endif
+		endif
+	else
+		if Player.AirTimer==0
+			Object.State=0
+		endif
+		switch Object.State
+		case 0
+			CallFunction(Water_CreateAirBubble)
+			Player.AirTimer++
+			if Player.AirTimer==360
+				PlayStageSfx(Object.Value5,0)
+				Object.State++
+			endif
+			break
+		case 1
+			CallFunction(Water_CreateAirBubble)
+			Player.AirTimer++
+			if Player.AirTimer==660
+				PlayStageSfx(Object.Value5,0)
+				Object.State++
+			endif
+			break
+		case 2
+			CallFunction(Water_CreateAirBubble)
+			Player.AirTimer++
+			if Player.AirTimer==960
+				PlayStageSfx(Object.Value5,0)
+				Object.State++
+			endif
+			break
+		case 3
+			CallFunction(Water_CreateAirBubble)
+			Player.AirTimer++
+			if Player.AirTimer==1080
+				TempValue0=0
+				CallFunction(Water_CreateCountBubble)
+				Object.State++
+			endif
+			break
+		case 4
+			Player.AirTimer++
+			if Player.AirTimer==1200
+				TempValue0=1
+				CallFunction(Water_CreateCountBubble)
+				Object.State++
+			endif
+			break
+		case 5
+			CallFunction(Water_CreateAirBubble)
+			Player.AirTimer++
+			if Player.AirTimer==1320
+				TempValue0=2
+				CallFunction(Water_CreateCountBubble)
+				Object.State++
+			endif
+			break
+		case 6
+			CallFunction(Water_CreateAirBubble)
+			TempValue0=Player.AirTimer
+			TempValue0&=63
+			if TempValue0==0
+				PlayStageSfx(Object.Value6,0)
+			endif
+			Player.AirTimer++
+			if Player.AirTimer==1440
+				TempValue0=3
+				CallFunction(Water_CreateCountBubble)
+				Object.State++
+			endif
+			break
+		case 7
+			CallFunction(Water_CreateAirBubble)
+			TempValue0=Player.AirTimer
+			TempValue0&=63
+			if TempValue0==0
+				PlayStageSfx(Object.Value6,0)
+			endif
+			Player.AirTimer++
+			if Player.AirTimer==1560
+				TempValue0=4
+				CallFunction(Water_CreateCountBubble)
+				Object.State++
+			endif
+			break
+		case 8
+			CallFunction(Water_CreateAirBubble)
+			TempValue0=Player.AirTimer
+			TempValue0&=63
+			if TempValue0==0
+				PlayStageSfx(Object.Value6,0)
+			endif
+			Player.AirTimer++
+			if Player.AirTimer==1680
+				TempValue0=5
+				CallFunction(Water_CreateCountBubble)
+				Object.State++
+			endif
+			break
+		case 9
+			CallFunction(Water_CreateAirBubble)
+			Player.AirTimer++
+			if Player.AirTimer==1800
+				if Player.State!=PlayerObject_Death
+					Stage.TimeEnabled=0
+					Screen.CameraEnabled=0
+					Player.State=PlayerObject_Drown
+					Player.Animation=ANI_DROWNING
+					Player.Speed=0
+					Player.XVelocity=0
+					Player.YVelocity=0
+					Player.TileCollisions=0
+					Player.ObjectInteraction=0
+					Player.DrawOrder=5
+					Object.Value1=2
+					Object.Value3=60
+					PlayStageSfx(Object.Value4,0)
+					Object.State++
+				endif
+			endif
+			break
+		case 10
+			Player.AirTimer++
+			if Player.AirTimer==1860
+				Object.State++
+			endif
+			if Object.Value1>0
+				Object.Value1--
+				if Object.Value2>0
+					Object.Value2--
+				else
+					Rand(TempValue1,2)
+					TempValue1+=2
+					CreateTempObject(TypeName[AirBubble],TempValue1,Player.XPos,Player.YPos)
+					Object[TempObjectPos].DrawOrder=5
+					Object[TempObjectPos].Value3=-34816
+					Object[TempObjectPos].YPos-=393216
+					Rand(Object[TempObjectPos].Value1,256)
+					Object[TempObjectPos].Value2=Object[TempObjectPos].XPos
+					Object.Value2=512
+				endif
+			else
+				Rand(TempValue0,4)
+				if TempValue0==1
+					Object.Value2=2
+				else
+					Object.Value2=512
+				endif
+				Object.Value1=6
+				Rand(TempValue1,2)
+				TempValue1+=2
+				CreateTempObject(TypeName[AirBubble],TempValue1,Player.XPos,Player.YPos)
+				Object[TempObjectPos].DrawOrder=5
+				Object[TempObjectPos].Value3=-34816
+				Object[TempObjectPos].YPos-=393216
+				Rand(Object[TempObjectPos].Value1,256)
+				Object[TempObjectPos].Value2=Object[TempObjectPos].XPos
+			endif
+			break
+		endswitch
+		if Player.YPos<Object.YPos
+			if Player.State!=PlayerObject_Death
+				Player.YVelocity<<=1
+				if Player.YVelocity<-1048576
+					Player.YVelocity=-1048576
+				endif
+				if Player.State==PlayerObject_HandleTailsFlight
+					if Player.Timer<480
+						PlaySfx(24,1)
+					else
+						PlaySfx(25,1)
+					endif
+				endif
+				Player.TopSpeed=393216
+				Player.Acceleration=3072
+				Player.Deceleration=3072
+				Player.AirAcceleration=6144
+				Player.AirDeceleration=1536
+				Player.GravityStrength=14336
+				Player.JumpStrength=425984
+				Player.JumpCap=-262144
+				CreateTempObject(TypeName[WaterSplash],0,Player.XPos,Stage.WaterLevel)
+				Object[TempObjectPos].DrawOrder=4
+				PlayStageSfx(Object.Value3,0)
+				Player.AirTimer=0
+			endif
+		endif
+	endif
+	Stage.WaterLevel>>=16
+endsub
+
+
+sub ObjectDraw
+	Object.Value0++
+	if Object.Value0>23
+		Object.Value0=0
+		Object.Frame++
+		Object.Frame&=3
+	endif
+	TempValue0=Screen.XOffset
+	Sin(TempValue1,Oscillation)
+	TempValue1>>=5
+	TempValue0+=TempValue1
+	TempValue0&=63
+	FlipSign(TempValue0)
+	TempValue1=Stage.WaterLevel
+	TempValue1-=Screen.YOffset
+	DrawSpriteScreenFX(Object.Frame,FX_INK,TempValue0,TempValue1)
+	TempValue0+=128
+	DrawSpriteScreenFX(Object.Frame,FX_INK,TempValue0,TempValue1)
+	TempValue0+=128
+	DrawSpriteScreenFX(Object.Frame,FX_INK,TempValue0,TempValue1)
+	TempValue0+=128
+	DrawSpriteScreenFX(Object.Frame,FX_INK,TempValue0,TempValue1)
+	Object.Value7++
+	if Object.Value7>1
+		TileLayer[0].DeformationOffsetW++
+		TileLayer[1].DeformationOffsetW++
+		TileLayer[2].DeformationOffsetW++
+		Object.Value7=0
+	endif
+	TempValue0=Stage.WaterLevel
+	TempValue0-=Screen.YOffset
+	if TempValue0<0
+		TempValue0=0
+	endif
+	if TempValue0>Screen.YSize
+		TempValue0=Screen.YSize
+	endif
+	switch Object[24].PropertyValue
+	case 0
+		DrawRect(0,TempValue0,Screen.XSize,Screen.YSize,0,96,48,128)
+		break
+	case 1
+		DrawRect(0,TempValue0,Screen.XSize,Screen.YSize,8,0,8,96)
+		break
+	case 2
+		DrawRect(0,TempValue0,Screen.XSize,Screen.YSize,0,160,48,104)
+		break
+	case 3
+		DrawRect(0,TempValue0,Screen.XSize,Screen.YSize,32,0,64,104)
+		break
+	endswitch
+endsub
+
+
+sub ObjectStartup
+	LoadSpriteSheet("R4/Objects.gif")
+	Player.AirTimer=0
+	ArrayPos0=32
+	while ArrayPos0<1056
+		if Object[ArrayPos0].Type==TypeName[Water]
+			Object[ArrayPos0].Priority=1
+			Object[ArrayPos0].DrawOrder=5
+			Object[ArrayPos0].InkEffect=2
+			Object[ArrayPos0].Alpha=160
+			switch Stage.ListPos
+//REPLACE
+			endswitch
+			Stage.NewWaterLevel=Object[ArrayPos0].YPos
+			if Player.YPos>Stage.NewWaterLevel
+				Player.YVelocity>>=2
+				Player.XVelocity>>=1
+				Player.Speed>>=1
+				Player.TopSpeed>>=1
+				Player.Acceleration>>=1
+				Player.Deceleration>>=1
+				Player.AirAcceleration>>=1
+				Player.AirDeceleration>>=1
+				Player.GravityStrength=4096
+				Player.JumpStrength=229376
+				Object.Value1=52
+			endif
+		endif
+		ArrayPos0++
+	loop
+	SpriteFrame(0,-8,128,16,1,1)
+	SpriteFrame(0,-8,128,16,1,18)
+	SpriteFrame(0,-8,128,16,1,35)
+	SpriteFrame(0,-8,128,16,1,52)
+#platform: SW_Rendering
+	ArrayPos0=0
+	CallFunction(Water_Function49)
+	ArrayPos0=128
+	CallFunction(Water_Function49)
+	ArrayPos0=160
+	CallFunction(Water_Function50)
+	ArrayPos0=256
+	while ArrayPos0<576
+		ArrayPos1=ArrayPos0
+		ArrayPos1-=256
+		Stage[ArrayPos0].DeformationData1=Stage[ArrayPos1].DeformationData1
+		ArrayPos0++
+	loop
+#endplatform
+	SetLayerDeformation(3,128,4,0,0,0)
+endsub
+
+sub RSDK
+	LoadSpriteSheet("Global/Display.gif")
+	SetEditorIcon(Icon0,SingleIcon,-16,-16,32,32,1,143)
+endsub

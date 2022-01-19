@@ -334,6 +334,7 @@ sub ObjectMain
 					CallFunction(ActFinish_LoadEnding)
 				else
 					Stage.ListPos=TempValue0
+//SPECIAL
 					if Options.GameMode==1
 						ArrayPos1=Options.SaveSlot
 						ArrayPos1<<=3

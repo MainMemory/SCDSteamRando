@@ -25,12 +25,14 @@ namespace SCDSteamRando
 				MessageBox.Show(this, "Decompiled scripts not found. You must have the scripts installed for randomized music to work.\n\nIf you want to have randomized music, please download the scripts and place them in the \"Scripts\" folder.", "Scripts Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 				randomMusic.Enabled = false;
 				separateSoundtracks.Enabled = false;
+				randomUFOs.Enabled = false;
+				ufoDifficulty.Enabled = false;
 			}
 			settings = Settings.Load();
 			seedSelector.Value = settings.Seed;
 			randomSeed.Checked = settings.RandomSeed;
-			modeSelector.SelectedIndex = settings.Mode;
-			mainPathSelector.SelectedIndex = settings.MainPath;
+			modeSelector.SelectedIndex = (int)settings.Mode;
+			mainPathSelector.SelectedIndex = (int)settings.MainPath;
 			maxBackJump.Value = settings.MaxBackJump;
 			maxForwJump.Value = settings.MaxForwJump;
 			backJumpProb.Value = settings.BackJumpProb;
@@ -38,20 +40,37 @@ namespace SCDSteamRando
 			if (randomMusic.Enabled)
 				randomMusic.Checked = settings.RandomMusic;
 			separateSoundtracks.Checked = settings.SeparateSoundtracks;
+			randomItemMode.SelectedIndex = (int)settings.RandomItems;
+			randomTimePosts.Checked = settings.RandomTimePosts;
+			replaceCheckpoints.Checked = settings.ReplaceCheckpoints;
+			randomPalettes.Checked = settings.RandomPalettes;
+			if (randomUFOs.Enabled)
+				randomUFOs.Checked = settings.RandomUFOs;
+			ufoDifficulty.SelectedIndex = (int)settings.UFODifficulty;
+			randomWater.Checked = settings.RandomWater;
+			addWaterOnly.Checked = settings.AddWaterOnly;
 		}
 
 		private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
 		{
 			settings.Seed = (int)seedSelector.Value;
 			settings.RandomSeed = randomSeed.Checked;
-			settings.Mode = modeSelector.SelectedIndex;
-			settings.MainPath = mainPathSelector.SelectedIndex;
+			settings.Mode = (Modes)modeSelector.SelectedIndex;
+			settings.MainPath = (MainPath)mainPathSelector.SelectedIndex;
 			settings.MaxBackJump = (int)maxBackJump.Value;
 			settings.MaxForwJump = (int)maxForwJump.Value;
 			settings.BackJumpProb = (int)backJumpProb.Value;
 			settings.AllowSameLevel = allowSameLevel.Checked;
 			settings.RandomMusic = randomMusic.Checked;
 			settings.SeparateSoundtracks = separateSoundtracks.Checked;
+			settings.RandomItems = (ItemMode)randomItemMode.SelectedIndex;
+			settings.RandomTimePosts = randomTimePosts.Checked;
+			settings.ReplaceCheckpoints = replaceCheckpoints.Checked;
+			settings.RandomPalettes = randomPalettes.Checked;
+			settings.RandomUFOs = randomUFOs.Checked;
+			settings.UFODifficulty = (UFODifficulty)ufoDifficulty.SelectedIndex;
+			settings.RandomWater = randomWater.Checked;
+			settings.AddWaterOnly = addWaterOnly.Checked;
 			settings.Save();
 		}
 
@@ -118,6 +137,7 @@ namespace SCDSteamRando
 		};
 
 		static readonly Regex musregex = new Regex(@"SetMusicTrack\((.+),([0-9]+),([0-9]+)\)", RegexOptions.Compiled);
+		static readonly Regex ssboundregex = new Regex(@"Stage\.([XY]Boundary[12])=([0-9]+)", RegexOptions.Compiled);
 		readonly int[] stageids = new int[stagecount + 1];
 		readonly Stage[] stages = new Stage[stagecount];
 		private void randomizeButton_Click(object sender, EventArgs e)
@@ -132,8 +152,43 @@ namespace SCDSteamRando
 				seed = (int)seedSelector.Value;
 			string path = Directory.CreateDirectory(@"mods\Rando").FullName;
 			File.WriteAllText(Path.Combine(path, "mod.ini"), Properties.Resources.mod_ini);
-			if (Directory.Exists(Path.Combine(path, "Data\\Scripts")))
-				Directory.Delete(Path.Combine(path, "Data\\Scripts"), true);
+			if (Directory.Exists(Path.Combine(path, "Data")))
+				Directory.Delete(Path.Combine(path, "Data"), true);
+			VirtualDirectory vdir = new VirtualDirectory("Data");
+			if (Directory.Exists("Scripts"))
+				vdir.AddDirectory("Scripts").ScanDirectory("Scripts");
+			RSDKv3.DataFile dataFile = null;
+			if (File.Exists("Data.rsdk"))
+			{
+				dataFile = new RSDKv3.DataFile("Data.rsdk");
+				foreach (var item in dataFile.files)
+					vdir.AddFile(item.fullFilename.Substring(item.fullFilename.IndexOf('/') + 1), "Data.rsdk");
+			}
+			else if (Directory.Exists("Data"))
+				vdir.ScanDirectory("Data");
+			string[] mods = null;
+			if (File.Exists(@"mods\SCDSteamModLoader.ini"))
+			{
+				ModLoaderInfo info = IniSerializer.Deserialize<ModLoaderInfo>(@"mods\SCDSteamModLoader.ini");
+				if (info.Mods != null)
+					mods = info.Mods.Select(a => Path.Combine(Directory.GetCurrentDirectory(), "mods", a, "Data")).Where(a => Directory.Exists(a)).ToArray();
+			}
+			else if (File.Exists(@"mods\modconfig.ini"))
+			{
+				DecompModInfo info = IniSerializer.Deserialize<DecompModInfo>(@"mods\modconfig.ini");
+				if (info.Mods?.Mods != null)
+					mods = info.Mods.Mods.Where(a => a.Value).Select(a => Path.Combine(Directory.GetCurrentDirectory(), "mods", a.Key, "Data")).Where(a => Directory.Exists(a)).ToArray();
+			}
+			if (mods != null)
+				foreach (string mod in mods)
+					vdir.ScanDirectory(mod);
+			VirtualFile vfile = vdir.GetFile("Game/GameConfig.bin");
+			RSDKv3.GameConfig gc;
+			if (vfile.SourcePath == "Data.rsdk")
+				using (MemoryStream ms = new MemoryStream(dataFile.files.Single(a => a.fullFilename == vfile.FullName).fileData))
+					gc = new RSDKv3.GameConfig(ms);
+			else
+				gc = new RSDKv3.GameConfig(vfile.SourcePath);
 			Directory.CreateDirectory(Path.Combine(path, @"Data\Scripts\Menu"));
 			Directory.CreateDirectory(Path.Combine(path, @"Data\Scripts\Global"));
 			Directory.CreateDirectory(Path.Combine(path, @"Data\Scripts\R8"));
@@ -141,127 +196,153 @@ namespace SCDSteamRando
 			for (int i = 0; i < stagecount; i++)
 			{
 				stageids[i] = i;
-				stages[i] = new Stage();
+				stages[i] = new Stage(i);
 			}
 			stageids[stagecount] = stagecount;
-			settings.Mode = modeSelector.SelectedIndex;
-			bool timewarp = true;
-			switch (modeSelector.SelectedIndex)
+			settings.Mode = (Modes)modeSelector.SelectedIndex;
+			if (randomTimePosts.Checked || replaceCheckpoints.Checked)
 			{
-				case 0: // stages + warps
+				int lamppostid = gc.objects.FindIndex(a => a.name == "LampPost") + 1;
+				int pastpostid = gc.objects.FindIndex(a => a.name == "Past Post") + 1;
+				int futurepostid = gc.objects.FindIndex(a => a.name == "Future Post") + 1;
+				var regstg = gc.stageLists[1].list;
+				bool allstg = false;
+				if (randomTimePosts.Checked)
+					switch (settings.Mode)
 					{
-						int[] order = new int[stagecount];
-						for (int i = 0; i < stagecount; i++)
-							order[i] = r.Next();
-						Array.Sort(order, stageids);
-						switch (mainPathSelector.SelectedIndex)
+						case Modes.AllStagesWarps:
+						case Modes.BranchingPaths:
+						case Modes.Segments:
+						case Modes.Wild:
+							allstg = true;
+							break;
+					}
+				for (int i = 0; i < stagecount; i++)
+				{
+					if (i % 10 > 7) continue;
+					vfile = vdir.GetFile($"Stages/{regstg[i].folder}/Act{regstg[i].id}.bin");
+					RSDKv3.Scene scn;
+					if (vfile.SourcePath == "Data.rsdk")
+						using (MemoryStream ms = new MemoryStream(dataFile.files.Single(a => a.fullFilename == vfile.FullName).fileData))
+							scn = new RSDKv3.Scene(ms);
+					else
+						scn = new RSDKv3.Scene(vfile.SourcePath);
+					bool haspast = scn.entities.Any(a => a.type == pastpostid);
+					bool hasfuture = scn.entities.Any(a => a.type == futurepostid);
+					if ((haspast && hasfuture) || allstg)
+					{
+						var posts = scn.entities.Where(a => a.type == pastpostid || a.type == futurepostid).ToList();
+						if (replaceCheckpoints.Checked)
+							posts.AddRange(scn.entities.Where(a => a.type == lamppostid));
+						if (posts.Count > 1 || allstg)
 						{
-							case 0: // Act Clear
+							haspast = false;
+							hasfuture = false;
+							foreach (var item in posts)
+							{
+								if (item.type == lamppostid)
+									item.propertyValue = 0;
+								item.type = (byte)(r.Next(2) == 0 ? pastpostid : futurepostid);
+								if (item.type == pastpostid)
+									haspast = true;
+								else
+									hasfuture = true;
+							}
+							if (!allstg)
+							{
+								if (!haspast)
+								{
+									posts[r.Next(posts.Count)].type = (byte)pastpostid;
+									haspast = true;
+								}
+								if (!hasfuture)
+								{
+									posts[r.Next(posts.Count)].type = (byte)futurepostid;
+									hasfuture = true;
+								}
+							}
+							stages[i].HasPastPost = haspast;
+							stages[i].HasFuturePost = hasfuture;
+							vfile.SourcePath = Path.Combine(path, vfile.FullName);
+							Directory.CreateDirectory(Path.GetDirectoryName(vfile.SourcePath));
+							scn.write(vfile.SourcePath);
+						}
+					}
+				}
+			}
+			bool timewarp = true;
+			switch (settings.Mode)
+			{
+				case Modes.AllStagesWarps:
+					{
+						Shuffle(r, stageids, stagecount);
+						switch ((MainPath)mainPathSelector.SelectedIndex)
+						{
+							case MainPath.ActClear:
+								for (int i = 0; i < stagecount; i++)
+									stages[stageids[i]].Clear = stageids[i + 1];
+								break;
+							case MainPath.TimeTravel:
 								for (int i = 0; i < stagecount; i++)
 								{
-									int next;
-									if (i == stagecount - 1)
-										next = stagecount;
+									int next = stageids[i + 1];
+									if (stages[stageids[i]].HasPastPost && stages[stageids[i]].HasFuturePost)
+										switch (r.Next(2))
+										{
+											case 0:
+												stages[stageids[i]].Past = next;
+												break;
+											case 1:
+												stages[stageids[i]].Future = next;
+												break;
+										}
+									else if (stages[stageids[i]].HasPastPost)
+										stages[stageids[i]].Past = next;
+									else if (stages[stageids[i]].HasFuturePost)
+										stages[stageids[i]].Future = next;
 									else
-										next = stageids[i + 1];
-									stages[stageids[i]].Clear = next;
+										stages[stageids[i]].Clear = next;
 								}
 								break;
-							case 1: // Time Travel
+							case MainPath.AnyExit:
 								for (int i = 0; i < stagecount; i++)
 								{
-									int next;
-									if (i == stagecount - 1)
-										next = stagecount;
+									int next = stageids[i + 1];
+									if (stages[stageids[i]].HasPastPost && stages[stageids[i]].HasFuturePost)
+										switch (r.Next(3))
+										{
+											case 0:
+												stages[stageids[i]].Clear = next;
+												break;
+											case 1:
+												stages[stageids[i]].Past = next;
+												break;
+											case 2:
+												stages[stageids[i]].Future = next;
+												break;
+										}
+									else if (stages[stageids[i]].HasPastPost)
+										switch (r.Next(2))
+										{
+											case 0:
+												stages[stageids[i]].Clear = next;
+												break;
+											case 1:
+												stages[stageids[i]].Past = next;
+												break;
+										}
+									else if (stages[stageids[i]].HasFuturePost)
+										switch (r.Next(2))
+										{
+											case 0:
+												stages[stageids[i]].Clear = next;
+												break;
+											case 1:
+												stages[stageids[i]].Future = next;
+												break;
+										}
 									else
-										next = stageids[i + 1];
-									switch (stageids[i] % 10)
-									{
-										case 0:
-										case 4:
-											switch (r.Next(2))
-											{
-												case 0:
-													stages[stageids[i]].Past = next;
-													break;
-												case 1:
-													stages[stageids[i]].Future = next;
-													break;
-											}
-											break;
-										case 1:
-										case 5:
-											stages[stageids[i]].Future = next;
-											break;
-										case 2:
-										case 3:
-										case 6:
-										case 7:
-											stages[stageids[i]].Past = next;
-											break;
-										case 8:
-										case 9:
-											stages[stageids[i]].Clear = next;
-											break;
-									}
-								}
-								break;
-							case 2: // Any Exit
-								for (int i = 0; i < stagecount; i++)
-								{
-									int next;
-									if (i == stagecount - 1)
-										next = stagecount;
-									else
-										next = stageids[i + 1];
-									switch (stageids[i] % 10)
-									{
-										case 0:
-										case 4:
-											switch (r.Next(3))
-											{
-												case 0:
-													stages[stageids[i]].Clear = next;
-													break;
-												case 1:
-													stages[stageids[i]].Past = next;
-													break;
-												case 2:
-													stages[stageids[i]].Future = next;
-													break;
-											}
-											break;
-										case 1:
-										case 5:
-											switch (r.Next(2))
-											{
-												case 0:
-													stages[stageids[i]].Clear = next;
-													break;
-												case 1:
-													stages[stageids[i]].Future = next;
-													break;
-											}
-											break;
-										case 2:
-										case 3:
-										case 6:
-										case 7:
-											switch (r.Next(2))
-											{
-												case 0:
-													stages[stageids[i]].Clear = next;
-													break;
-												case 1:
-													stages[stageids[i]].Past = next;
-													break;
-											}
-											break;
-										case 8:
-										case 9:
-											stages[stageids[i]].Clear = next;
-											break;
-									}
+										stages[stageids[i]].Clear = next;
 								}
 								break;
 						}
@@ -269,44 +350,52 @@ namespace SCDSteamRando
 						{
 							Stage stg = stages[stageids[i]];
 							int min, max;
-							if (r.Next(100) < backJumpProb.Value && (i > 0 || backJumpProb.Value == 100))
-							{
-								min = Math.Max(i - (int)maxBackJump.Value, 0);
-								max = Math.Max(i - (int)maxBackJump.Minimum + 1, 0);
-							}
-							else
-							{
-								min = i + (int)maxForwJump.Minimum;
-								max = Math.Min(i + (int)maxForwJump.Value + 1, stagecount + 1);
-							}
 							if (stg.Clear == -1)
-								stg.Clear = stageids[r.Next(min, max)];
-							switch (stageids[i] % 10)
 							{
-								case 0:
-								case 4:
-									if (stg.Past == -1)
-										stg.Past = stageids[r.Next(min, max)];
-									if (stg.Future == -1)
-										stg.Future = stageids[r.Next(min, max)];
-									break;
-								case 1:
-								case 5:
-									if (stg.Future == -1)
-										stg.Future = stageids[r.Next(min, max)];
-									break;
-								case 2:
-								case 3:
-								case 6:
-								case 7:
-									if (stg.Past == -1)
-										stg.Past = stageids[r.Next(min, max)];
-									break;
+								if (r.Next(100) < backJumpProb.Value && (i > 0 || backJumpProb.Value == 100))
+								{
+									min = Math.Max(i - (int)maxBackJump.Value, 0);
+									max = Math.Max(i - (int)maxBackJump.Minimum + 1, 0);
+								}
+								else
+								{
+									min = i + (int)maxForwJump.Minimum;
+									max = Math.Min(i + (int)maxForwJump.Value + 1, stagecount + 1);
+								}
+								stg.Clear = stageids[r.Next(min, max)];
+							}
+							if (stg.HasPastPost && stg.Past == -1)
+							{
+								if (r.Next(100) < backJumpProb.Value && (i > 0 || backJumpProb.Value == 100))
+								{
+									min = Math.Max(i - (int)maxBackJump.Value, 0);
+									max = Math.Max(i - (int)maxBackJump.Minimum + 1, 0);
+								}
+								else
+								{
+									min = i + (int)maxForwJump.Minimum;
+									max = Math.Min(i + (int)maxForwJump.Value + 1, stagecount + 1);
+								}
+								stg.Past = stageids[r.Next(min, max)];
+							}
+							if (stg.HasFuturePost && stg.Future == -1)
+							{
+								if (r.Next(100) < backJumpProb.Value && (i > 0 || backJumpProb.Value == 100))
+								{
+									min = Math.Max(i - (int)maxBackJump.Value, 0);
+									max = Math.Max(i - (int)maxBackJump.Minimum + 1, 0);
+								}
+								else
+								{
+									min = i + (int)maxForwJump.Minimum;
+									max = Math.Min(i + (int)maxForwJump.Value + 1, stagecount + 1);
+								}
+								stg.Future = stageids[r.Next(min, max)];
 							}
 						}
 					}
 					break;
-				case 1: // rounds
+				case Modes.Rounds:
 					{
 						for (int i = 0; i < stagecount; i++)
 						{
@@ -355,13 +444,7 @@ namespace SCDSteamRando
 							}
 						}
 						int[] rounds = new int[8];
-						int[] order = new int[7];
-						for (int i = 0; i < 7; i++)
-						{
-							rounds[i] = i;
-							order[i] = r.Next();
-						}
-						Array.Sort(order, rounds);
+						Shuffle(r, rounds, 7);
 						rounds[7] = 7;
 						for (int i = 0; i < 7; i++)
 						{
@@ -373,32 +456,29 @@ namespace SCDSteamRando
 						timewarp = false;
 					}
 					break;
-				case 2: // acts
+				case Modes.Acts:
 					{
 						for (int i = 0; i < stagecount; i++)
 						{
 							Stage stg = stages[i];
-							switch (i % 10)
-							{
-								case 0:
-								case 4:
-									stg.Past = i + 1;
-									stg.Future = i + 3;
-									stg.GoodFuture = i + 2;
-									break;
-								case 1:
-								case 5:
-									stg.Future = i - 1;
-									break;
-								case 2:
-								case 6:
-									stg.Past = i - 2;
-									break;
-								case 3:
-								case 7:
-									stg.Past = i - 3;
-									break;
-							}
+							if (stg.Act < 2)
+								switch (stg.TimePeriod)
+								{
+									case TimePeriods.Present:
+										stg.Past = i + 1;
+										stg.Future = i + 3;
+										stg.GoodFuture = i + 2;
+										break;
+									case TimePeriods.Past:
+										stg.Future = i - 1;
+										break;
+									case TimePeriods.GoodFuture:
+										stg.Past = i - 2;
+										break;
+									case TimePeriods.BadFuture:
+										stg.Past = i - 3;
+										break;
+								}
 						}
 						int[] rounds = new int[7];
 						int[] order = new int[7];
@@ -470,7 +550,7 @@ namespace SCDSteamRando
 						timewarp = false;
 					}
 					break;
-				case 3: // time periods
+				case Modes.TimePeriods:
 					{
 						int[] rounds = new int[7];
 						for (int i = 0; i < 7; i++)
@@ -540,7 +620,7 @@ namespace SCDSteamRando
 						stages[stageids[stagecount - 1]].Clear = stagecount;
 					}
 					break;
-				case 4: // branching paths
+				case Modes.BranchingPaths:
 					{
 						List<int> stagepool = new List<int>(stageids.Take(stagecount));
 						List<int> curset = new List<int>() { r.Next(stagecount) };
@@ -555,31 +635,17 @@ namespace SCDSteamRando
 								stg.Clear = GetStageFromLists(r, newset, stagepool, stagepool.Count / 6);
 								if (!newset.Contains(stg.Clear))
 									newset.Add(stg.Clear);
-								switch (curset[i] % 10)
+								if (stg.HasPastPost)
 								{
-									case 0:
-									case 4:
-										stg.Past = GetStageFromLists(r, newset, stagepool, stagepool.Count / 6);
-										if (!newset.Contains(stg.Past))
-											newset.Add(stg.Past);
-										stg.Future = GetStageFromLists(r, newset, stagepool, stagepool.Count / 6);
-										if (!newset.Contains(stg.Future))
-											newset.Add(stg.Future);
-										break;
-									case 1:
-									case 5:
-										stg.Future = GetStageFromLists(r, newset, stagepool, stagepool.Count / 6);
-										if (!newset.Contains(stg.Future))
-											newset.Add(stg.Future);
-										break;
-									case 2:
-									case 3:
-									case 6:
-									case 7:
-										stg.Past = GetStageFromLists(r, newset, stagepool, stagepool.Count / 6);
-										if (!newset.Contains(stg.Past))
-											newset.Add(stg.Past);
-										break;
+									stg.Past = GetStageFromLists(r, newset, stagepool, stagepool.Count / 6);
+									if (!newset.Contains(stg.Past))
+										newset.Add(stg.Past);
+								}
+								if (stg.HasFuturePost)
+								{
+									stg.Future = GetStageFromLists(r, newset, stagepool, stagepool.Count / 6);
+									if (!newset.Contains(stg.Future))
+										newset.Add(stg.Future);
 								}
 							}
 							stagepool.RemoveAll(a => newset.Contains(a));
@@ -591,31 +657,408 @@ namespace SCDSteamRando
 						ids2.CopyTo(stageids);
 					}
 					break;
+				case Modes.Segments:
+					{
+						int[] regstg = new int[stagecount - (stagecount / 10 * 2)];
+						int[] bossstg = new int[stagecount / 10 * 2];
+						int[] regord = new int[regstg.Length];
+						int[] bossord = new int[bossstg.Length];
+						for (int i = 0; i < stagecount / 10; i++)
+						{
+							for (int j = 0; j < 8; j++)
+							{
+								regstg[i * 8 + j] = i * 10 + j;
+								regord[i * 8 + j] = r.Next();
+							}
+							for (int j = 0; j < 2; j++)
+							{
+								bossstg[i * 2 + j] = i * 10 + j + 8;
+								bossord[i * 2 + j] = r.Next();
+							}
+						}
+						Array.Sort(regord, regstg);
+						Array.Sort(bossord, bossstg);
+						for (int i = 0; i < stagecount / 10; i++)
+						{
+							for (int j = 0; j < 8; j++)
+								stageids[i * 10 + j] = regstg[i * 8 + j];
+							for (int j = 0; j < 2; j++)
+								stageids[i * 10 + j + 8] = bossstg[i * 2 + j];
+						}
+						int segbase = 0;
+						for (int i = 0; i < stagecount; i++)
+						{
+							Stage stg = stages[stageids[i]];
+							if (i % 10 == 0)
+								segbase = i;
+							int next;
+							if (i >= stagecount - 2)
+								next = stagecount;
+							else if (i % 10 == 8 || i % 10 == 7)
+								next = stageids[i + 2];
+							else
+								next = stageids[i + 1];
+							stages[stageids[i]].Clear = next;
+							if (i % 10 == 7)
+								stages[stageids[i]].ClearGF = stageids[segbase + 8];
+							if (stg.HasPastPost)
+								stg.Past = stageids[r.Next(8) + segbase];
+							if (stg.HasFuturePost)
+								stg.Future = stageids[r.Next(8) + segbase];
+						}
+					}
+					break;
+				case Modes.Wild:
+					{
+						Queue<int> stgq = new Queue<int>();
+						stgq.Enqueue(r.Next(stagecount));
+						List<int> neword = new List<int>(stagecount);
+						while (neword.Count < stagecount)
+						{
+							if (stgq.Count == 0)
+							{
+								foreach (var id in stageids.Except(neword))
+									if (id != stagecount)
+										stgq.Enqueue(id);
+							}
+							int i = stgq.Dequeue();
+							neword.Add(i);
+							Stage stg = stages[stageids[i]];
+							stg.Clear = r.Next(stagecount + 1);
+							if (stg.Clear != stagecount && !neword.Contains(stg.Clear) && !stgq.Contains(stg.Clear))
+								stgq.Enqueue(stg.Clear);
+							if (stg.HasPastPost)
+							{
+								stg.Past = r.Next(stagecount + 1);
+								if (stg.Past != stagecount && !neword.Contains(stg.Past) && !stgq.Contains(stg.Past))
+									stgq.Enqueue(stg.Past);
+							}
+							if (stg.HasFuturePost)
+							{
+								stg.Future = r.Next(stagecount + 1);
+								if (stg.Future != stagecount && !neword.Contains(stg.Future) && !stgq.Contains(stg.Future))
+									stgq.Enqueue(stg.Future);
+							}
+						}
+						neword.CopyTo(stageids);
+					}
+					break;
+				case Modes.Shadow:
+					{
+						int[] present = new int[14];
+						int[] past = new int[14];
+						int[] goodfuture = new int[14];
+						int[] badfuture = new int[14];
+						int[] boss = new int[14];
+						for (int i = 0; i < 7; i++)
+						{
+							present[i * 2] = i * 10;
+							past[i * 2] = i * 10 + 1;
+							goodfuture[i * 2] = i * 10 + 2;
+							badfuture[i * 2] = i * 10 + 3;
+							present[i * 2 + 1] = i * 10 + 4;
+							past[i * 2 + 1] = i * 10 + 5;
+							goodfuture[i * 2 + 1] = i * 10 + 6;
+							badfuture[i * 2 + 1] = i * 10 + 7;
+							boss[i * 2] = i * 10 + 8;
+							boss[i * 2 + 1] = i * 10 + 9;
+						}
+						Shuffle(r, present);
+						Shuffle(r, past);
+						Shuffle(r, goodfuture);
+						Shuffle(r, badfuture);
+						Shuffle(r, boss);
+						Queue<int>[] queues = new Queue<int>[] { new Queue<int>(present), new Queue<int>(past), new Queue<int>(goodfuture), new Queue<int>(badfuture) };
+						List<int> neword = new List<int>(stagecount);
+						foreach (var set in ShadowStageSet.StageList)
+						{
+							foreach (var stg in set.stages)
+								neword.Add(queues[(int)stg.timePeriod].Dequeue());
+							foreach (var stg in set.bosses)
+								neword.Add(boss[stg]);
+						}
+						int last = neword.Count;
+						int[] rest = queues.SelectMany(a => a).ToArray();
+						Shuffle(r, rest);
+						neword.AddRange(rest);
+						neword.Add(boss[12]);
+						neword.Add(boss[13]);
+						int ind = 0;
+						foreach (var set in ShadowStageSet.StageList)
+						{
+							int next = set.stages.Count + set.bosses.Count;
+							if (set.stages[0].timePeriod == TimePeriods.Present)
+								++next;
+							foreach (var item in set.stages)
+							{
+								Stage stg = stages[neword[ind]];
+								if (item.boss2 != -1)
+								{
+									stg.Future = boss[item.boss];
+									stg.Past = boss[item.boss2];
+									stages[boss[item.boss]].Clear = neword[last];
+									stages[boss[item.boss2]].Clear = neword[last];
+								}
+								else if (item.boss != -1)
+								{
+									Stage bossstg = stages[boss[item.boss]];
+									bossstg.Clear = neword[ind + next];
+									switch (item.timePeriod)
+									{
+										case TimePeriods.Present:
+											bossstg.Future = neword[ind + next - 1];
+											bossstg.Past = neword[ind + next + 1];
+											break;
+										case TimePeriods.Past:
+										case TimePeriods.GoodFuture:
+											bossstg.Future = neword[ind + next - 1];
+											break;
+										case TimePeriods.BadFuture:
+											bossstg.Past = neword[ind + next + 1];
+											break;
+									}
+									stg.Clear = boss[item.boss];
+								}
+								else
+								{
+									stg.Clear = neword[ind + next];
+									switch (item.timePeriod)
+									{
+										case TimePeriods.Present:
+											stg.Future = neword[ind + next - 1];
+											stg.Past = neword[ind + next + 1];
+											break;
+										case TimePeriods.Past:
+										case TimePeriods.GoodFuture:
+											stg.Future = neword[ind + next - 1];
+											break;
+										case TimePeriods.BadFuture:
+											stg.Past = neword[ind + next + 1];
+											break;
+									}
+								}
+								++ind;
+							}
+							ind += set.bosses.Count;
+						}
+						for (; ind < neword.Count - 2; ind++)
+						{
+							stages[neword[ind]].Clear = neword[ind + 1];
+							stages[neword[ind]].Future = neword[Math.Min(ind + 2, neword.Count - 1)];
+						}
+						stages[boss[12]].Clear = boss[13];
+						stages[boss[13]].Clear = stagecount;
+						neword.CopyTo(stageids);
+					}
+					break;
 			}
 			string tmpstr = Properties.Resources.LoadSaveMenu_template;
 			tmpstr = tmpstr.Replace("//REPLACE1", $"SaveRAM[ArrayPos1]={stageids[0] + 1}");
 			tmpstr = tmpstr.Replace("//REPLACE2", $"Stage.ListPos={stageids[0]}");
-			File.WriteAllText(Path.Combine(path, @"Data\Scripts\Menu\LoadSaveMenu.txt"), tmpstr);
-			File.WriteAllText(Path.Combine(path, @"Data\Scripts\R8\Amy.txt"), Properties.Resources.Amy);
+			string newpath = Path.Combine(path, @"Data\Scripts\Menu\LoadSaveMenu.txt");
+			File.WriteAllText(newpath, tmpstr);
+			vdir.AddFile("Scripts/Menu/LoadSaveMenu.txt", newpath);
+			newpath = Path.Combine(path, @"Data\Scripts\R8\Amy.txt");
+			File.WriteAllText(newpath, Properties.Resources.Amy);
+			vdir.AddFile("Scripts/R8/Amy.txt", newpath);
 			System.Text.StringBuilder sb = new System.Text.StringBuilder();
-			for (int i = 0; i < stagecount; i++)
+			switch (settings.Mode)
 			{
-				Stage stg = stages[i];
-				int stgno = i % 10;
-				sb.AppendLine($"\tcase {i}");
-				if (stg.ClearGF != -1)
-				{
-					sb.AppendLine($"\t\tif Good_Future_Count==2");
-					sb.AppendLine($"\t\t\tTempValue0={stg.ClearGF}");
-					sb.AppendLine($"\t\telse");
-					sb.AppendLine($"\t\t\tTempValue0={stg.Clear}");
-					sb.AppendLine($"\t\tendif");
-				}
-				else
-					sb.AppendLine($"\t\tTempValue0={stg.Clear}");
-				sb.AppendLine("\t\tbreak");
+				case Modes.Segments:
+					for (int i = 0; i < stagecount; i++)
+					{
+						Stage stg = stages[i];
+						sb.AppendLine($"\tcase {i}");
+						if (stg.Clear % 10 > 7)
+						{
+							sb.AppendLine($"\t\tGetBit(TempValue0,SpecialStage.TimeStones,{Array.IndexOf(stageids, i) / 10})");
+							sb.AppendLine("\t\tif TempValue0!=0");
+							sb.AppendLine($"\t\t\tTempValue0={stg.ClearGF}");
+							sb.AppendLine("\t\telse");
+							sb.AppendLine($"\t\t\tTempValue0={stg.Clear}");
+							sb.AppendLine("\t\tendif");
+						}
+						else
+							sb.AppendLine($"\t\tTempValue0={stg.Clear}");
+						sb.AppendLine("\t\tbreak");
+					}
+					tmpstr = Properties.Resources.ActFinish_template;
+					tmpstr = tmpstr.Replace("//REPLACE", sb.ToString());
+					sb.Clear();
+					sb.AppendLine("\t\t\t\t\tswitch Stage.ListPos");
+					int ssnum = 0;
+					for (int i = 0; i < stagecount; i++)
+					{
+						sb.AppendLine($"\t\t\t\t\tcase {stageids[i]}");
+						if (i % 10 == 7)
+						{
+							sb.AppendLine($"\t\t\t\t\t\tSpecialStage.ListPos={ssnum++}");
+							sb.AppendLine("\t\t\t\t\t\tbreak");
+							i += 2;
+						}
+					}
+					sb.AppendLine("\t\t\t\t\tendswitch");
+					tmpstr = tmpstr.Replace("//SPECIAL", sb.ToString());
+					newpath = Path.Combine(path, @"Data\Scripts\Global\ActFinish.txt");
+					File.WriteAllText(newpath, tmpstr);
+					vdir.AddFile("Scripts/Global/ActFinish.txt", newpath);
+					sb.Clear();
+					ssnum = 0;
+					for (int i = 0; i < stagecount; i++)
+					{
+						sb.AppendLine($"\tcase {stageids[i]}");
+						if (i % 10 == 7)
+						{
+							sb.AppendLine($"\t\tTempValue0={ssnum++}");
+							sb.AppendLine("\t\tbreak");
+							i += 2;
+						}
+					}
+					newpath = Path.Combine(path, @"Data\Scripts\Global\SpecialRing.txt");
+					File.WriteAllText(newpath, Properties.Resources.SpecialRing_template.Replace("//REPLACE", sb.ToString()));
+					vdir.AddFile("Scripts/Global/SpecialRing.txt", newpath);
+					break;
+				case Modes.Shadow:
+					for (int i = 0; i < stagecount; i++)
+					{
+						Stage stg = stages[i];
+						sb.AppendLine($"\tcase {i}");
+						if (Array.IndexOf(stageids, i) < 29)
+						{
+							if (stg.Clear == -1)
+								switch (stg.TimePeriod)
+								{
+									case TimePeriods.Past:
+										sb.AppendLine("\t\tif Warp.Destination==2");
+										sb.AppendLine($"\t\t\tTempValue0={stg.Future}");
+										sb.AppendLine("\t\telse");
+										sb.AppendLine($"\t\t\tTempValue0={stg.Past}");
+										sb.AppendLine("\t\tendif");
+										break;
+									case TimePeriods.GoodFuture:
+									case TimePeriods.BadFuture:
+										sb.AppendLine("\t\tif Warp.Destination==1");
+										sb.AppendLine($"\t\t\tTempValue0={stg.Past}");
+										sb.AppendLine("\t\telse");
+										sb.AppendLine($"\t\t\tTempValue0={stg.Future}");
+										sb.AppendLine("\t\tendif");
+										break;
+								}
+							else if (stg.Act == 2)
+							{
+								if (stg.Past != -1 && stg.Future != -1)
+								{
+									sb.AppendLine("\t\tswitch SaveRAM[0x4000]");
+									sb.AppendLine("\t\tcase 0");
+									sb.AppendLine($"\t\t\tTempValue0={stg.Clear}");
+									sb.AppendLine("\t\t\tbreak");
+									sb.AppendLine("\t\tcase 1");
+									sb.AppendLine($"\t\t\tTempValue0={stg.Past}");
+									sb.AppendLine("\t\t\tbreak");
+									sb.AppendLine("\t\tcase 2");
+									sb.AppendLine($"\t\t\tTempValue0={stg.Future}");
+									sb.AppendLine("\t\t\tbreak");
+									sb.AppendLine("\t\tendswitch");
+								}
+								else if (stg.Future != -1)
+								{
+									sb.AppendLine("\t\tif SaveRAM[0x4000]!=0");
+									sb.AppendLine($"\t\t\tTempValue0={stg.Future}");
+									sb.AppendLine("\t\telse");
+									sb.AppendLine($"\t\t\tTempValue0={stg.Clear}");
+									sb.AppendLine("\t\tendif");
+								}
+								else if (stg.Past != -1)
+								{
+									sb.AppendLine("\t\tif SaveRAM[0x4000]!=0");
+									sb.AppendLine($"\t\t\tTempValue0={stg.Past}");
+									sb.AppendLine("\t\telse");
+									sb.AppendLine($"\t\t\tTempValue0={stg.Clear}");
+									sb.AppendLine("\t\tendif");
+								}
+								else
+									sb.AppendLine($"\t\tTempValue0={stg.Clear}");
+							}
+							else
+							{
+								if (stg.Clear % 10 > 7)
+									sb.AppendLine($"\t\tSaveRAM[0x4000]=Warp.Destination");
+								if (stg.Past != -1 && stg.Future != -1)
+								{
+									sb.AppendLine("\t\tswitch Warp.Destination");
+									sb.AppendLine("\t\tcase 0");
+									sb.AppendLine($"\t\t\tTempValue0={stg.Clear}");
+									sb.AppendLine("\t\t\tbreak");
+									sb.AppendLine("\t\tcase 1");
+									sb.AppendLine($"\t\t\tTempValue0={stg.Past}");
+									sb.AppendLine("\t\t\tbreak");
+									sb.AppendLine("\t\tcase 2");
+									sb.AppendLine($"\t\t\tTempValue0={stg.Future}");
+									sb.AppendLine("\t\t\tbreak");
+									sb.AppendLine("\t\tendswitch");
+								}
+								else if (stg.Future != -1)
+								{
+									sb.AppendLine("\t\tif Warp.Destination!=0");
+									sb.AppendLine($"\t\t\tTempValue0={stg.Future}");
+									sb.AppendLine("\t\telse");
+									sb.AppendLine($"\t\t\tTempValue0={stg.Clear}");
+									sb.AppendLine("\t\tendif");
+								}
+								else if (stg.Past != -1)
+								{
+									sb.AppendLine("\t\tif Warp.Destination!=0");
+									sb.AppendLine($"\t\t\tTempValue0={stg.Past}");
+									sb.AppendLine("\t\telse");
+									sb.AppendLine($"\t\t\tTempValue0={stg.Clear}");
+									sb.AppendLine("\t\tendif");
+								}
+								else
+									sb.AppendLine($"\t\tTempValue0={stg.Clear}");
+							}
+						}
+						else
+							sb.AppendLine($"\t\tTempValue0={stg.Clear}");
+						sb.AppendLine("\t\tbreak");
+					}
+					newpath = Path.Combine(path, @"Data\Scripts\Global\ActFinish.txt");
+					File.WriteAllText(newpath, Properties.Resources.ActFinish_template.Replace("//REPLACE", sb.ToString()));
+					vdir.AddFile("Scripts/Global/ActFinish.txt", newpath);
+					sb.Clear();
+					for (int i = 0; i < 29; i++)
+						sb.AppendLine($"\tcase {stageids[i]}");
+					newpath = Path.Combine(path, @"Data\Scripts\Global\FuturePost.txt");
+					File.WriteAllText(newpath, Properties.Resources.FuturePost_template.Replace("//REPLACE", sb.ToString()));
+					vdir.AddFile("Scripts/Global/FuturePost.txt", newpath);
+					newpath = Path.Combine(path, @"Data\Scripts\Global\PastPost.txt");
+					File.WriteAllText(newpath, Properties.Resources.PastPost);
+					vdir.AddFile("Scripts/Global/PastPost.txt", newpath);
+					newpath = Path.Combine(path, @"Data\Scripts\Global\GoalPost.txt");
+					File.WriteAllText(newpath, Properties.Resources.GoalPost);
+					vdir.AddFile("Scripts/Global/GoalPost.txt", newpath);
+					break;
+				default:
+					for (int i = 0; i < stagecount; i++)
+					{
+						Stage stg = stages[i];
+						sb.AppendLine($"\tcase {i}");
+						if (stg.ClearGF != -1)
+						{
+							sb.AppendLine("\t\tif Good_Future_Count==2");
+							sb.AppendLine($"\t\t\tTempValue0={stg.ClearGF}");
+							sb.AppendLine("\t\telse");
+							sb.AppendLine($"\t\t\tTempValue0={stg.Clear}");
+							sb.AppendLine("\t\tendif");
+						}
+						else
+							sb.AppendLine($"\t\tTempValue0={stg.Clear}");
+						sb.AppendLine("\t\tbreak");
+					}
+					newpath = Path.Combine(path, @"Data\Scripts\Global\ActFinish.txt");
+					File.WriteAllText(newpath, Properties.Resources.ActFinish_template.Replace("//REPLACE", sb.ToString()));
+					vdir.AddFile("Scripts/Global/ActFinish.txt", newpath);
+					break;
 			}
-			File.WriteAllText(Path.Combine(path, @"Data\Scripts\Global\ActFinish.txt"), Properties.Resources.ActFinish_template.Replace("//REPLACE", sb.ToString()));
 			if (timewarp)
 			{
 				sb.Clear();
@@ -623,6 +1066,8 @@ namespace SCDSteamRando
 				{
 					Stage stg = stages[i];
 					if (stg.Past == -1 && stg.Future == -1)
+						continue;
+					if (settings.Mode == Modes.Shadow && Array.IndexOf(stageids, i) < 29)
 						continue;
 					sb.AppendLine($"\t\t\tcase {i}");
 					if (stg.Past != -1 && stg.Future != -1)
@@ -652,43 +1097,21 @@ namespace SCDSteamRando
 					}
 					sb.AppendLine("\t\t\t\tbreak");
 				}
-				File.WriteAllText(Path.Combine(path, @"Data\Scripts\Global\TimeWarp.txt"), Properties.Resources.TimeWarp_template.Replace("//REPLACE", sb.ToString()));
+				newpath = Path.Combine(path, @"Data\Scripts\Global\TimeWarp.txt");
+				File.WriteAllText(newpath, Properties.Resources.TimeWarp_template.Replace("//REPLACE", sb.ToString()));
+				vdir.AddFile("Scripts/Global/TimeWarp.txt", newpath);
 			}
 			if (randomMusic.Checked)
 			{
-				Dictionary<string, string> scriptFiles = new Dictionary<string, string>();
-				string dir = Path.Combine(Directory.GetCurrentDirectory(), "Scripts");
-				foreach (string item in Directory.EnumerateFiles(dir, "*.txt", SearchOption.AllDirectories))
-					scriptFiles[item.Substring(dir.Length + 1)] = item;
-				string[] mods = null;
-				if (File.Exists(@"mods\SCDSteamModLoader.ini"))
-				{
-					ModLoaderInfo info = IniSerializer.Deserialize<ModLoaderInfo>(@"mods\SCDSteamModLoader.ini");
-					if (info.Mods != null)
-						mods = info.Mods.Select(a => Path.Combine(Directory.GetCurrentDirectory(), "mods", a)).ToArray();
-				}
-				else if (File.Exists(@"mods\modconfig.ini"))
-				{
-					DecompModInfo info = IniSerializer.Deserialize<DecompModInfo>(@"mods\modconfig.ini");
-					if (info.Mods?.Mods != null)
-						mods = info.Mods.Mods.Where(a => a.Value).Select(a => Path.Combine(Directory.GetCurrentDirectory(), "mods", a.Key)).ToArray();
-				}
-				if (mods != null)
-					foreach (string mod in mods)
-					{
-						dir = Path.Combine(Directory.GetCurrentDirectory(), @"Data\Scripts");
-						foreach (string item in Directory.EnumerateFiles(dir, "*.txt", SearchOption.AllDirectories))
-							scriptFiles[item.Substring(dir.Length + 1)] = item;
-					}
-				var scripts = new List<(string file, string script)>();
+				var scripts = new List<(VirtualFile file, string script)>();
 				Dictionary<string, string> musicFiles = new Dictionary<string, string>();
-				foreach (var file in scriptFiles)
+				foreach (var file in vdir.GetDirectory("Scripts").GetAllFiles().Where(a => a.Name.EndsWith(".txt")))
 				{
-					string script = File.ReadAllText(file.Value);
+					string script = File.ReadAllText(file.SourcePath);
 					MatchCollection matches = musregex.Matches(script);
 					if (matches.Count > 0)
 					{
-						scripts.Add((file.Key, script));
+						scripts.Add((file, script));
 						foreach (Match match in matches)
 							if (!musicFiles.ContainsKey(match.Groups[1].Value))
 								musicFiles.Add(match.Groups[1].Value, match.Groups[3].Value);
@@ -702,8 +1125,9 @@ namespace SCDSteamRando
 				var muslistus = muslist.Where(a => !a.Key.StartsWith("\"JP/", StringComparison.OrdinalIgnoreCase)).ToArray();
 				foreach (var script in scripts)
 				{
-					Directory.CreateDirectory(Path.GetDirectoryName(Path.Combine(path, @"Data\Scripts", script.file)));
-					File.WriteAllText(Path.Combine(path, @"Data\Scripts", script.file), musregex.Replace(script.script, m =>
+					script.file.SourcePath = Path.Combine(path, script.file.FullName);
+					Directory.CreateDirectory(Path.GetDirectoryName(script.file.SourcePath));
+					File.WriteAllText(script.file.SourcePath, musregex.Replace(script.script, m =>
 					{
 						if (separateSoundtracks.Checked)
 							if (m.Groups[1].Value.StartsWith("\"JP/", StringComparison.OrdinalIgnoreCase))
@@ -725,6 +1149,291 @@ namespace SCDSteamRando
 					}));
 				}
 			}
+			if (randomItemMode.SelectedIndex > 0)
+			{
+				int monitorid = gc.objects.FindIndex(a => a.name == "Monitor") + 1;
+				byte[] itemmap = new byte[9];
+				for (byte i = 0; i < 9; i++)
+					itemmap[i] = i;
+				if ((ItemMode)randomItemMode.SelectedIndex == ItemMode.OneToOne)
+					Shuffle(r, itemmap);
+				foreach (var stginf in gc.stageLists[1].list)
+				{
+					if ((ItemMode)randomItemMode.SelectedIndex == ItemMode.OneToOnePerStage)
+						Shuffle(r, itemmap);
+					vfile = vdir.GetFile($"Stages/{stginf.folder}/Act{stginf.id}.bin");
+					RSDKv3.Scene scn;
+					if (vfile.SourcePath == "Data.rsdk")
+						using (MemoryStream ms = new MemoryStream(dataFile.files.Single(a => a.fullFilename == vfile.FullName).fileData))
+							scn = new RSDKv3.Scene(ms);
+					else
+						scn = new RSDKv3.Scene(vfile.SourcePath);
+					foreach (var item in scn.entities.Where(a => a.type == monitorid))
+						switch ((ItemMode)randomItemMode.SelectedIndex)
+						{
+							case ItemMode.OneToOne:
+							case ItemMode.OneToOnePerStage:
+								item.propertyValue = itemmap[item.propertyValue];
+								break;
+							case ItemMode.Wild:
+								item.propertyValue = (byte)r.Next(9);
+								break;
+						}
+					vfile.SourcePath = Path.Combine(path, vfile.FullName);
+					Directory.CreateDirectory(Path.GetDirectoryName(vfile.SourcePath));
+					scn.write(vfile.SourcePath);
+				}
+			}
+			if (randomUFOs.Checked)
+			{
+				foreach (var stginf in gc.stageLists[2].list)
+				{
+					vfile = vdir.GetFile($"Stages/{stginf.folder}/StageConfig.bin");
+					RSDKv3.StageConfig stgcnf;
+					if (vfile.SourcePath == "Data.rsdk")
+						using (MemoryStream ms = new MemoryStream(dataFile.files.Single(a => a.fullFilename == vfile.FullName).fileData))
+							stgcnf = new RSDKv3.StageConfig(ms);
+					else
+						stgcnf = new RSDKv3.StageConfig(vfile.SourcePath);
+					int ufoid = stgcnf.objects.FindIndex(a => a.name == "UFO") + 1;
+					int ufonodeid = stgcnf.objects.FindIndex(a => a.name == "UFO Node") + 1;
+					int xmin = 0;
+					int xmax = 4096;
+					int ymin = 0;
+					int ymax = 4096;
+					foreach (var m in ssboundregex.Matches(File.ReadAllText(vdir.GetDirectory("Scripts").GetFile(stgcnf.objects.Find(a => a.name == "BGEffects").script).SourcePath)).Cast<Match>())
+						switch (m.Groups[1].Value)
+						{
+							case "XBoundary1":
+								xmin = int.Parse(m.Groups[2].Value) >> 16;
+								break;
+							case "XBoundary2":
+								xmax = int.Parse(m.Groups[2].Value) >> 16;
+								break;
+							case "YBoundary1":
+								ymin = int.Parse(m.Groups[2].Value) >> 16;
+								break;
+							case "YBoundary2":
+								ymax = int.Parse(m.Groups[2].Value) >> 16;
+								break;
+						}
+					xmin += 128;
+					xmax -= 128;
+					ymin += 128;
+					ymax -= 128;
+					int mindist = 0;
+					int maxdist = 0;
+					int mincnt = 0;
+					int maxcnt = 0;
+					switch ((UFODifficulty)ufoDifficulty.SelectedIndex)
+					{
+						case UFODifficulty.Easy:
+							mindist = 64;
+							maxdist = 640;
+							mincnt = 4;
+							maxcnt = 6;
+							break;
+						case UFODifficulty.Medium:
+							mindist = 96;
+							maxdist = 960;
+							mincnt = 6;
+							maxcnt = 9;
+							break;
+						case UFODifficulty.Hard:
+							mindist = 128;
+							maxdist = 1280;
+							mincnt = 8;
+							maxcnt = 12;
+							break;
+						case UFODifficulty.Wild:
+							mincnt = 1;
+							maxcnt = 30;
+							break;
+					}
+					vfile = vdir.GetFile($"Stages/{stginf.folder}/Act{stginf.id}.bin");
+					RSDKv3.Scene scn;
+					if (vfile.SourcePath == "Data.rsdk")
+						using (MemoryStream ms = new MemoryStream(dataFile.files.Single(a => a.fullFilename == vfile.FullName).fileData))
+							scn = new RSDKv3.Scene(ms);
+					else
+						scn = new RSDKv3.Scene(vfile.SourcePath);
+					scn.entities.RemoveAll(a => a.type == ufoid || a.type == ufonodeid);
+					int cnt = r.Next(mincnt, maxcnt + 1);
+					for (int i = 0; i <= cnt; i++)
+					{
+						int nodecnt = r.Next(2, 9);
+						int lastx = r.Next(xmin + 64, xmax - 63);
+						int lasty = r.Next(ymin + 64, ymax - 63);
+						scn.entities.Add(new RSDKv3.Scene.Entity((byte)ufoid, i == cnt ? (byte)2 : (byte)r.Next(2), (byte)lastx, (byte)lasty));
+						scn.entities.Add(new RSDKv3.Scene.Entity((byte)ufonodeid, (byte)(r.Next(1, 9) * 30), (short)lastx, (short)lasty));
+						for (int j = 1; j < nodecnt; j++)
+						{
+							if ((UFODifficulty)ufoDifficulty.SelectedIndex == UFODifficulty.Wild)
+							{
+								lastx = r.Next(xmin + 64, xmax - 63);
+								lasty = r.Next(ymin + 64, ymax - 63);
+							}
+							else
+							{
+								int newx, newy;
+								do
+								{
+									int dist = r.Next(mindist, maxdist + 1);
+									double ang = r.NextDouble() * (2 * Math.PI);
+									newx = lastx + (int)(Math.Cos(ang) * dist);
+									newy = lasty + (int)(Math.Sin(ang) * dist);
+								}
+								while (newx <= xmin || newx >= xmax || newy <= ymin || newy >= ymax);
+								lastx = newx;
+								lasty = newy;
+							}
+							scn.entities.Add(new RSDKv3.Scene.Entity((byte)ufonodeid, (byte)(r.Next(1, 9) * 30), (short)lastx, (short)lasty));
+						}
+					}
+					vfile.SourcePath = Path.Combine(path, vfile.FullName);
+					Directory.CreateDirectory(Path.GetDirectoryName(vfile.SourcePath));
+					scn.write(vfile.SourcePath);
+				}
+			}
+			if (randomWater.Checked)
+			{
+				sb.Clear();
+				for (int i = 0; i < gc.stageLists[1].list.Count; i++)
+				{
+					var stginf = gc.stageLists[1].list[i];
+					vfile = vdir.GetFile($"Stages/{stginf.folder}/StageConfig.bin");
+					RSDKv3.StageConfig stgcnf;
+					if (vfile.SourcePath == "Data.rsdk")
+						using (MemoryStream ms = new MemoryStream(dataFile.files.Single(a => a.fullFilename == vfile.FullName).fileData))
+							stgcnf = new RSDKv3.StageConfig(ms);
+					else
+						stgcnf = new RSDKv3.StageConfig(vfile.SourcePath);
+					bool randwater = r.Next(2) == 1;
+					bool haswater = false;
+					int waterid = stgcnf.objects.FindIndex(a => a.name == "Water") + 1;
+					if (waterid == 0)
+					{
+						if (!randwater)
+							continue;
+						waterid = stgcnf.objects.Count + 1;
+						stgcnf.objects.Add(new RSDKv3.GameConfig.ObjectInfo() { name = "Water", script = "Global/Water.txt" });
+						stgcnf.objects.Add(new RSDKv3.GameConfig.ObjectInfo() { name = "Water Splash", script = "R4/WaterSplash.txt" });
+						stgcnf.objects.Add(new RSDKv3.GameConfig.ObjectInfo() { name = "Air Bubble", script = "R4/AirBubble.txt" });
+						stgcnf.objects.Add(new RSDKv3.GameConfig.ObjectInfo() { name = "Countdown Bubble", script = "R4/CountdownBubble.txt" });
+						sb.AppendLine($"\t\t\tcase {i}");
+						sb.AppendLine($"\t\t\t\tObject[ArrayPos0].Value3={stgcnf.soundFX.Count}");
+						stgcnf.soundFX.Add("Stage/WaterSplash.wav");
+						sb.AppendLine($"\t\t\t\tObject[ArrayPos0].Value4={stgcnf.soundFX.Count}");
+						stgcnf.soundFX.Add("Stage/Drowning.wav");
+						sb.AppendLine($"\t\t\t\tObject[ArrayPos0].Value5={stgcnf.soundFX.Count}");
+						stgcnf.soundFX.Add("Stage/AirAlert.wav");
+						sb.AppendLine($"\t\t\t\tObject[ArrayPos0].Value6={stgcnf.soundFX.Count}");
+						stgcnf.soundFX.Add("Stage/DrownAlert.wav");
+						sb.AppendLine("\t\t\t\tbreak");
+						vfile.SourcePath = Path.Combine(path, vfile.FullName);
+						Directory.CreateDirectory(Path.GetDirectoryName(vfile.SourcePath));
+						stgcnf.write(vfile.SourcePath);
+					}
+					else if (addWaterOnly.Checked)
+						continue;
+					else
+						haswater = true;
+					if (stgcnf.loadGlobalObjects)
+						waterid += gc.objects.Count;
+					vfile = vdir.GetFile($"Stages/{stginf.folder}/Act{stginf.id}.bin");
+					RSDKv3.Scene scn;
+					if (vfile.SourcePath == "Data.rsdk")
+						using (MemoryStream ms = new MemoryStream(dataFile.files.Single(a => a.fullFilename == vfile.FullName).fileData))
+							scn = new RSDKv3.Scene(ms);
+					else
+						scn = new RSDKv3.Scene(vfile.SourcePath);
+					if (haswater)
+					{
+						if (randwater)
+							scn.entities.Find(a => a.type == waterid).ypos = (short)r.Next(scn.height << 7);
+						else
+							scn.entities.RemoveAll(a => a.type == waterid);
+					}
+					else
+					{
+						scn.objectTypeNames.Add("Water");
+						scn.objectTypeNames.Add("Water Splash");
+						scn.objectTypeNames.Add("Air Bubble");
+						scn.objectTypeNames.Add("Countdown Bubble");
+						scn.entities.Add(new RSDKv3.Scene.Entity((byte)waterid, 0, 0, (short)r.Next(scn.height << 7)));
+					}
+					vfile.SourcePath = Path.Combine(path, vfile.FullName);
+					Directory.CreateDirectory(Path.GetDirectoryName(vfile.SourcePath));
+					scn.write(vfile.SourcePath);
+					if (!haswater)
+					{
+						vfile = vdir.GetFile($"Stages/{stginf.folder}/Backgrounds.bin");
+						RSDKv3.Backgrounds bg;
+						if (vfile.SourcePath == "Data.rsdk")
+							using (MemoryStream ms = new MemoryStream(dataFile.files.Single(a => a.fullFilename == vfile.FullName).fileData))
+								bg = new RSDKv3.Backgrounds(ms);
+						else
+							bg = new RSDKv3.Backgrounds(vfile.SourcePath);
+						foreach (var item in bg.hScroll)
+							item.deform = true;
+						vfile.SourcePath = Path.Combine(path, vfile.FullName);
+						Directory.CreateDirectory(Path.GetDirectoryName(vfile.SourcePath));
+						bg.write(vfile.SourcePath);
+					}
+				}
+				newpath = Path.Combine(path, @"Data\Scripts\Global\Water.txt");
+				File.WriteAllText(newpath, Properties.Resources.Water_template.Replace("//REPLACE", sb.ToString()));
+				vdir.AddFile("Scripts/Global/Water.txt", newpath);
+			}
+			if (randomPalettes.Checked)
+			{
+				foreach (var file in vdir.GetDirectory("Palettes").GetAllFiles().Where(a => a.Name.EndsWith(".act")))
+				{
+					HueRotation hr = new HueRotation(r);
+					byte[] pal;
+					if (file.SourcePath == "Data.rsdk")
+						pal = dataFile.files.Single(a => a.fullFilename == file.FullName).fileData;
+					else
+						pal = File.ReadAllBytes(file.SourcePath);
+					hr.ApplyRotation(pal);
+					file.SourcePath = Path.Combine(path, file.FullName);
+					Directory.CreateDirectory(Path.GetDirectoryName(file.SourcePath));
+					File.WriteAllBytes(file.SourcePath, pal);
+				}
+				foreach (var file in vdir.GetDirectory("Stages").GetAllFiles().Where(a => a.Name == "16x16Tiles.gif" || a.Name == "StageConfig.bin"))
+				{
+					HueRotation hr = new HueRotation(r);
+					switch (file.Name)
+					{
+						case "16x16Tiles.gif":
+							byte[] gif;
+							if (file.SourcePath == "Data.rsdk")
+								gif = dataFile.files.Single(a => a.fullFilename == file.FullName).fileData;
+							else
+								gif = File.ReadAllBytes(file.SourcePath);
+							var pal = new byte[(1 << ((gif[0xA] & 7) + 1)) * 3];
+							Array.Copy(gif, 0xD, pal, 0, pal.Length);
+							hr.ApplyRotation(pal);
+							Array.Copy(pal, 0, gif, 0xD, pal.Length);
+							file.SourcePath = Path.Combine(path, file.FullName);
+							Directory.CreateDirectory(Path.GetDirectoryName(file.SourcePath));
+							File.WriteAllBytes(file.SourcePath, gif);
+							break;
+						case "StageConfig.bin":
+							RSDKv3.StageConfig stgcnf;
+							if (file.SourcePath == "Data.rsdk")
+								using (MemoryStream ms = new MemoryStream(dataFile.files.Single(a => a.fullFilename == file.FullName).fileData))
+									stgcnf = new RSDKv3.StageConfig(ms);
+							else
+								stgcnf = new RSDKv3.StageConfig(file.SourcePath);
+							hr.ApplyRotation(stgcnf.stagePalette);
+							file.SourcePath = Path.Combine(path, file.FullName);
+							Directory.CreateDirectory(Path.GetDirectoryName(file.SourcePath));
+							stgcnf.write(file.SourcePath);
+							break;
+					}
+				}
+			}
 			spoilerLevelList.BeginUpdate();
 			spoilerLevelList.Items.Clear();
 			for (int i = 0; i < stagecount; i++)
@@ -735,6 +1444,16 @@ namespace SCDSteamRando
 			saveLogButton.Enabled = true;
 			makeChartButton.Enabled = true;
 		}
+
+		private static void Shuffle<T>(Random r, T[] array, int count)
+		{
+			int[] order = new int[count];
+			for (int i = 0; i < count; i++)
+				order[i] = r.Next();
+			Array.Sort(order, array);
+		}
+
+		private static void Shuffle<T>(Random r, T[] array) => Shuffle(r, array, array.Length);
 
 		private static int GetStageFromLists(Random r, List<int> curset, List<int> stagepool, int weight)
 		{
@@ -754,8 +1473,8 @@ namespace SCDSteamRando
 				return "Start";
 			else if (id == stagecount)
 				return "Ending";
-			else
-				return $"{RoundNames[id / 10]} {ZoneNames[id % 10]}";
+			int rnd = Math.DivRem(id, 10, out int zon);
+			return $"{RoundNames[rnd]} {ZoneNames[zon]}";
 		}
 
 		private void spoilerLevelList_SelectedIndexChanged(object sender, EventArgs e)
@@ -764,7 +1483,7 @@ namespace SCDSteamRando
 			{
 				System.Text.StringBuilder sb = new System.Text.StringBuilder();
 				Stage stg = stages[stageids[spoilerLevelList.SelectedIndex]];
-				if (settings.Mode == 0)
+				if (settings.Mode == Modes.AllStagesWarps)
 				{
 					sb.AppendLine($"Clear -> {GetStageName(stg.Clear)} ({Array.IndexOf(stageids, stg.Clear) - spoilerLevelList.SelectedIndex:+##;-##;0})");
 					if (stg.Past != -1)
@@ -884,8 +1603,8 @@ namespace SCDSteamRando
 				using (StreamWriter sw = File.CreateText(saveFileDialog1.FileName))
 				{
 					sw.WriteLine($"Seed: {seedSelector.Value}");
-					sw.WriteLine($"Mode: {modeSelector.SelectedItem}");
-					if (settings.Mode == 0)
+					sw.WriteLine($"Mode: {settings.Mode}");
+					if (settings.Mode == Modes.AllStagesWarps)
 					{
 						sw.WriteLine($"Main Path: {mainPathSelector.SelectedItem}");
 						sw.WriteLine($"Max Backwards Jump: {maxBackJump.Value}");
@@ -900,7 +1619,7 @@ namespace SCDSteamRando
 					{
 						Stage stg = stages[stageids[i]];
 						sw.WriteLine($"{GetStageName(stageids[i])}:");
-						if (settings.Mode == 0)
+						if (settings.Mode == Modes.AllStagesWarps)
 						{
 							sw.WriteLine($"Clear -> {GetStageName(stg.Clear)} ({Array.IndexOf(stageids, stg.Clear) - spoilerLevelList.SelectedIndex:+##;-##;0})");
 							if (stg.Past != -1)
@@ -938,14 +1657,15 @@ namespace SCDSteamRando
 			int gridmaxv = 0;
 			switch (settings.Mode)
 			{
-				case 0: // stages + warps
+				case Modes.AllStagesWarps: // stages + warps
+				case Modes.Wild: // wild
 					gridmaxh = 1;
 					gridmaxv = stagecount + 2;
 					for (int i = 0; i <= stagecount; i++)
 						levels[stageids[i]] = new ChartNode(0, i + 1);
 					levels[stagecount + 1] = new ChartNode(0, 0);
 					break;
-				case 4: // branching paths
+				case Modes.BranchingPaths: // branching paths
 					{
 						int row = 0;
 						int col = 0;
@@ -964,6 +1684,45 @@ namespace SCDSteamRando
 						levels[stagecount] = new ChartNode(0, ++row);
 						gridmaxv = row + 1;
 						levels[stagecount + 1] = new ChartNode(0, 0);
+					}
+					break;
+				case Modes.Segments: // segments
+					{
+						gridmaxh = 2;
+						int row = 0;
+						for (int i = 0; i < stagecount; i++)
+						{
+							if (i % 10 == 8)
+								levels[stageids[i]] = new ChartNode(1, row + 1);
+							else
+								levels[stageids[i]] = new ChartNode(0, ++row);
+						}
+						levels[stagecount] = new ChartNode(0, ++row);
+						gridmaxv = row + 1;
+						levels[stagecount + 1] = new ChartNode(0, 0);
+					}
+					break;
+				case Modes.Shadow: // shadow
+					{
+						gridmaxh = 1;
+						gridmaxv = 11;
+						int[] stgcnts = { 1, 3, 3, 5, 5, 5, 0 };
+						int[][] bosses = { new int[] { }, new[] { 8 }, new[] { 4 }, new[] { 4, 8, 10 }, new[] { 2, 6 }, new int[] { }, new[] { 0, 1, 5, 9, 10 } };
+						int ind = 0;
+						for (int i = 0; i < stgcnts.Length; i++)
+						{
+							int y = gridmaxv / 4 - stgcnts[i] / 2;
+							for (int j = 0; j < stgcnts[i]; j++)
+								levels[stageids[ind++]] = new ChartNode(gridmaxh, y++ * 2 + 1);
+							if (bosses[i].Length > 0)
+								for (int j = 0; j < bosses[i].Length; j++)
+									levels[stageids[ind++]] = new ChartNode(gridmaxh, bosses[i][j]);
+							gridmaxh++;
+						}
+						for (; ind < stagecount; ind++)
+							levels[stageids[ind]] = new ChartNode(gridmaxh++, 5);
+						levels[stagecount] = new ChartNode(gridmaxh++, 5);
+						levels[stagecount + 1] = new ChartNode(0, 5);
 					}
 					break;
 				default: // normal game structure
@@ -1308,7 +2067,7 @@ namespace SCDSteamRando
 					{
 						r = a.MinY.CompareTo(b.MinY);
 						if (r == 0)
-							r = a.Color.CompareTo(b.Color);
+							r = a.Type.CompareTo(b.Type);
 					}
 					return r;
 				});
@@ -1334,7 +2093,7 @@ namespace SCDSteamRando
 					{
 						r = a.MinX.CompareTo(b.MinX);
 						if (r == 0)
-							r = a.Color.CompareTo(b.Color);
+							r = a.Type.CompareTo(b.Type);
 					}
 					return r;
 				});
@@ -1365,11 +2124,7 @@ namespace SCDSteamRando
 					stageorder.AddRange(stageids);
 					stageorder.Reverse();
 					StringFormat fmt = new StringFormat() { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
-					Pen clearpen = new Pen(Color.Black, 3) { EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor };
-					Pen pastpen = new Pen(Color.Blue, 3) { EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor };
-					Pen futurepen = new Pen(Color.Lime, 3) { EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor };
-					Pen badfuturepen = new Pen(Color.Red, 3) { EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor };
-					Pen cleargfpen = new Pen(Color.Fuchsia, 3) { EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor };
+					Pen pen = new Pen(Color.Black, 3) { EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor };
 					foreach (var id in stageorder)
 					{
 						var node = levels[id];
@@ -1387,25 +2142,6 @@ namespace SCDSteamRando
 						foreach (var (dir, list) in node.OutgoingConnections)
 							foreach (var con in list)
 							{
-								Pen pen;
-								switch (con.Color)
-								{
-									case ConnectionType.Past:
-										pen = pastpen;
-										break;
-									case ConnectionType.Future:
-										pen = futurepen;
-										break;
-									case ConnectionType.BadFuture:
-										pen = badfuturepen;
-										break;
-									case ConnectionType.ClearGF:
-										pen = cleargfpen;
-										break;
-									default:
-										pen = clearpen;
-										break;
-								}
 								int srclane = Array.LastIndexOf(node.ConnectionOrder[dir], con);
 								int srcx = 0;
 								int srcy = 0;
@@ -1448,6 +2184,31 @@ namespace SCDSteamRando
 										dsty += textsz.Height + 1;
 										break;
 								}
+								switch (con.Type)
+								{
+									case ConnectionType.Clear:
+										pen.Color = Color.Black;
+										break;
+									case ConnectionType.Past:
+										pen.Color = Color.Blue;
+										break;
+									case ConnectionType.Future:
+										if (settings.Mode == Modes.Shadow && node.GridX < 7)
+											pen.Color = Color.Red;
+										else
+											pen.Color = Color.Lime;
+										break;
+									case ConnectionType.BadFuture:
+										pen.Color = Color.Red;
+										break;
+									case ConnectionType.ClearGF:
+										pen.Color = Color.Fuchsia;
+										break;
+								}
+								if (con.MaxX - con.MinX == 1 || con.MaxY - con.MinY == 1)
+									pen.DashStyle = System.Drawing.Drawing2D.DashStyle.Solid;
+								else
+									pen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dash;
 								if (node.GetDistance(con.Node) == 1)
 									gfx.DrawLine(pen, srcx, srcy, dstx, dsty);
 								else
@@ -1519,13 +2280,338 @@ namespace SCDSteamRando
 		}
 	}
 
+	class VirtualDirectory
+	{
+		class DirectoryCollection : System.Collections.ObjectModel.KeyedCollection<string, VirtualDirectory>
+		{
+			protected override string GetKeyForItem(VirtualDirectory item) => item.Name;
+		}
+
+		class FileCollection : System.Collections.ObjectModel.KeyedCollection<string, VirtualFile>
+		{
+			protected override string GetKeyForItem(VirtualFile item) => item.Name;
+		}
+
+		public string Name { get; }
+		public string FullName { get; }
+
+		readonly DirectoryCollection directories = new DirectoryCollection();
+		readonly FileCollection files = new FileCollection();
+		
+		public VirtualDirectory(string name)
+		{
+			Name = name;
+			FullName = name;
+		}
+
+		private VirtualDirectory(string name, string fullname)
+		{
+			Name = name;
+			FullName = fullname;
+		}
+
+		public override string ToString()
+		{
+			return Name;
+		}
+
+		public VirtualDirectory AddDirectory(string path)
+		{
+			int dirind = path.IndexOfAny(new[] { '\\', '/' });
+			if (dirind != -1)
+			{
+				string dir = path.Substring(0, dirind);
+				VirtualDirectory vdir;
+				if (!directories.Contains(dir))
+					vdir = AddDirectory(dir);
+				else
+					vdir = directories[dir];
+				return vdir.AddDirectory(path.Substring(dirind + 1));
+			}
+			if (directories.Contains(path))
+				return directories[path];
+			var vd = new VirtualDirectory(path, FullName + '/' + path);
+			directories.Add(vd);
+			return vd;
+		}
+
+		public VirtualFile AddFile(string path, string source)
+		{
+			int dirind = path.IndexOfAny(new[] { '\\', '/' });
+			if (dirind != -1)
+			{
+				string dir = path.Substring(0, dirind);
+				if (!directories.Contains(dir))
+					return AddDirectory(dir).AddFile(path.Substring(dirind + 1), source);
+				return directories[dir].AddFile(path.Substring(dirind + 1), source);
+			}
+			if (files.Contains(path))
+			{
+				var f = files[path];
+				f.SourcePath = source;
+				return f;
+			}
+			var vf = new VirtualFile(path, FullName + '/' + path, source);
+			files.Add(vf);
+			return vf;
+		}
+
+		public VirtualDirectory GetDirectory(string path)
+		{
+			int dirind = path.IndexOfAny(new[] { '\\', '/' });
+			if (dirind != -1)
+				return directories[path.Substring(0, dirind)].GetDirectory(path.Substring(dirind + 1));
+			return directories[path];
+		}
+
+		public VirtualFile GetFile(string path)
+		{
+			int dirind = path.IndexOfAny(new[] { '\\', '/' });
+			if (dirind != -1)
+				return directories[path.Substring(0, dirind)].GetFile(path.Substring(dirind + 1));
+			return files[path];
+		}
+
+		public bool DirectoryExists(string path)
+		{
+			int dirind = path.IndexOfAny(new[] { '\\', '/' });
+			if (dirind != -1)
+			{
+				string dir = path.Substring(0, dirind);
+				if (!directories.Contains(dir))
+					return false;
+				return directories[dir].DirectoryExists(path.Substring(dirind + 1));
+			}
+			return directories.Contains(path);
+		}
+
+		public bool FileExists(string path)
+		{
+			int dirind = path.IndexOfAny(new[] { '\\', '/' });
+			if (dirind != -1)
+			{
+				string dir = path.Substring(0, dirind);
+				if (!directories.Contains(dir))
+					return false;
+				return directories[dir].FileExists(path.Substring(dirind + 1));
+			}
+			return files.Contains(path);
+		}
+
+		public IEnumerable<VirtualDirectory> EnumerateDirectories() => directories;
+
+		public IEnumerable<VirtualFile> EnumerateFiles() => files;
+
+		public IEnumerable<VirtualFile> GetAllFiles()
+		{
+			foreach (var file in files)
+				yield return file;
+			foreach (var dir in directories)
+				foreach (var file in dir.GetAllFiles())
+					yield return file;
+		}
+
+		public void ScanDirectory(string dir) => ScanDirectory(new DirectoryInfo(dir));
+
+		public void ScanDirectory(DirectoryInfo dir)
+		{
+			foreach (var item in dir.EnumerateDirectories())
+			{
+				VirtualDirectory vdir;
+				if (directories.Contains(item.Name))
+					vdir = directories[item.Name];
+				else
+				{
+					vdir = new VirtualDirectory(item.Name, FullName + '/' + item.Name);
+					directories.Add(vdir);
+				}
+				vdir.ScanDirectory(item);
+			}
+			foreach (var item in dir.EnumerateFiles())
+			{
+				if (files.Contains(item.Name))
+					files[item.Name].SourcePath = item.FullName;
+				else
+					files.Add(new VirtualFile(item.Name, FullName + '/' + item.Name, item.FullName));
+			}
+		}
+	}
+
+	class VirtualFile
+	{
+		public string Name { get; }
+		public string FullName { get; }
+		public string SourcePath { get; set; }
+
+		public VirtualFile(string name, string fullname, string source)
+		{
+			Name = name;
+			FullName = fullname;
+			SourcePath = source;
+		}
+
+		public override string ToString()
+		{
+			return Name;
+		}
+	}
+
 	class Stage
 	{
+		public int ID { get; }
+		public int Round { get; }
+		public int Act { get; }
+		public TimePeriods TimePeriod { get; }
+		public bool HasPastPost { get; set; }
+		public bool HasFuturePost { get; set; }
 		public int Clear { get; set; } = -1;
 		public int ClearGF { get; set; } = -1;
 		public int Past { get; set; } = -1;
 		public int Future { get; set; } = -1;
 		public int GoodFuture { get; set; } = -1;
+
+		public Stage(int id)
+		{
+			ID = id;
+			Round = Math.DivRem(id, 10, out int rem);
+			Act = Math.DivRem(rem, 4, out rem);
+			switch (Act)
+			{
+				case 2:
+					TimePeriod = (TimePeriods)(rem + 2);
+					break;
+				default:
+					TimePeriod = (TimePeriods)rem;
+					switch (TimePeriod)
+					{
+						case TimePeriods.Present:
+							HasPastPost = true;
+							HasFuturePost = true;
+							break;
+						case TimePeriods.Past:
+							HasFuturePost = true;
+							break;
+						case TimePeriods.GoodFuture:
+						case TimePeriods.BadFuture:
+							HasPastPost = true;
+							break;
+					}
+					break;
+			}
+		}
+	}
+
+	enum TimePeriods { Present, Past, GoodFuture, BadFuture }
+
+	readonly struct ShadowStageSet
+	{
+		public readonly System.Collections.ObjectModel.ReadOnlyCollection<ShadowStage> stages;
+		public readonly System.Collections.ObjectModel.ReadOnlyCollection<int> bosses;
+
+		public ShadowStageSet(params ShadowStage[] stages)
+		{
+			this.stages = new System.Collections.ObjectModel.ReadOnlyCollection<ShadowStage>(stages);
+			List<int> tmp = new List<int>();
+			foreach (var item in stages)
+			{
+				if (item.boss != -1 && !tmp.Contains(item.boss))
+					tmp.Add(item.boss);
+				if (item.boss2 != -1 && !tmp.Contains(item.boss2))
+					tmp.Add(item.boss2);
+			}
+			bosses = new System.Collections.ObjectModel.ReadOnlyCollection<int>(tmp);
+		}
+
+		public static readonly ShadowStageSet[] StageList = new[]
+		{
+			new ShadowStageSet(new ShadowStage(TimePeriods.Present)),
+			new ShadowStageSet(new ShadowStage(TimePeriods.BadFuture), new ShadowStage(TimePeriods.Present), new ShadowStage(TimePeriods.GoodFuture, 0)),
+			new ShadowStageSet(new ShadowStage(TimePeriods.Present, 1), new ShadowStage(TimePeriods.Present), new ShadowStage(TimePeriods.Present)),
+			new ShadowStageSet(new ShadowStage(TimePeriods.BadFuture), new ShadowStage(TimePeriods.Present, 2), new ShadowStage(TimePeriods.Present), new ShadowStage(TimePeriods.Present, 3), new ShadowStage(TimePeriods.GoodFuture, 4)),
+			new ShadowStageSet(new ShadowStage(TimePeriods.BadFuture, 5), new ShadowStage(TimePeriods.Present), new ShadowStage(TimePeriods.Present, 6), new ShadowStage(TimePeriods.Present), new ShadowStage(TimePeriods.GoodFuture)),
+			new ShadowStageSet(new ShadowStage(TimePeriods.BadFuture, 7, 8), new ShadowStage(TimePeriods.Past, 7, 9), new ShadowStage(TimePeriods.Past, 9, 9), new ShadowStage(TimePeriods.Past, 9, 10), new ShadowStage(TimePeriods.GoodFuture, 11, 10)),
+		};
+	}
+
+	readonly struct ShadowStage
+	{
+		public readonly TimePeriods timePeriod;
+		public readonly int boss;
+		public readonly int boss2;
+
+		public ShadowStage(TimePeriods timePeriod, int boss = -1, int boss2 = -1)
+		{
+			this.timePeriod = timePeriod;
+			this.boss = boss;
+			this.boss2 = boss2;
+		}
+	}
+
+	class HueRotation
+	{
+		readonly double _0, _1, _2;
+
+		const double sqrtonethird = 0.57735026918962573;
+		const double max = 0.52359877559829893;
+
+		public HueRotation(Random rand) : this(rand.Next(1, 12) * max) { }
+
+		public HueRotation(double radians)
+		{
+			double cosA = Math.Cos(radians);
+			double sinA = Math.Sin(radians);
+			double onethirdoneminuscosA = (1.0 - cosA) / 3;
+			double sqrtonethirdsinA = sqrtonethird * sinA;
+
+			_0 = cosA + onethirdoneminuscosA;
+			_1 = onethirdoneminuscosA - sqrtonethirdsinA;
+			_2 = onethirdoneminuscosA + sqrtonethirdsinA;
+		}
+
+		private void ApplyRotationInternal(byte rin, byte gin, byte bin, out byte rout, out byte gout, out byte bout)
+		{
+			rout = Clamp(rin * _0 + gin * _1 + bin * _2);
+			gout = Clamp(rin * _2 + gin * _0 + bin * _1);
+			bout = Clamp(rin * _1 + gin * _2 + bin * _0);
+		}
+
+		public void ApplyRotation(RSDKv3.Palette palette)
+		{
+			foreach (var line in palette.colors)
+				ApplyRotation(line);
+		}
+
+		public void ApplyRotation(RSDKv3.Palette.Color[] palette)
+		{
+			foreach (var color in palette)
+			{
+				ApplyRotationInternal(color.R, color.G, color.B, out byte r, out byte g, out byte b);
+				color.R = r;
+				color.G = g;
+				color.B = b;
+			}
+		}
+
+		public void ApplyRotation(byte[] palette)
+		{
+			for (int i = 0; i < palette.Length - 2; i += 3)
+			{
+				ApplyRotationInternal(palette[i], palette[i + 1], palette[i + 2], out byte r, out byte g, out byte b);
+				palette[i] = r;
+				palette[i + 1] = g;
+				palette[i + 2] = b;
+			}
+		}
+
+		static byte Clamp(double val)
+		{
+			int ival = (int)Math.Round(val, MidpointRounding.AwayFromZero);
+			if (ival < 0)
+				return 0;
+			else if (ival > 255)
+				return 255;
+			return (byte)ival;
+		}
 	}
 
 	class ChartNode
@@ -1549,59 +2635,47 @@ namespace SCDSteamRando
 		public void Connect(ConnectionType color, ChartNode dest)
 		{
 			Direction outdir, indir;
-			if (GridY == dest.GridY)
+			int xdiff = GridX - dest.GridX;
+			int ydiff = GridY - dest.GridY;
+			if (ydiff == -1)
 			{
-				switch (GridX - dest.GridX)
-				{
-					case -1:
-						outdir = Direction.Right;
-						indir = Direction.Left;
-						break;
-					case 1:
-						outdir = Direction.Left;
-						indir = Direction.Right;
-						break;
-					case 0:
-						outdir = Direction.Right;
-						indir = Direction.Right;
-						break;
-					default:
-						outdir = Direction.Top;
-						indir = Direction.Top;
-						break;
-				}
+				outdir = Direction.Bottom;
+				indir = Direction.Top;
 			}
-			else
+			else if (ydiff == 1)
 			{
-				int ydist = GridY - dest.GridY;
-				if (ydist < 0)
+				outdir = Direction.Top;
+				indir = Direction.Bottom;
+			}
+			else if (xdiff == 0)
+			{
+				if (ydiff < 1)
 				{
-					if (ydist == -1)
-					{
-						outdir = Direction.Bottom;
-						indir = Direction.Top;
-					}
-					else
-					{
-						outdir = Direction.Right;
-						indir = Direction.Right;
-					}
+					outdir = Direction.Right;
+					indir = Direction.Right;
 				}
 				else
 				{
-					if (ydist == 1)
-					{
-						outdir = Direction.Top;
-						indir = Direction.Bottom;
-					}
-					else
-					{
-						outdir = Direction.Left;
-						indir = Direction.Left;
-					}
+					outdir = Direction.Left;
+					indir = Direction.Left;
 				}
 			}
-			ChartConnection c = dest.IncomingConnections[indir].Find(a => a.Color == color);
+			else if (ydiff == 0 && (xdiff < -1 || xdiff > 1))
+			{
+				outdir = Direction.Top;
+				indir = Direction.Top;
+			}
+			else if (xdiff < 0)
+			{
+				outdir = Direction.Right;
+				indir = Direction.Left;
+			}
+			else
+			{
+				outdir = Direction.Left;
+				indir = Direction.Right;
+			}
+			ChartConnection c = dest.IncomingConnections[indir].Find(a => a.Type == color);
 			if (c == null)
 			{
 				c = new ChartConnection(indir, color, this, dest);
@@ -1619,7 +2693,7 @@ namespace SCDSteamRando
 	{
 		public ChartNode Node { get; }
 		public Direction Side { get; }
-		public ConnectionType Color { get; }
+		public ConnectionType Type { get; }
 		public List<ChartNode> Sources { get; }
 		public int MinX { get; private set; }
 		public int MinY { get; private set; }
@@ -1628,11 +2702,11 @@ namespace SCDSteamRando
 		public int Distance { get; private set; }
 		public int Lane { get; set; }
 
-		public ChartConnection(Direction side, ConnectionType color, ChartNode src, ChartNode dst)
+		public ChartConnection(Direction side, ConnectionType type, ChartNode src, ChartNode dst)
 		{
 			Node = dst;
 			Side = side;
-			Color = color;
+			Type = type;
 			Sources = new List<ChartNode>() { src };
 			MinX = Math.Min(src.GridX, dst.GridX);
 			MinY = Math.Min(src.GridY, dst.GridY);
@@ -1679,6 +2753,7 @@ namespace SCDSteamRando
 
 	class DecompModInfo
 	{
+		[IniName("mods")]
 		public DecompModList Mods { get; set; }
 	}
 
@@ -1695,9 +2770,9 @@ namespace SCDSteamRando
 		[IniAlwaysInclude]
 		public bool RandomSeed { get; set; }
 		[IniAlwaysInclude]
-		public int Mode { get; set; }
+		public Modes Mode { get; set; }
 		[IniAlwaysInclude]
-		public int MainPath { get; set; }
+		public MainPath MainPath { get; set; }
 		[System.ComponentModel.DefaultValue(69)]
 		[IniAlwaysInclude]
 		public int MaxBackJump { get; set; } = 69;
@@ -1713,6 +2788,22 @@ namespace SCDSteamRando
 		public bool RandomMusic { get; set; }
 		[IniAlwaysInclude]
 		public bool SeparateSoundtracks { get; set; }
+		[IniAlwaysInclude]
+		public ItemMode RandomItems { get; set; }
+		[IniAlwaysInclude]
+		public bool RandomTimePosts { get; set; }
+		[IniAlwaysInclude]
+		public bool ReplaceCheckpoints { get; set; }
+		[IniAlwaysInclude]
+		public bool RandomPalettes { get; set; }
+		[IniAlwaysInclude]
+		public bool RandomUFOs { get; set; }
+		[IniAlwaysInclude]
+		public UFODifficulty UFODifficulty { get; set; }
+		[IniAlwaysInclude]
+		public bool RandomWater { get; set; }
+		[IniAlwaysInclude]
+		public bool AddWaterOnly { get; set; }
 
 		public static Settings Load()
 		{
@@ -1725,5 +2816,40 @@ namespace SCDSteamRando
 		{
 			IniSerializer.Serialize(this, "RandoSettings.ini");
 		}
+	}
+
+	enum Modes
+	{
+		AllStagesWarps,
+		Rounds,
+		Acts,
+		TimePeriods,
+		BranchingPaths,
+		Segments,
+		Wild,
+		Shadow
+	}
+
+	enum MainPath
+	{
+		ActClear,
+		TimeTravel,
+		AnyExit
+	}
+
+	enum ItemMode
+	{
+		Off,
+		OneToOne,
+		OneToOnePerStage,
+		Wild
+	}
+
+	enum UFODifficulty
+	{
+		Easy,
+		Medium,
+		Hard,
+		Wild
 	}
 }

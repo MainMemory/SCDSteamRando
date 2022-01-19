@@ -36,6 +36,7 @@ namespace SCDSteamRando
 			System.Windows.Forms.Label label4;
 			System.Windows.Forms.Label label5;
 			System.Windows.Forms.Label label6;
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
 			this.seedSelector = new System.Windows.Forms.NumericUpDown();
 			this.randomSeed = new System.Windows.Forms.CheckBox();
 			this.randomMusic = new System.Windows.Forms.CheckBox();
@@ -51,15 +52,26 @@ namespace SCDSteamRando
 			this.separateSoundtracks = new System.Windows.Forms.CheckBox();
 			this.saveLogButton = new System.Windows.Forms.Button();
 			this.makeChartButton = new System.Windows.Forms.Button();
+			this.randomItemMode = new System.Windows.Forms.ComboBox();
+			this.randomTimePosts = new System.Windows.Forms.CheckBox();
+			this.replaceCheckpoints = new System.Windows.Forms.CheckBox();
+			this.randomPalettes = new System.Windows.Forms.CheckBox();
+			this.ufoDifficulty = new System.Windows.Forms.ComboBox();
+			this.randomUFOs = new System.Windows.Forms.CheckBox();
+			this.randomWater = new System.Windows.Forms.CheckBox();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabPage1 = new System.Windows.Forms.TabPage();
 			this.label7 = new System.Windows.Forms.Label();
 			this.panel1 = new System.Windows.Forms.Panel();
+			this.tabPage3 = new System.Windows.Forms.TabPage();
+			this.label9 = new System.Windows.Forms.Label();
+			this.label8 = new System.Windows.Forms.Label();
 			this.tabPage2 = new System.Windows.Forms.TabPage();
 			this.spoilerLevelInfo = new System.Windows.Forms.TextBox();
 			this.spoilerLevelList = new System.Windows.Forms.ListBox();
 			this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
 			this.saveFileDialog2 = new System.Windows.Forms.SaveFileDialog();
+			this.addWaterOnly = new System.Windows.Forms.CheckBox();
 			label1 = new System.Windows.Forms.Label();
 			label2 = new System.Windows.Forms.Label();
 			label3 = new System.Windows.Forms.Label();
@@ -73,6 +85,7 @@ namespace SCDSteamRando
 			this.tabControl1.SuspendLayout();
 			this.tabPage1.SuspendLayout();
 			this.panel1.SuspendLayout();
+			this.tabPage3.SuspendLayout();
 			this.tabPage2.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -164,7 +177,7 @@ namespace SCDSteamRando
 			// randomMusic
 			// 
 			this.randomMusic.AutoSize = true;
-			this.randomMusic.Location = new System.Drawing.Point(6, 191);
+			this.randomMusic.Location = new System.Drawing.Point(8, 6);
 			this.randomMusic.Name = "randomMusic";
 			this.randomMusic.Size = new System.Drawing.Size(110, 17);
 			this.randomMusic.TabIndex = 6;
@@ -255,7 +268,7 @@ namespace SCDSteamRando
 			// randomizeButton
 			// 
 			this.randomizeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.randomizeButton.Location = new System.Drawing.Point(414, 204);
+			this.randomizeButton.Location = new System.Drawing.Point(416, 224);
 			this.randomizeButton.Name = "randomizeButton";
 			this.randomizeButton.Size = new System.Drawing.Size(75, 23);
 			this.randomizeButton.TabIndex = 7;
@@ -294,11 +307,14 @@ namespace SCDSteamRando
 			this.modeSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.modeSelector.FormattingEnabled = true;
 			this.modeSelector.Items.AddRange(new object[] {
-            "Shuffle All Stages + Warps",
+            "Shuffle All Stages w/ Warps",
             "Shuffle Rounds",
             "Shuffle Acts",
             "Shuffle Time Periods",
-            "Branching Paths"});
+            "Branching Paths",
+            "Segments",
+            "Wild",
+            "Shadow"});
 			this.modeSelector.Location = new System.Drawing.Point(49, 32);
 			this.modeSelector.Name = "modeSelector";
 			this.modeSelector.Size = new System.Drawing.Size(190, 21);
@@ -309,7 +325,7 @@ namespace SCDSteamRando
 			// separateSoundtracks
 			// 
 			this.separateSoundtracks.AutoSize = true;
-			this.separateSoundtracks.Location = new System.Drawing.Point(122, 191);
+			this.separateSoundtracks.Location = new System.Drawing.Point(124, 6);
 			this.separateSoundtracks.Name = "separateSoundtracks";
 			this.separateSoundtracks.Size = new System.Drawing.Size(135, 17);
 			this.separateSoundtracks.TabIndex = 8;
@@ -324,7 +340,7 @@ namespace SCDSteamRando
 			this.saveLogButton.AutoSize = true;
 			this.saveLogButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.saveLogButton.Enabled = false;
-			this.saveLogButton.Location = new System.Drawing.Point(417, 204);
+			this.saveLogButton.Location = new System.Drawing.Point(417, 163);
 			this.saveLogButton.Name = "saveLogButton";
 			this.saveLogButton.Size = new System.Drawing.Size(72, 23);
 			this.saveLogButton.TabIndex = 2;
@@ -340,7 +356,7 @@ namespace SCDSteamRando
 			this.makeChartButton.AutoSize = true;
 			this.makeChartButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.makeChartButton.Enabled = false;
-			this.makeChartButton.Location = new System.Drawing.Point(330, 204);
+			this.makeChartButton.Location = new System.Drawing.Point(330, 163);
 			this.makeChartButton.Name = "makeChartButton";
 			this.makeChartButton.Size = new System.Drawing.Size(81, 23);
 			this.makeChartButton.TabIndex = 3;
@@ -349,34 +365,120 @@ namespace SCDSteamRando
 			this.makeChartButton.UseVisualStyleBackColor = true;
 			this.makeChartButton.Click += new System.EventHandler(this.makeChartButton_Click);
 			// 
+			// randomItemMode
+			// 
+			this.randomItemMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.randomItemMode.FormattingEnabled = true;
+			this.randomItemMode.Items.AddRange(new object[] {
+            "Off",
+            "One to One",
+            "One to One Per Stage",
+            "Wild"});
+			this.randomItemMode.Location = new System.Drawing.Point(103, 29);
+			this.randomItemMode.Name = "randomItemMode";
+			this.randomItemMode.Size = new System.Drawing.Size(201, 21);
+			this.randomItemMode.TabIndex = 9;
+			this.toolTip1.SetToolTip(this.randomItemMode, "One to One: The types of items will be shuffled between each other.\r\nOne to One P" +
+        "er Stage: Same as One to One, but reshuffled each stage.\r\nWild: Each monitor has" +
+        " a random item.");
+			// 
+			// randomTimePosts
+			// 
+			this.randomTimePosts.AutoSize = true;
+			this.randomTimePosts.Location = new System.Drawing.Point(6, 56);
+			this.randomTimePosts.Name = "randomTimePosts";
+			this.randomTimePosts.Size = new System.Drawing.Size(134, 17);
+			this.randomTimePosts.TabIndex = 11;
+			this.randomTimePosts.Text = "Randomize Time Posts";
+			this.toolTip1.SetToolTip(this.randomTimePosts, "Time Posts will randomly be set to Past or Future.");
+			this.randomTimePosts.UseVisualStyleBackColor = true;
+			// 
+			// replaceCheckpoints
+			// 
+			this.replaceCheckpoints.AutoSize = true;
+			this.replaceCheckpoints.Location = new System.Drawing.Point(146, 56);
+			this.replaceCheckpoints.Name = "replaceCheckpoints";
+			this.replaceCheckpoints.Size = new System.Drawing.Size(208, 17);
+			this.replaceCheckpoints.TabIndex = 12;
+			this.replaceCheckpoints.Text = "Replace Checkpoints With Time Posts";
+			this.toolTip1.SetToolTip(this.replaceCheckpoints, "Replaces all checkpoints with a time post set to a random destination.");
+			this.replaceCheckpoints.UseVisualStyleBackColor = true;
+			// 
+			// randomPalettes
+			// 
+			this.randomPalettes.AutoSize = true;
+			this.randomPalettes.Location = new System.Drawing.Point(6, 79);
+			this.randomPalettes.Name = "randomPalettes";
+			this.randomPalettes.Size = new System.Drawing.Size(120, 17);
+			this.randomPalettes.TabIndex = 13;
+			this.randomPalettes.Text = "Randomize Palettes";
+			this.toolTip1.SetToolTip(this.randomPalettes, "Randomly hue-shifts all the game\'s palettes.");
+			this.randomPalettes.UseVisualStyleBackColor = true;
+			// 
+			// ufoDifficulty
+			// 
+			this.ufoDifficulty.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.ufoDifficulty.FormattingEnabled = true;
+			this.ufoDifficulty.Items.AddRange(new object[] {
+            "Easy",
+            "Medium",
+            "Hard",
+            "Wild"});
+			this.ufoDifficulty.Location = new System.Drawing.Point(177, 100);
+			this.ufoDifficulty.Name = "ufoDifficulty";
+			this.ufoDifficulty.Size = new System.Drawing.Size(121, 21);
+			this.ufoDifficulty.TabIndex = 16;
+			this.toolTip1.SetToolTip(this.ufoDifficulty, "Sets the difficulty level for the Special Stages.");
+			// 
+			// randomUFOs
+			// 
+			this.randomUFOs.AutoSize = true;
+			this.randomUFOs.Location = new System.Drawing.Point(6, 102);
+			this.randomUFOs.Name = "randomUFOs";
+			this.randomUFOs.Size = new System.Drawing.Size(109, 17);
+			this.randomUFOs.TabIndex = 14;
+			this.randomUFOs.Text = "Randomize UFOs";
+			this.toolTip1.SetToolTip(this.randomUFOs, "The number and placements of UFOs in the Special Stages will be randomized.");
+			this.randomUFOs.UseVisualStyleBackColor = true;
+			// 
+			// randomWater
+			// 
+			this.randomWater.AutoSize = true;
+			this.randomWater.Location = new System.Drawing.Point(6, 127);
+			this.randomWater.Name = "randomWater";
+			this.randomWater.Size = new System.Drawing.Size(111, 17);
+			this.randomWater.TabIndex = 17;
+			this.randomWater.Text = "Randomize Water";
+			this.toolTip1.SetToolTip(this.randomWater, "Water will be randomly added, removed, or adjusted in levels.\r\nMay make the game " +
+        "unwinnable.");
+			this.randomWater.UseVisualStyleBackColor = true;
+			// 
 			// tabControl1
 			// 
 			this.tabControl1.Controls.Add(this.tabPage1);
+			this.tabControl1.Controls.Add(this.tabPage3);
 			this.tabControl1.Controls.Add(this.tabPage2);
-			this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.tabControl1.Dock = System.Windows.Forms.DockStyle.Top;
 			this.tabControl1.Location = new System.Drawing.Point(0, 0);
 			this.tabControl1.Name = "tabControl1";
 			this.tabControl1.SelectedIndex = 0;
-			this.tabControl1.Size = new System.Drawing.Size(503, 259);
+			this.tabControl1.Size = new System.Drawing.Size(503, 218);
 			this.tabControl1.TabIndex = 0;
 			// 
 			// tabPage1
 			// 
-			this.tabPage1.Controls.Add(this.separateSoundtracks);
 			this.tabPage1.Controls.Add(this.modeSelector);
 			this.tabPage1.Controls.Add(this.label7);
 			this.tabPage1.Controls.Add(this.panel1);
-			this.tabPage1.Controls.Add(this.randomizeButton);
 			this.tabPage1.Controls.Add(label1);
 			this.tabPage1.Controls.Add(this.seedSelector);
 			this.tabPage1.Controls.Add(this.randomSeed);
-			this.tabPage1.Controls.Add(this.randomMusic);
 			this.tabPage1.Location = new System.Drawing.Point(4, 22);
 			this.tabPage1.Name = "tabPage1";
 			this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage1.Size = new System.Drawing.Size(495, 233);
+			this.tabPage1.Size = new System.Drawing.Size(495, 192);
 			this.tabPage1.TabIndex = 0;
-			this.tabPage1.Text = "Settings";
+			this.tabPage1.Text = "Level Order";
 			this.tabPage1.UseVisualStyleBackColor = true;
 			// 
 			// label7
@@ -409,6 +511,46 @@ namespace SCDSteamRando
 			this.panel1.Size = new System.Drawing.Size(360, 132);
 			this.panel1.TabIndex = 5;
 			// 
+			// tabPage3
+			// 
+			this.tabPage3.Controls.Add(this.addWaterOnly);
+			this.tabPage3.Controls.Add(this.randomWater);
+			this.tabPage3.Controls.Add(this.ufoDifficulty);
+			this.tabPage3.Controls.Add(this.label9);
+			this.tabPage3.Controls.Add(this.randomUFOs);
+			this.tabPage3.Controls.Add(this.randomPalettes);
+			this.tabPage3.Controls.Add(this.replaceCheckpoints);
+			this.tabPage3.Controls.Add(this.randomTimePosts);
+			this.tabPage3.Controls.Add(this.label8);
+			this.tabPage3.Controls.Add(this.randomItemMode);
+			this.tabPage3.Controls.Add(this.separateSoundtracks);
+			this.tabPage3.Controls.Add(this.randomMusic);
+			this.tabPage3.Location = new System.Drawing.Point(4, 22);
+			this.tabPage3.Name = "tabPage3";
+			this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
+			this.tabPage3.Size = new System.Drawing.Size(495, 192);
+			this.tabPage3.TabIndex = 2;
+			this.tabPage3.Text = "Misc";
+			this.tabPage3.UseVisualStyleBackColor = true;
+			// 
+			// label9
+			// 
+			this.label9.AutoSize = true;
+			this.label9.Location = new System.Drawing.Point(121, 103);
+			this.label9.Name = "label9";
+			this.label9.Size = new System.Drawing.Size(50, 13);
+			this.label9.TabIndex = 15;
+			this.label9.Text = "Difficulty:";
+			// 
+			// label8
+			// 
+			this.label8.AutoSize = true;
+			this.label8.Location = new System.Drawing.Point(6, 32);
+			this.label8.Name = "label8";
+			this.label8.Size = new System.Drawing.Size(91, 13);
+			this.label8.TabIndex = 10;
+			this.label8.Text = "Randomize Items:";
+			// 
 			// tabPage2
 			// 
 			this.tabPage2.Controls.Add(this.makeChartButton);
@@ -418,7 +560,7 @@ namespace SCDSteamRando
 			this.tabPage2.Location = new System.Drawing.Point(4, 22);
 			this.tabPage2.Name = "tabPage2";
 			this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage2.Size = new System.Drawing.Size(495, 233);
+			this.tabPage2.Size = new System.Drawing.Size(495, 192);
 			this.tabPage2.TabIndex = 1;
 			this.tabPage2.Text = "Spoilers";
 			this.tabPage2.UseVisualStyleBackColor = true;
@@ -433,7 +575,7 @@ namespace SCDSteamRando
 			this.spoilerLevelInfo.Name = "spoilerLevelInfo";
 			this.spoilerLevelInfo.ReadOnly = true;
 			this.spoilerLevelInfo.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-			this.spoilerLevelInfo.Size = new System.Drawing.Size(264, 192);
+			this.spoilerLevelInfo.Size = new System.Drawing.Size(264, 151);
 			this.spoilerLevelInfo.TabIndex = 1;
 			this.spoilerLevelInfo.WordWrap = false;
 			// 
@@ -443,7 +585,7 @@ namespace SCDSteamRando
 			this.spoilerLevelList.FormattingEnabled = true;
 			this.spoilerLevelList.Location = new System.Drawing.Point(6, 6);
 			this.spoilerLevelList.Name = "spoilerLevelList";
-			this.spoilerLevelList.Size = new System.Drawing.Size(213, 212);
+			this.spoilerLevelList.Size = new System.Drawing.Size(213, 173);
 			this.spoilerLevelList.TabIndex = 0;
 			this.spoilerLevelList.SelectedIndexChanged += new System.EventHandler(this.spoilerLevelList_SelectedIndexChanged);
 			// 
@@ -458,6 +600,18 @@ namespace SCDSteamRando
 			this.saveFileDialog2.DefaultExt = "png";
 			this.saveFileDialog2.Filter = "PNG Files|*.png";
 			// 
+			// addWaterOnly
+			// 
+			this.addWaterOnly.AutoSize = true;
+			this.addWaterOnly.Location = new System.Drawing.Point(123, 127);
+			this.addWaterOnly.Name = "addWaterOnly";
+			this.addWaterOnly.Size = new System.Drawing.Size(101, 17);
+			this.addWaterOnly.TabIndex = 18;
+			this.addWaterOnly.Text = "Only Add Water";
+			this.toolTip1.SetToolTip(this.addWaterOnly, "If checked, water will only be added to levels that didn\'t have it.\r\nIt will not " +
+        "be altered in levels that already had water.");
+			this.addWaterOnly.UseVisualStyleBackColor = true;
+			// 
 			// MainForm
 			// 
 			this.AcceptButton = this.randomizeButton;
@@ -465,7 +619,9 @@ namespace SCDSteamRando
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(503, 259);
 			this.Controls.Add(this.tabControl1);
+			this.Controls.Add(this.randomizeButton);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "MainForm";
 			this.Text = "Sonic CD 2011 Randomizer";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
@@ -479,6 +635,8 @@ namespace SCDSteamRando
 			this.tabPage1.PerformLayout();
 			this.panel1.ResumeLayout(false);
 			this.panel1.PerformLayout();
+			this.tabPage3.ResumeLayout(false);
+			this.tabPage3.PerformLayout();
 			this.tabPage2.ResumeLayout(false);
 			this.tabPage2.PerformLayout();
 			this.ResumeLayout(false);
@@ -511,5 +669,16 @@ namespace SCDSteamRando
 		private System.Windows.Forms.SaveFileDialog saveFileDialog1;
 		private System.Windows.Forms.Button makeChartButton;
 		private System.Windows.Forms.SaveFileDialog saveFileDialog2;
+		private System.Windows.Forms.TabPage tabPage3;
+		private System.Windows.Forms.Label label8;
+		private System.Windows.Forms.ComboBox randomItemMode;
+		private System.Windows.Forms.CheckBox randomTimePosts;
+		private System.Windows.Forms.CheckBox replaceCheckpoints;
+		private System.Windows.Forms.CheckBox randomPalettes;
+		private System.Windows.Forms.CheckBox randomUFOs;
+		private System.Windows.Forms.Label label9;
+		private System.Windows.Forms.ComboBox ufoDifficulty;
+		private System.Windows.Forms.CheckBox randomWater;
+		private System.Windows.Forms.CheckBox addWaterOnly;
 	}
 }
