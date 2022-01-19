@@ -1036,6 +1036,20 @@ namespace SCDSteamRando
 					newpath = Path.Combine(path, @"Data\Scripts\Global\GoalPost.txt");
 					File.WriteAllText(newpath, Properties.Resources.GoalPost);
 					vdir.AddFile("Scripts/Global/GoalPost.txt", newpath);
+					if (vdir.FileExists("Scripts/Global/BlueShield.txt"))
+						tmpstr = File.ReadAllText(vdir.GetFile("Scripts/Global/BlueShield.txt").SourcePath);
+					else
+						tmpstr = Properties.Resources.BlueShield;
+					newpath = Path.Combine(path, @"Data\Scripts\Global\BlueShield.txt");
+					File.WriteAllText(newpath, tmpstr.Replace("Warp.Timer==0", "Warp.Timer>0"));
+					vdir.AddFile("Scripts/Global/BlueShield.txt", newpath);
+					if (vdir.FileExists("Scripts/Global/Invincibility.txt"))
+						tmpstr = File.ReadAllText(vdir.GetFile("Scripts/Global/Invincibility.txt").SourcePath);
+					else
+						tmpstr = Properties.Resources.BlueShield;
+					newpath = Path.Combine(path, @"Data\Scripts\Global\Invincibility.txt");
+					File.WriteAllText(newpath, tmpstr.Replace("Warp.Timer==0", "Warp.Timer>0"));
+					vdir.AddFile("Scripts/Global/Invincibility.txt", newpath);
 					break;
 				default:
 					for (int i = 0; i < stagecount; i++)

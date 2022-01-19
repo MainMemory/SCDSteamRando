@@ -105,6 +105,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Water.template.txt" />
+    <None Include="Resources\BlueShield.txt" />
+    <None Include="Resources\Invincibility.txt" />
     <Content Include="SonicCD.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

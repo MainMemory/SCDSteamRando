@@ -118,6 +118,35 @@ namespace SCDSteamRando.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to //------------Sonic CD BlueShield Script-------------//
+        /////--------Scripted by Christian Whitehead &apos;The Taxman&apos;--------//
+        /////-------Unpacked By Rubberduckycooly&apos;s Script Unpacker-------//
+        ///
+        /////-------Aliases-------//
+        ///#alias 25: TYPE_BLUESHIELD
+        ///
+        ///
+        ///sub ObjectMain
+        ///	Object.DrawOrder=Object[-2].DrawOrder
+        ///	if Player.State==PlayerObject_Death
+        ///		Object.Type=TypeName[BlankObject]
+        ///	endif
+        ///	if Player.State==PlayerObject_Drown
+        ///		Object.Type=TypeName[BlankObject]
+        ///	endif
+        ///endsub
+        ///
+        ///
+        ///sub ObjectDraw
+        ///	Object.Valu [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string BlueShield {
+            get {
+                return ResourceManager.GetString("BlueShield", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to //------------Sonic CD FuturePost Script-------------//
         /////--------Scripted by Christian Whitehead &apos;The Taxman&apos;--------//
         /////-------Unpacked By Rubberduckycooly&apos;s Script Unpacker-------//
@@ -168,6 +197,32 @@ namespace SCDSteamRando.Properties {
         internal static string GoalPost {
             get {
                 return ResourceManager.GetString("GoalPost", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to //------------Sonic CD Invincibility Script-------------//
+        /////--------Scripted by Christian Whitehead &apos;The Taxman&apos;--------//
+        /////-------Unpacked By Rubberduckycooly&apos;s Script Unpacker-------//
+        ///
+        /////-------Aliases-------//
+        ///#alias 26: TYPE_INVINCIBILITY
+        ///
+        ///
+        ///sub ObjectDraw
+        ///	switch Object.State
+        ///	case 0
+        ///		Object.Value0++
+        ///		if Object.Value0&gt;3
+        ///			Object.Value0=0
+        ///			CreateTempObject(TypeName[Invincibility],0,Player.XPos,Player.YPos)
+        ///			Object[TempObjectPos].State=1
+        ///			Object[TempObjectPos].InkEffect=2
+        ///			O [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Invincibility {
+            get {
+                return ResourceManager.GetString("Invincibility", resourceCulture);
             }
         }
         
