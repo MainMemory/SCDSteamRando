@@ -1278,7 +1278,7 @@ namespace SCDSteamRando
 						int nodecnt = r.Next(2, 9);
 						int lastx = r.Next(xmin + 64, xmax - 63);
 						int lasty = r.Next(ymin + 64, ymax - 63);
-						scn.entities.Add(new RSDKv3.Scene.Entity((byte)ufoid, i == cnt ? (byte)2 : (byte)r.Next(2), (byte)lastx, (byte)lasty));
+						scn.entities.Add(new RSDKv3.Scene.Entity((byte)ufoid, i == cnt ? (byte)2 : (byte)r.Next(2), (short)lastx, (short)lasty));
 						scn.entities.Add(new RSDKv3.Scene.Entity((byte)ufonodeid, (byte)(r.Next(1, 9) * 30), (short)lastx, (short)lasty));
 						for (int j = 1; j < nodecnt; j++)
 						{
