@@ -26,7 +26,7 @@ sub ObjectMain
 			if Object.Value0>0
 				Object.Value0-=8
 			else
-				//PlayStageSfx(41,0)
+				PlayMusic(Options.Soundtrack)
 				Object.State++
 			endif
 			SetScreenFade(0,0,0,Object.Value0)
@@ -49,46 +49,57 @@ sub ObjectMain
 				if KeyPress.Up==1
 					if SelectedOption>0
 						SelectedOption--
+						PlaySfx(23,0)
 					endif
 				endif
 				if KeyPress.Down==1
 					if SelectedOption<4
 						SelectedOption++
+						PlaySfx(23,0)
 					endif
 				endif
 				if KeyPress.ButtonB==1
 					if SelectedOption==4
 						Object.State++
+						PlayStageSfx(1,0)
 					else
 						SelectedOption=4
+						PlaySfx(23,0)
 					endif
 				endif
 				CheckTouchRect(14,54,65,73)
 				if CheckResult>-1
 					SelectedOption=0
+					PlaySfx(23,0)
 				endif
 				CheckTouchRect(14,78,65,97)
 				if CheckResult>-1
 					SelectedOption=1
+					PlaySfx(23,0)
 				endif
 				CheckTouchRect(14,102,65,121)
 				if CheckResult>-1
 					SelectedOption=2
+					PlaySfx(23,0)
 				endif
 				CheckTouchRect(14,126,65,145)
 				if CheckResult>-1
 					if SelectedOption==3
 						Object.State++
+						PlaySfx(19,0)
 					else
 						SelectedOption=3
+						PlaySfx(23,0)
 					endif
 				endif
 				CheckTouchRect(14,150,65,169)
 				if CheckResult>-1
 					if SelectedOption==4
 						Object.State++
+						PlayStageSfx(1,0)
 					else
 						SelectedOption=4
+						PlaySfx(23,0)
 					endif
 				endif
 				switch SelectedOption
@@ -96,11 +107,13 @@ sub ObjectMain
 					if KeyPress.Left==1
 						if RouteIndex>0
 							RouteIndex--
+							PlaySfx(23,0)
 						endif
 					endif
 					if KeyPress.Right==1
 						if RouteIndex<Object.Value3
 							RouteIndex++
+							PlaySfx(23,0)
 						endif
 					endif
 					break
@@ -108,18 +121,26 @@ sub ObjectMain
 					if KeyPress.Left==1
 						if OptsIndex>0
 							OptsIndex--
+							PlaySfx(23,0)
 						endif
 					endif
 					if KeyPress.Right==1
 						if OptsIndex<Object.Value6
 							OptsIndex++
+							PlaySfx(23,0)
 						endif
 					endif
 					break
 				case 3
+					if KeyPress.Start==1
+						Object.State++
+						PlaySfx(19,0)
+					endif
+					break
 				case 4
 					if KeyPress.Start==1
 						Object.State++
+						PlayStageSfx(1,0)
 					endif
 					break
 				endswitch
@@ -213,7 +234,11 @@ sub ObjectMain
 			if TempValue0>255
 				TempValue0=255
 			endif
-			SetScreenFade(0,0,0,TempValue0)
+			if SelectedOption==3
+				SetScreenFade(208,255,224,TempValue0)
+			else
+				SetScreenFade(0,0,0,TempValue0)
+			endif
 			break
 		endswitch
 		break
@@ -959,6 +984,8 @@ sub ObjectStartup
 	endif
 	SpriteFrame(2,1,5,6,209,132) // 118: "/"
 	LoadPalette("RandoSummary.act",0,128,0,128)
+	SetMusicTrack("JP/DAGarden.ogg",0,1)
+	SetMusicTrack("US/DAGarden.ogg",1,117382)
 endsub
 
 sub RSDK
