@@ -80,8 +80,7 @@ namespace SCDSteamRando.Properties {
         ///
         ///function ActFinish_LoadEnding
         ///	if Options.GameMode==2
-        ///		TimeAttack.Result=Stage.Seconds
-        ///		TimeAttack.R [rest of string was truncated]&quot;;.
+        ///		TimeAttack.Result=Stage.Sec [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ActFinish_template {
             get {
@@ -143,6 +142,35 @@ namespace SCDSteamRando.Properties {
         internal static string BlueShield {
             get {
                 return ResourceManager.GetString("BlueShield", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to //------------Sonic CD Credits Control Script-------------//
+        /////--------Scripted by Christian Whitehead &apos;The Taxman&apos;--------//
+        /////-------Unpacked By Rubberduckycooly&apos;s Script Unpacker-------//
+        ///
+        /////-------Aliases-------//
+        ///#alias 34: TYPE_CREDITSCONTROL
+        ///
+        ///
+        ///sub ObjectMain
+        ///	switch Object.State
+        ///	case 0
+        ///		Screen.YOffset=Object.Value2
+        ///		TempValue0=256
+        ///		TempValue0-=Screen.CenterX
+        ///		Screen.XOffset=TempValue0
+        ///		Object.DrawOrder=0
+        ///		if Object.Value0&lt;8
+        ///			Object.Value0++
+        ///		else
+        ///			Object.Value0=254
+        ///			 [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string CreditsControl {
+            get {
+                return ResourceManager.GetString("CreditsControl", resourceCulture);
             }
         }
         
@@ -291,6 +319,26 @@ namespace SCDSteamRando.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] RandoSummaryImg {
+            get {
+                object obj = ResourceManager.GetObject("RandoSummaryImg", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] RandoSummaryPal {
+            get {
+                object obj = ResourceManager.GetObject("RandoSummaryPal", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to //------------Sonic CD Special Ring Script-------------//
         /////--------Scripted by Christian Whitehead &apos;The Taxman&apos;--------//
         /////-------Unpacked By Rubberduckycooly&apos;s Script Unpacker-------//
@@ -315,6 +363,54 @@ namespace SCDSteamRando.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to //------------Sonic CD Stage Setup Script-------------//
+        /////--------Scripted by Christian Whitehead &apos;The Taxman&apos;--------//
+        /////-------Unpacked By Rubberduckycooly&apos;s Script Unpacker-------//
+        ///
+        /////-------Aliases-------//
+        ///#alias 2: TYPE_STAGESETUP
+        ///
+        ///#alias Player.Value0:Player.Rings
+        ///#alias Player.Value6:Player.MinRollSpeed
+        ///
+        ///function StageSetup_CheckGoodFuture
+        ///	if Good_Future==1
+        ///		if Object.PropertyValue&gt;0
+        ///			ResetObjectEntity(Object.EntityNo,Flower_TypeNo,0,Object.XPos,Object.YPos)
+        ///			Object.DrawOrder= [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string StageSetup {
+            get {
+                return ResourceManager.GetString("StageSetup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to //------------Sonic CD Tails Unlock Scr Script-------------//
+        /////--------Scripted by Christian Whitehead &apos;The Taxman&apos;--------//
+        /////-------Unpacked By Rubberduckycooly&apos;s Script Unpacker-------//
+        ///
+        /////-------Aliases-------//
+        ///#alias 5: TYPE_TAILSUNLOCKSCR
+        ///#alias Object.Value1: SelectedOption
+        ///#alias Object.Value2: RouteIndex
+        ///#alias Object.Value7: SpriteSheet2
+        ///#alias Object[32].XPos: MainXPos
+        ///#alias Object[32].YPos: MainYPos
+        ///
+        ///sub ObjectMain
+        ///	switch Object.PropertyValue
+        ///	case 0
+        ///		switch Object.State
+        ///	 [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string TailsUnlock_template {
+            get {
+                return ResourceManager.GetString("TailsUnlock_template", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to //------------Sonic CD TimeWarp Script-------------//
         /////--------Scripted by Christian Whitehead &apos;The Taxman&apos;--------//
         /////-------Unpacked By Rubberduckycooly&apos;s Script Unpacker-------//
@@ -332,8 +428,7 @@ namespace SCDSteamRando.Properties {
         ///		if Object.Value1&lt;320
         ///			if Object.Value1==0
         ///				Player.Invincible=1000
-        ///				Player.ControlMode=-1
-        ///#platform: Mobile [rest of string was truncated]&quot;;.
+        ///				Player.ControlMode=-1        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string TimeWarp_template {
             get {

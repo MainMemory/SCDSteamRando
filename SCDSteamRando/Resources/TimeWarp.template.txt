@@ -124,70 +124,51 @@ sub ObjectDraw
 			switch Stage.ListPos
 //REPLACE
 			endswitch
+			ArrayPos0=Options.SaveSlot
+			ArrayPos0*=400
+			ArrayPos0+=200
+			TempValue2=Stage.Seconds
+			TempValue2*=100
+			TempValue3=Stage.Minutes
+			TempValue3*=6000
+			TempValue2+=TempValue3
+			TempValue2+=Stage.MilliSeconds
+			SaveRAM[ArrayPos0]+=TempValue2
+			ArrayPos0++
+			TempValue3=SaveRAM[ArrayPos0]
+			SaveRAM[ArrayPos0]++
+			ArrayPos0++
+			SaveRAM[ArrayPos0]++
+			ArrayPos0+=2
+			SaveRAM[ArrayPos0]+=Transporter_Destroyed
+			ArrayPos0++
+			TempValue3*=3
+			ArrayPos0+=TempValue3
+			SaveRAM[ArrayPos0]=Stage.ListPos
+			ArrayPos0++
+			SaveRAM[ArrayPos0]=TempValue1
+			ArrayPos0++
+			SaveRAM[ArrayPos0]=TempValue2
 			if TempValue0==70
-				if Options.GameMode==2
-					TimeAttack.Result=Stage.Seconds
-					TimeAttack.Result*=100
-					TempValue0=Stage.Minutes
-					TempValue0*=6000
-					TimeAttack.Result+=TempValue0
-					TimeAttack.Result+=Stage.MilliSeconds
-					TempValue0=Stage.ListPos
-					TempValue0%=10
-					TempValue0>>=2
-					TempValue1=Stage.ListPos
-					TempValue1/=10
-					TempValue1*=3
-					TempValue0+=TempValue1
-					TempValue0++
-					TempValue1=Stage.Seconds
-					TempValue1*=100
-					TempValue2=Stage.Minutes
-					TempValue2*=6000
-					TempValue1+=TempValue2
-					TempValue1+=Stage.MilliSeconds
-					SetLeaderboard(TempValue0,TempValue1)
-					Stage.ListPos=2
-				else
-					if Stage.PlayerListPos==0
-#platform: Mobile
-						EngineCallback(4)
-#endplatform
+				ArrayPos1=Options.SaveSlot
+				ArrayPos1<<=3
+				ArrayPos1+=3
+				SaveRAM[ArrayPos1]=71
+				if Stage.PlayerListPos==0
+					EngineCallback(4)
+					if SpecialStage.TimeStones>126
 #platform: Standard
-						if Stage.DebugMode==0
-							SetAchievement(7,100)
-						endif
-						TempValue0=Stage.ListPos
-						TempValue0%=10
-						TempValue0>>=2
-						TempValue1=Stage.ListPos
-						TempValue1/=10
-						TempValue1*=3
-						TempValue0+=TempValue1
-						TempValue0++
-						TempValue1=Stage.Seconds
-						TempValue1*=100
-						TempValue2=Stage.Minutes
-						TempValue2*=6000
-						TempValue1+=TempValue2
-						TempValue1+=Stage.MilliSeconds
-						SetLeaderboard(TempValue0,TempValue1)
+						LoadVideo("Good_Ending")
 #endplatform
-						if Player.Score>0
 #platform: Mobile
-							if Options.GameMode==1
-								if Stage.DebugMode==0
-#endplatform
-									SetLeaderboard(0,Player.Score)
-#platform: Mobile
-								endif
-							endif
-#endplatform
+						if Options.Soundtrack==0
+							LoadVideo("Good_Ending")
+						else
+							LoadVideo("Good_EndingUS")
 						endif
-#platform: Standard
-						EngineCallback(4)
 #endplatform
-						if SpecialStage.TimeStones>126
+					else
+						if Good_Future_List>16382
 #platform: Standard
 							LoadVideo("Good_Ending")
 #endplatform
@@ -199,40 +180,24 @@ sub ObjectDraw
 							endif
 #endplatform
 						else
-							if Good_Future_List>16382
 #platform: Standard
-								LoadVideo("Good_Ending")
+							LoadVideo("Bad_Ending")
 #endplatform
 #platform: Mobile
-								if Options.Soundtrack==0
-									LoadVideo("Good_Ending")
-								else
-									LoadVideo("Good_EndingUS")
-								endif
-#endplatform
-							else
-#platform: Standard
+							if Options.Soundtrack==0
 								LoadVideo("Bad_Ending")
-#endplatform
-#platform: Mobile
-								if Options.Soundtrack==0
-									LoadVideo("Bad_Ending")
-								else
-									LoadVideo("Bad_EndingUS")
-								endif
-#endplatform
+							else
+								LoadVideo("Bad_EndingUS")
 							endif
+#endplatform
 						endif
-						if SaveRAM[36]==0
-							SaveRAM[36]=1
-							WriteSaveRAM()
-							Stage.ListPos=8
-						else
-							Stage.ListPos=1
-						endif
-					else
-						Stage.ListPos=7
 					endif
+					if SaveRAM[36]==0
+						SaveRAM[36]=1
+					endif
+					Stage.ListPos=8
+				else
+					Stage.ListPos=7
 				endif
 				Stage.ActiveList=PRESENTATION_STAGE
 			else
@@ -244,6 +209,8 @@ sub ObjectDraw
 				Fade_Colour+=TempValue0
 				Fade_Colour+=224
 				LampPost.Check=0
+				Transporter_Destroyed=0
+				MetalSonic_Destroyed=0
 				if Options.GameMode==1
 					ArrayPos1=Options.SaveSlot
 					ArrayPos1<<=3
@@ -265,9 +232,9 @@ sub ObjectDraw
 					SaveRAM[ArrayPos1]=MetalSonic_List
 					SaveRAM[ArrayPos1]<<=16
 					SaveRAM[ArrayPos1]+=Good_Future_List
-					WriteSaveRAM()
 				endif
 			endif
+			WriteSaveRAM()
 			LoadStage()
 		endif
 		break

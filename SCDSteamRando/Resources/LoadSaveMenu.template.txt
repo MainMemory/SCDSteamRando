@@ -603,6 +603,10 @@ sub ObjectMain
 				endif
 			endif
 			Stage.PlayerListPos=Object[+ArrayPos0].Value3
+			if Stage.ListPos==70
+				Stage.ActiveList=PRESENTATION_STAGE
+				Stage.ListPos=8
+			endif
 			LoadStage()
 		endif
 		SetScreenFade(0,0,0,Object.Value0)
@@ -789,6 +793,18 @@ sub ObjectMain
 			SaveRAM[ArrayPos1]=0
 			ArrayPos1++
 			SaveRAM[ArrayPos1]=50000
+			ArrayPos1++
+			SaveRAM[ArrayPos1]=0
+			ArrayPos1=Options.SaveSlot
+			ArrayPos1*=400
+			ArrayPos1+=200
+			SaveRAM[ArrayPos1]=0
+			ArrayPos1++
+			SaveRAM[ArrayPos1]=0
+			ArrayPos1++
+			SaveRAM[ArrayPos1]=0
+			ArrayPos1++
+			SaveRAM[ArrayPos1]=0
 			ArrayPos1++
 			SaveRAM[ArrayPos1]=0
 			WriteSaveRAM()

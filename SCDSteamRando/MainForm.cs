@@ -189,9 +189,13 @@ namespace SCDSteamRando
 					gc = new RSDKv3.GameConfig(ms);
 			else
 				gc = new RSDKv3.GameConfig(vfile.SourcePath);
-			Directory.CreateDirectory(Path.Combine(path, @"Data\Scripts\Menu"));
+			Directory.CreateDirectory(Path.Combine(path, @"Data\Palettes"));
+			Directory.CreateDirectory(Path.Combine(path, @"Data\Scripts\Credits"));
 			Directory.CreateDirectory(Path.Combine(path, @"Data\Scripts\Global"));
+			Directory.CreateDirectory(Path.Combine(path, @"Data\Scripts\Menu"));
 			Directory.CreateDirectory(Path.Combine(path, @"Data\Scripts\R8"));
+			Directory.CreateDirectory(Path.Combine(path, @"Data\Scripts\Secrets"));
+			Directory.CreateDirectory(Path.Combine(path, @"Data\Sprites\Secrets"));
 			Random r = new Random(seed);
 			for (int i = 0; i < stagecount; i++)
 			{
@@ -861,7 +865,186 @@ namespace SCDSteamRando
 			newpath = Path.Combine(path, @"Data\Scripts\R8\Amy.txt");
 			File.WriteAllText(newpath, Properties.Resources.Amy);
 			vdir.AddFile("Scripts/R8/Amy.txt", newpath);
+			if (vdir.FileExists("Scripts/Credits/CreditsControl.txt"))
+				tmpstr = File.ReadAllText(vdir.GetFile("Scripts/Credits/CreditsControl.txt").SourcePath);
+			else
+				tmpstr = Properties.Resources.CreditsControl;
+			newpath = Path.Combine(path, @"Data\Scripts\Credits\CreditsControl.txt");
+			File.WriteAllText(newpath, tmpstr.Replace("Stage.ListPos=1", "Stage.ListPos=8"));
+			vdir.AddFile("Scripts/Credits/CreditsControl.txt", newpath);
+			if (vdir.FileExists("Scripts/Global/StageSetup.txt"))
+				tmpstr = File.ReadAllText(vdir.GetFile("Scripts/Global/StageSetup.txt").SourcePath);
+			else
+				tmpstr = Properties.Resources.StageSetup;
+			newpath = Path.Combine(path, @"Data\Scripts\Global\StageSetup.txt");
+			File.WriteAllText(newpath, tmpstr.Replace("Transporter_Destroyed=1", "Transporter_Destroyed=0"));
+			vdir.AddFile("Scripts/Global/StageSetup.txt", newpath);
+			tmpstr = Properties.Resources.TailsUnlock_template;
+			tmpstr = tmpstr.Replace("//REPLACE1", $"SaveRAM[ArrayPos1]={stageids[0] + 1}");
+			tmpstr = tmpstr.Replace("//REPLACE2", $"Stage.ListPos={stageids[0]}");
 			System.Text.StringBuilder sb = new System.Text.StringBuilder();
+			int numopts = 10;
+			if (settings.Mode == Modes.AllStagesWarps)
+				numopts = 15;
+			sb.AppendLine($"\tObject[32].Value6={(numopts + 6) / 7 - 1}");
+			int optypos = 487;
+			sb.AppendLine("\tTempValue4=100");
+			sb.AppendLine("\t// Build");
+			sb.AppendLine("\tArrayPos1++");
+			sb.AppendLine($"\tResetObjectEntity(ArrayPos1,TypeName[Tails Unlock Scr],8,TempValue4,{optypos})");
+			sb.AppendLine("\tObject[ArrayPos1].Priority=1");
+			sb.AppendLine("\tObject[ArrayPos1].Value1=TempValue1");
+			DateTime buildDate = File.GetLastWriteTimeUtc(Application.ExecutablePath);
+			sb.AppendLine($"\tObject[ArrayPos1].Value2={buildDate.Year}");
+			sb.AppendLine($"\tObject[ArrayPos1].Value3={buildDate.Month}");
+			sb.AppendLine($"\tObject[ArrayPos1].Value4={buildDate.Day}");
+			sb.AppendLine($"\tObject[ArrayPos1].Value5={buildDate.Hour}");
+			sb.AppendLine($"\tObject[ArrayPos1].Value6={buildDate.Minute}");
+			optypos += 38;
+			sb.AppendLine("\t// Seed");
+			sb.AppendLine("\tArrayPos1++");
+			sb.AppendLine($"\tResetObjectEntity(ArrayPos1,TypeName[Tails Unlock Scr],9,TempValue4,{optypos})");
+			sb.AppendLine("\tObject[ArrayPos1].Priority=1");
+			sb.AppendLine("\tObject[ArrayPos1].Value1=TempValue1");
+			sb.AppendLine($"\tObject[ArrayPos1].Value2={Math.Abs(seed)}");
+			if (seed < 0)
+			{
+				int seed2 = seed;
+				int digits = 0;
+				do
+				{
+					seed2 /= 10;
+					digits++;
+				}
+				while (seed2 != 0);
+				sb.AppendLine($"\tObject[ArrayPos1].Value3={digits * 8}");
+			}
+			optypos += 38;
+			sb.AppendLine("\t// Mode");
+			sb.AppendLine("\tArrayPos1++");
+			sb.AppendLine($"\tResetObjectEntity(ArrayPos1,TypeName[Tails Unlock Scr],10,TempValue4,{optypos})");
+			sb.AppendLine("\tObject[ArrayPos1].Priority=1");
+			sb.AppendLine("\tObject[ArrayPos1].Value0=71");
+			sb.AppendLine($"\tObject[ArrayPos1].Value1={(int)settings.Mode + 86}");
+			if (settings.Mode == Modes.AllStagesWarps)
+			{
+				optypos += 38;
+				sb.AppendLine("\t// Main path");
+				sb.AppendLine("\tArrayPos1++");
+				sb.AppendLine($"\tResetObjectEntity(ArrayPos1,TypeName[Tails Unlock Scr],10,TempValue4,{optypos})");
+				sb.AppendLine("\tObject[ArrayPos1].Priority=1");
+				sb.AppendLine("\tObject[ArrayPos1].Value0=72");
+				sb.AppendLine($"\tObject[ArrayPos1].Value1={mainPathSelector.SelectedIndex + 94}");
+				optypos += 38;
+				sb.AppendLine("\t// Max BW jump");
+				sb.AppendLine("\tArrayPos1++");
+				sb.AppendLine($"\tResetObjectEntity(ArrayPos1,TypeName[Tails Unlock Scr],11,TempValue4,{optypos})");
+				sb.AppendLine("\tObject[ArrayPos1].Priority=1");
+				sb.AppendLine("\tObject[ArrayPos1].Value1=TempValue1");
+				sb.AppendLine("\tObject[ArrayPos1].Value2=73");
+				sb.AppendLine($"\tObject[ArrayPos1].Value3={maxBackJump.Value}");
+				optypos += 38;
+				sb.AppendLine("\t// Max FW jump");
+				sb.AppendLine("\tArrayPos1++");
+				sb.AppendLine($"\tResetObjectEntity(ArrayPos1,TypeName[Tails Unlock Scr],11,TempValue4,{optypos})");
+				sb.AppendLine("\tObject[ArrayPos1].Priority=1");
+				sb.AppendLine("\tObject[ArrayPos1].Value1=TempValue1");
+				sb.AppendLine("\tObject[ArrayPos1].Value2=74");
+				sb.AppendLine($"\tObject[ArrayPos1].Value3={maxForwJump.Value}");
+				optypos = 487;
+				sb.AppendLine("\tTempValue4+=Screen.XSize");
+				sb.AppendLine("\tTempValue4-=88");
+				sb.AppendLine("\t// BW prob");
+				sb.AppendLine("\tArrayPos1++");
+				sb.AppendLine($"\tResetObjectEntity(ArrayPos1,TypeName[Tails Unlock Scr],11,TempValue4,{optypos})");
+				sb.AppendLine("\tObject[ArrayPos1].Priority=1");
+				sb.AppendLine("\tObject[ArrayPos1].Value1=TempValue1");
+				sb.AppendLine("\tObject[ArrayPos1].Value1+=TempValue4");
+				sb.AppendLine("\tObject[ArrayPos1].Value1-=100");
+				sb.AppendLine("\tObject[ArrayPos1].Value2=75");
+				sb.AppendLine($"\tObject[ArrayPos1].Value3={backJumpProb.Value}");
+				optypos += 38;
+				sb.AppendLine("\t// Allow same");
+				sb.AppendLine("\tArrayPos1++");
+				sb.AppendLine($"\tResetObjectEntity(ArrayPos1,TypeName[Tails Unlock Scr],10,TempValue4,{optypos})");
+				sb.AppendLine("\tObject[ArrayPos1].Priority=1");
+				sb.AppendLine("\tObject[ArrayPos1].Value0=76");
+				sb.AppendLine($"\tObject[ArrayPos1].Value1={(allowSameLevel.Checked ? 97 : 98)}");
+			}
+			optypos += 38;
+			sb.AppendLine("\t// Music");
+			sb.AppendLine("\tArrayPos1++");
+			sb.AppendLine($"\tResetObjectEntity(ArrayPos1,TypeName[Tails Unlock Scr],10,TempValue4,{optypos})");
+			sb.AppendLine("\tObject[ArrayPos1].Priority=1");
+			sb.AppendLine("\tObject[ArrayPos1].Value0=77");
+			sb.AppendLine($"\tObject[ArrayPos1].Value1={(randomMusic.Checked ? (separateSoundtracks.Checked ? 102 : 101) : 100)}");
+			optypos += 38;
+			sb.AppendLine("\t// Items");
+			sb.AppendLine("\tArrayPos1++");
+			sb.AppendLine($"\tResetObjectEntity(ArrayPos1,TypeName[Tails Unlock Scr],10,TempValue4,{optypos})");
+			sb.AppendLine("\tObject[ArrayPos1].Priority=1");
+			sb.AppendLine("\tObject[ArrayPos1].Value0=78");
+			sb.AppendLine($"\tObject[ArrayPos1].Value1={new[] { 100, 103, 104, 92 }[randomItemMode.SelectedIndex]}");
+			optypos += 38;
+			sb.AppendLine("\t// Time posts");
+			sb.AppendLine("\tArrayPos1++");
+			sb.AppendLine($"\tResetObjectEntity(ArrayPos1,TypeName[Tails Unlock Scr],10,TempValue4,{optypos})");
+			sb.AppendLine("\tObject[ArrayPos1].Priority=1");
+			sb.AppendLine("\tObject[ArrayPos1].Value0=79");
+			sb.AppendLine($"\tObject[ArrayPos1].Value1={(randomTimePosts.Checked ? 99 : 100)}");
+			if (settings.Mode == Modes.AllStagesWarps)
+				optypos += 38;
+			else
+			{
+				optypos = 487;
+				sb.AppendLine("\tTempValue4+=Screen.XSize");
+				sb.AppendLine("\tTempValue4-=88");
+			}
+			sb.AppendLine("\t// Checkpoints");
+			sb.AppendLine("\tArrayPos1++");
+			sb.AppendLine($"\tResetObjectEntity(ArrayPos1,TypeName[Tails Unlock Scr],10,TempValue4,{optypos})");
+			sb.AppendLine("\tObject[ArrayPos1].Priority=1");
+			sb.AppendLine("\tObject[ArrayPos1].Value0=80");
+			sb.AppendLine($"\tObject[ArrayPos1].Value1={(replaceCheckpoints.Checked ? 99 : 100)}");
+			if (settings.Mode == Modes.AllStagesWarps)
+			{
+				optypos = 487;
+				sb.AppendLine("\tTempValue4+=Screen.XSize");
+				sb.AppendLine("\tTempValue4-=88");
+			}
+			else
+				optypos += 38;
+			sb.AppendLine("\t// Palettes");
+			sb.AppendLine("\tArrayPos1++");
+			sb.AppendLine($"\tResetObjectEntity(ArrayPos1,TypeName[Tails Unlock Scr],10,TempValue4,{optypos})");
+			sb.AppendLine("\tObject[ArrayPos1].Priority=1");
+			sb.AppendLine("\tObject[ArrayPos1].Value0=81");
+			sb.AppendLine($"\tObject[ArrayPos1].Value1={(randomPalettes.Checked ? 99 : 100)}");
+			optypos += 38;
+			sb.AppendLine("\t// UFOs");
+			sb.AppendLine("\tArrayPos1++");
+			sb.AppendLine($"\tResetObjectEntity(ArrayPos1,TypeName[Tails Unlock Scr],10,TempValue4,{optypos})");
+			sb.AppendLine("\tObject[ArrayPos1].Priority=1");
+			sb.AppendLine("\tObject[ArrayPos1].Value0=82");
+			sb.AppendLine($"\tObject[ArrayPos1].Value1={(randomUFOs.Checked ? new[] { 105, 106, 107, 92 }[ufoDifficulty.SelectedIndex] : 100)}");
+			optypos += 38;
+			sb.AppendLine("\t// Water");
+			sb.AppendLine("\tArrayPos1++");
+			sb.AppendLine($"\tResetObjectEntity(ArrayPos1,TypeName[Tails Unlock Scr],10,TempValue4,{optypos})");
+			sb.AppendLine("\tObject[ArrayPos1].Priority=1");
+			sb.AppendLine("\tObject[ArrayPos1].Value0=83");
+			sb.Append($"\tObject[ArrayPos1].Value1={(randomWater.Checked ? (addWaterOnly.Checked ? 108 : 99) : 98)}");
+			tmpstr = tmpstr.Replace("//REPLACE3", sb.ToString());
+			newpath = Path.Combine(path, @"Data\Scripts\Secrets\TailsUnlock.txt");
+			File.WriteAllText(newpath, tmpstr);
+			vdir.AddFile("Scripts/Secrets/TailsUnlock.txt", newpath);
+			newpath = Path.Combine(path, @"Data\Palettes\RandoSummary.act");
+			File.WriteAllBytes(newpath, Properties.Resources.RandoSummaryPal);
+			vdir.AddFile("Palettes/RandoSummary.act", newpath);
+			newpath = Path.Combine(path, @"Data\Sprites\Secrets\RandoSummary.gif");
+			File.WriteAllBytes(newpath, Properties.Resources.RandoSummaryImg);
+			vdir.AddFile("Sprites/Secrets/RandoSummary.gif", newpath);
+			sb.Clear();
 			switch (settings.Mode)
 			{
 				case Modes.Segments:
@@ -948,7 +1131,7 @@ namespace SCDSteamRando
 							{
 								if (stg.Past != -1 && stg.Future != -1)
 								{
-									sb.AppendLine("\t\tswitch SaveRAM[0x4000]");
+									sb.AppendLine("\t\tswitch SaveRAM[7167]");
 									sb.AppendLine("\t\tcase 0");
 									sb.AppendLine($"\t\t\tTempValue0={stg.Clear}");
 									sb.AppendLine("\t\t\tbreak");
@@ -962,7 +1145,7 @@ namespace SCDSteamRando
 								}
 								else if (stg.Future != -1)
 								{
-									sb.AppendLine("\t\tif SaveRAM[0x4000]!=0");
+									sb.AppendLine("\t\tif SaveRAM[7167]!=0");
 									sb.AppendLine($"\t\t\tTempValue0={stg.Future}");
 									sb.AppendLine("\t\telse");
 									sb.AppendLine($"\t\t\tTempValue0={stg.Clear}");
@@ -970,7 +1153,7 @@ namespace SCDSteamRando
 								}
 								else if (stg.Past != -1)
 								{
-									sb.AppendLine("\t\tif SaveRAM[0x4000]!=0");
+									sb.AppendLine("\t\tif SaveRAM[7167]!=0");
 									sb.AppendLine($"\t\t\tTempValue0={stg.Past}");
 									sb.AppendLine("\t\telse");
 									sb.AppendLine($"\t\t\tTempValue0={stg.Clear}");
@@ -982,7 +1165,7 @@ namespace SCDSteamRando
 							else
 							{
 								if (stg.Clear % 10 > 7)
-									sb.AppendLine($"\t\tSaveRAM[0x4000]=Warp.Destination");
+									sb.AppendLine($"\t\tSaveRAM[7167]=Warp.Destination");
 								if (stg.Past != -1 && stg.Future != -1)
 								{
 									sb.AppendLine("\t\tswitch Warp.Destination");
@@ -1088,26 +1271,34 @@ namespace SCDSteamRando
 					{
 						sb.AppendLine("\t\t\t\tif Warp.Destination==1");
 						sb.AppendLine($"\t\t\t\t\tTempValue0={stg.Past}");
+						sb.AppendLine($"\t\t\t\t\tTempValue1=1");
 						sb.AppendLine("\t\t\t\telse");
 						if (stg.GoodFuture != -1)
 						{
 							sb.AppendLine("\t\t\t\t\tif Transporter_Destroyed==1");
 							sb.AppendLine($"\t\t\t\t\t\tTempValue0={stg.GoodFuture}");
+							sb.AppendLine($"\t\t\t\t\t\tTempValue1=3");
 							sb.AppendLine("\t\t\t\t\telse");
 							sb.AppendLine($"\t\t\t\t\t\tTempValue0={stg.Future}");
+							sb.AppendLine($"\t\t\t\t\t\tTempValue1=4");
 							sb.AppendLine("\t\t\t\t\tendif");
 						}
 						else
+						{
 							sb.AppendLine($"\t\t\t\t\tTempValue0={stg.Future}");
+							sb.AppendLine($"\t\t\t\t\tTempValue1=2");
+						}
 						sb.AppendLine("\t\t\t\tendif");
 					}
 					else if (stg.Future != -1)
 					{
 						sb.AppendLine($"\t\t\t\tTempValue0={stg.Future}");
+						sb.AppendLine($"\t\t\t\tTempValue1=2");
 					}
 					else if (stg.Past != -1)
 					{
 						sb.AppendLine($"\t\t\t\tTempValue0={stg.Past}");
+						sb.AppendLine($"\t\t\t\tTempValue1=1");
 					}
 					sb.AppendLine("\t\t\t\tbreak");
 				}
@@ -1183,6 +1374,10 @@ namespace SCDSteamRando
 					else
 						scn = new RSDKv3.Scene(vfile.SourcePath);
 					foreach (var item in scn.entities.Where(a => a.type == monitorid))
+					{
+						bool add = item.propertyValue > 9;
+						if (add)
+							item.propertyValue -= 10;
 						switch ((ItemMode)randomItemMode.SelectedIndex)
 						{
 							case ItemMode.OneToOne:
@@ -1193,6 +1388,9 @@ namespace SCDSteamRando
 								item.propertyValue = (byte)r.Next(9);
 								break;
 						}
+						if (add)
+							item.propertyValue += 10;
+					}
 					vfile.SourcePath = Path.Combine(path, vfile.FullName);
 					Directory.CreateDirectory(Path.GetDirectoryName(vfile.SourcePath));
 					scn.write(vfile.SourcePath);
@@ -1628,6 +1826,14 @@ namespace SCDSteamRando
 					}
 					sw.WriteLine($"Random Music: {randomMusic.Checked}");
 					sw.WriteLine($"Separate Soundtracks: {separateSoundtracks.Checked}");
+					sw.WriteLine($"Items: {randomItemMode.SelectedItem}");
+					sw.WriteLine($"Time Posts: {randomTimePosts.Checked}");
+					sw.WriteLine($"Replace Checkpoints: {replaceCheckpoints.Checked}");
+					sw.WriteLine($"Palettes: {randomPalettes.Checked}");
+					sw.WriteLine($"UFOs: {randomUFOs.Checked}");
+					sw.WriteLine($"UFO Difficulty: {ufoDifficulty.SelectedItem}");
+					sw.WriteLine($"Random Water: {randomWater.Checked}");
+					sw.WriteLine($"Add Only: {addWaterOnly.Checked}");
 					sw.WriteLine();
 					for (int i = 0; i < stagecount; i++)
 					{
@@ -1635,11 +1841,11 @@ namespace SCDSteamRando
 						sw.WriteLine($"{GetStageName(stageids[i])}:");
 						if (settings.Mode == Modes.AllStagesWarps)
 						{
-							sw.WriteLine($"Clear -> {GetStageName(stg.Clear)} ({Array.IndexOf(stageids, stg.Clear) - spoilerLevelList.SelectedIndex:+##;-##;0})");
+							sw.WriteLine($"Clear -> {GetStageName(stg.Clear)} ({Array.IndexOf(stageids, stg.Clear) - i:+##;-##;0})");
 							if (stg.Past != -1)
-								sw.WriteLine($"Past -> {GetStageName(stg.Past)} ({Array.IndexOf(stageids, stg.Past) - spoilerLevelList.SelectedIndex:+##;-##;0})");
+								sw.WriteLine($"Past -> {GetStageName(stg.Past)} ({Array.IndexOf(stageids, stg.Past) - i:+##;-##;0})");
 							if (stg.Future != -1)
-								sw.WriteLine($"Future -> {GetStageName(stg.Future)} ({Array.IndexOf(stageids, stg.Future) - spoilerLevelList.SelectedIndex:+##;-##;0})");
+								sw.WriteLine($"Future -> {GetStageName(stg.Future)} ({Array.IndexOf(stageids, stg.Future) - i:+##;-##;0})");
 						}
 						else
 						{

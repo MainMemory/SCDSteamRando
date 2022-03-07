@@ -23,23 +23,12 @@ function ActFinish_LoadEnding
 		TempValue0*=6000
 		TimeAttack.Result+=TempValue0
 		TimeAttack.Result+=Stage.MilliSeconds
-		TempValue0=Stage.ListPos
-		TempValue0%=10
-		TempValue0>>=2
-		TempValue1=Stage.ListPos
-		TempValue1/=10
-		TempValue1*=3
-		TempValue0+=TempValue1
-		TempValue0++
-		TempValue1=Stage.Seconds
-		TempValue1*=100
-		TempValue2=Stage.Minutes
-		TempValue2*=6000
-		TempValue1+=TempValue2
-		TempValue1+=Stage.MilliSeconds
-		SetLeaderboard(TempValue0,TempValue1)
 		Stage.ListPos=2
 	else
+		ArrayPos1=Options.SaveSlot
+		ArrayPos1<<=3
+		ArrayPos1+=3
+		SaveRAM[ArrayPos1]=71
 		if Stage.PlayerListPos==0
 #platform: Mobile
 			EngineCallback(4)
@@ -48,21 +37,6 @@ function ActFinish_LoadEnding
 			if Stage.DebugMode==0
 				SetAchievement(7,100)
 			endif
-			TempValue0=Stage.ListPos
-			TempValue0%=10
-			TempValue0>>=2
-			TempValue1=Stage.ListPos
-			TempValue1/=10
-			TempValue1*=3
-			TempValue0+=TempValue1
-			TempValue0++
-			TempValue1=Stage.Seconds
-			TempValue1*=100
-			TempValue2=Stage.Minutes
-			TempValue2*=6000
-			TempValue1+=TempValue2
-			TempValue1+=Stage.MilliSeconds
-			SetLeaderboard(TempValue0,TempValue1)
 #endplatform
 			if Player.Score>0
 #platform: Mobile
@@ -116,15 +90,13 @@ function ActFinish_LoadEnding
 			endif
 			if SaveRAM[36]==0
 				SaveRAM[36]=1
-				WriteSaveRAM()
-				Stage.ListPos=8
-			else
-				Stage.ListPos=1
 			endif
+			Stage.ListPos=8
 		else
 			Stage.ListPos=7
 		endif
 	endif
+	WriteSaveRAM()
 	Stage.ActiveList=PRESENTATION_STAGE
 	LoadStage()
 endfunction
@@ -313,6 +285,31 @@ sub ObjectMain
 					SetLeaderboard(TempValue0,TempValue1)
 				endif
 #endplatform
+				ArrayPos0=Options.SaveSlot
+				ArrayPos0*=400
+				ArrayPos0+=200
+				TempValue1=Stage.Seconds
+				TempValue1*=100
+				TempValue2=Stage.Minutes
+				TempValue2*=6000
+				TempValue1+=TempValue2
+				TempValue1+=Stage.MilliSeconds
+				SaveRAM[ArrayPos0]+=TempValue1
+				ArrayPos0++
+				TempValue2=SaveRAM[ArrayPos0]
+				SaveRAM[ArrayPos0]++
+				ArrayPos0+=2
+				SaveRAM[ArrayPos0]++
+				ArrayPos0++
+				SaveRAM[ArrayPos0]+=Transporter_Destroyed
+				ArrayPos0++
+				TempValue2*=3
+				ArrayPos0+=TempValue2
+				SaveRAM[ArrayPos0]=Stage.ListPos
+				ArrayPos0++
+				SaveRAM[ArrayPos0]=0
+				ArrayPos0++
+				SaveRAM[ArrayPos0]=TempValue1
 				Fade_Colour=208
 				Fade_Colour<<=16
 				TempValue0=255
@@ -402,6 +399,31 @@ sub ObjectMain
 					SetLeaderboard(TempValue0,TempValue1)
 				endif
 #endplatform
+				ArrayPos0=Options.SaveSlot
+				ArrayPos0*=400
+				ArrayPos0+=200
+				TempValue1=Stage.Seconds
+				TempValue1*=100
+				TempValue2=Stage.Minutes
+				TempValue2*=6000
+				TempValue1+=TempValue2
+				TempValue1+=Stage.MilliSeconds
+				SaveRAM[ArrayPos0]+=TempValue1
+				ArrayPos0++
+				TempValue2=SaveRAM[ArrayPos0]
+				SaveRAM[ArrayPos0]++
+				ArrayPos0+=2
+				SaveRAM[ArrayPos0]++
+				ArrayPos0++
+				SaveRAM[ArrayPos0]+=Transporter_Destroyed
+				ArrayPos0++
+				TempValue2*=3
+				ArrayPos0+=TempValue2
+				SaveRAM[ArrayPos0]=Stage.ListPos
+				ArrayPos0++
+				SaveRAM[ArrayPos0]=0
+				ArrayPos0++
+				SaveRAM[ArrayPos0]=TempValue1
 				Fade_Colour=0
 				Object.Value0=0
 				LampPost.Check=0
