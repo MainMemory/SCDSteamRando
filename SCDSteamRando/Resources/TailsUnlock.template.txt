@@ -908,10 +908,10 @@ sub ObjectStartup
 	SpriteFrame(TempValue1,11,31,13,192,288) // 88: "ACTS"
 	TempValue1=TempValue0
 	TempValue1-=81
-	SpriteFrame(TempValue1,11,81,13,52,399) // 89: "TIME PERIODS"
+	SpriteFrame(TempValue1,11,81,13,74,385) // 89: "TIME PERIODS"
 	TempValue1=TempValue0
 	TempValue1-=112
-	SpriteFrame(TempValue1,11,112,13,74,385) // 90: "BRANCHING PATHS"
+	SpriteFrame(TempValue1,11,112,13,57,399) // 90: "BRANCHING PATHS"
 	TempValue1=TempValue0
 	TempValue1-=63
 	SpriteFrame(TempValue1,11,63,13,52,413) // 91: "SEGMENTS"
@@ -983,6 +983,9 @@ sub ObjectStartup
 		SpriteFrame(0,0,16,24,206,1) // 117: Tails Walk 3
 	endif
 	SpriteFrame(2,1,5,6,209,132) // 118: "/"
+	TempValue1=TempValue0
+	TempValue1-=125
+	SpriteFrame(TempValue1,11,125,13,1,399) // 119: "REVERSE BRANCHING
 	LoadPalette("RandoSummary.act",0,128,0,128)
 	SetMusicTrack("JP/DAGarden.ogg",0,1)
 	SetMusicTrack("US/DAGarden.ogg",1,117382)

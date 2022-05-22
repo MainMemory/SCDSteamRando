@@ -217,6 +217,7 @@ namespace SCDSteamRando
 						case Modes.AllStagesWarps:
 						case Modes.BranchingPaths:
 						case Modes.Segments:
+						case Modes.ReverseBranching:
 						case Modes.Wild:
 							allstg = true;
 							break;
@@ -712,6 +713,113 @@ namespace SCDSteamRando
 						}
 					}
 					break;
+				case Modes.ReverseBranching:
+					{
+						int exitcnt = stages.Sum(a => a.CountExits()) - stages.Count(a => !a.HasFuturePost && !a.HasPastPost);
+						Shuffle(r, stageids, stagecount);
+						Stack<int> stagepool = new Stack<int>(stageids.Take(stagecount));
+						List<int> usedstg = new List<int>(stagecount + 1) { stagecount };
+						List<int> orphans = new List<int>();
+						int[] stagedepths = new int[stagecount + 1];
+						List<List<int>> depthstages = new List<List<int>>() { new List<int>() { stagecount } };
+						while (orphans.Count < exitcnt - stages[stagepool.Peek()].CountExits())
+						{
+							int stgid = stagepool.Pop();
+							Stage stg = stages[stgid];
+							exitcnt -= stg.CountExits();
+							int next = GetStageFromLists(r, orphans, usedstg, 2);
+							int depth = stagedepths[next] + 1;
+							stagedepths[stgid] = depth;
+							while (depthstages.Count <= depth)
+								depthstages.Add(new List<int>());
+							depthstages[depth].Add(stgid);
+							if (stg.HasPastPost && stg.HasFuturePost)
+								switch (r.Next(3))
+								{
+									case 0:
+										stg.Clear = next;
+										break;
+									case 1:
+										stg.Past = next;
+										break;
+									case 2:
+										stg.Future = next;
+										break;
+								}
+							else if (stg.HasPastPost)
+								switch (r.Next(2))
+								{
+									case 0:
+										stg.Clear = next;
+										break;
+									case 1:
+										stg.Past = next;
+										break;
+								}
+							else if (stg.HasFuturePost)
+								switch (r.Next(2))
+								{
+									case 0:
+										stg.Clear = next;
+										break;
+									case 1:
+										stg.Future = next;
+										break;
+								}
+							else
+								stg.Clear = next;
+							orphans.Remove(next);
+							usedstg.Add(stgid);
+							orphans.Add(stgid);
+						}
+						while (stagepool.Count > 0)
+						{
+							int stgid = stagepool.Pop();
+							Stage stg = stages[stgid];
+							int next = orphans[r.Next(orphans.Count)];
+							stg.Clear = next;
+							orphans.Remove(next);
+							int depth = stagedepths[next] + 1;
+							if (orphans.Count > 0 && stg.HasPastPost)
+							{
+								next = orphans[r.Next(orphans.Count)];
+								stg.Past = next;
+								orphans.Remove(next);
+								depth = Math.Max(depth, stagedepths[next] + 1);
+							}
+							if (orphans.Count > 0 && stg.HasFuturePost)
+							{
+								next = orphans[r.Next(orphans.Count)];
+								stg.Future = next;
+								orphans.Remove(next);
+								depth = Math.Max(depth, stagedepths[next] + 1);
+							}
+							stagedepths[stgid] = depth;
+							while (depthstages.Count <= depth)
+								depthstages.Add(new List<int>());
+							depthstages[depth].Add(stgid);
+							orphans.Add(stgid);
+						}
+						foreach (Stage stg in stages)
+						{
+							if (stg.Clear == -1)
+							{
+								var pool = depthstages[Math.Min(stagedepths[stg.ID] + r.Next(-1, 2), depthstages.Count - 1)];
+								stg.Clear = pool[r.Next(pool.Count)];
+							}
+							if (stg.HasPastPost && stg.Past == -1)
+							{
+								var pool = depthstages[Math.Min(stagedepths[stg.ID] + r.Next(-1, 2), depthstages.Count - 1)];
+								stg.Past = pool[r.Next(pool.Count)];
+							}
+							if (stg.HasFuturePost && stg.Future == -1)
+							{
+								var pool = depthstages[Math.Min(stagedepths[stg.ID] + r.Next(-1, 2), depthstages.Count - 1)];
+								stg.Future = pool[r.Next(pool.Count)];
+							}
+						}
+					}
+					break;
 				case Modes.Wild:
 					{
 						Queue<int> stgq = new Queue<int>();
@@ -925,7 +1033,7 @@ namespace SCDSteamRando
 			sb.AppendLine($"\tResetObjectEntity(ArrayPos1,TypeName[Tails Unlock Scr],10,TempValue4,{optypos})");
 			sb.AppendLine("\tObject[ArrayPos1].Priority=1");
 			sb.AppendLine("\tObject[ArrayPos1].Value0=71");
-			sb.AppendLine($"\tObject[ArrayPos1].Value1={(int)settings.Mode + 86}");
+			sb.AppendLine($"\tObject[ArrayPos1].Value1={new[] { 86, 87, 88, 89, 90, 91, 119, 92, 93 }[(int)settings.Mode]}");
 			if (settings.Mode == Modes.AllStagesWarps)
 			{
 				optypos += 38;
@@ -1695,49 +1803,71 @@ namespace SCDSteamRando
 			{
 				System.Text.StringBuilder sb = new System.Text.StringBuilder();
 				Stage stg = stages[stageids[spoilerLevelList.SelectedIndex]];
-				if (settings.Mode == Modes.AllStagesWarps)
+				switch (settings.Mode)
 				{
-					sb.AppendLine($"Clear -> {GetStageName(stg.Clear)} ({Array.IndexOf(stageids, stg.Clear) - spoilerLevelList.SelectedIndex:+##;-##;0})");
-					if (stg.Past != -1)
-						sb.AppendLine($"Past -> {GetStageName(stg.Past)} ({Array.IndexOf(stageids, stg.Past) - spoilerLevelList.SelectedIndex:+##;-##;0})");
-					if (stg.Future != -1)
-						sb.AppendLine($"Future -> {GetStageName(stg.Future)} ({Array.IndexOf(stageids, stg.Future) - spoilerLevelList.SelectedIndex:+##;-##;0})");
-					sb.Append("Shortest Path: ");
-					int[] shortestPath;
-					if (maxForwJump.Value < 2)
-					{
-						shortestPath = new int[stagecount - 1 - spoilerLevelList.SelectedIndex];
-						Array.Copy(stageids, spoilerLevelList.SelectedIndex, shortestPath, 0, shortestPath.Length);
-					}
-					else
-						shortestPath = FindShortestPath(stageids[spoilerLevelList.SelectedIndex]);
-					for (int i = 0; i < shortestPath.Length - 1; i++)
-					{
-						string exit;
-						if (stages[shortestPath[i]].Clear == shortestPath[i + 1])
-							exit = "Clear";
-						else if (stages[shortestPath[i]].Past == shortestPath[i + 1])
-							exit = "Past";
+					case Modes.AllStagesWarps:
+						sb.AppendLine($"Clear -> {GetStageName(stg.Clear)} ({Array.IndexOf(stageids, stg.Clear) - spoilerLevelList.SelectedIndex:+##;-##;0})");
+						if (stg.Past != -1)
+							sb.AppendLine($"Past -> {GetStageName(stg.Past)} ({Array.IndexOf(stageids, stg.Past) - spoilerLevelList.SelectedIndex:+##;-##;0})");
+						if (stg.Future != -1)
+							sb.AppendLine($"Future -> {GetStageName(stg.Future)} ({Array.IndexOf(stageids, stg.Future) - spoilerLevelList.SelectedIndex:+##;-##;0})");
+						sb.Append("Shortest Path: ");
+						int[] shortestPath;
+						if (maxForwJump.Value < 2)
+						{
+							shortestPath = new int[stagecount - 1 - spoilerLevelList.SelectedIndex];
+							Array.Copy(stageids, spoilerLevelList.SelectedIndex, shortestPath, 0, shortestPath.Length);
+						}
 						else
-							exit = "Future";
-						sb.AppendFormat("{0} ({1}) -> ", GetStageName(shortestPath[i]), exit);
-					}
-					sb.AppendFormat("Ending ({0} levels)", shortestPath.Length);
-				}
-				else
-				{
-					sb.AppendLine($"Clear -> {GetStageName(stg.Clear)}");
-					if (stg.ClearGF != -1)
-						sb.AppendLine($"Clear (Good Future) -> {GetStageName(stg.ClearGF)}");
-					if (stg.Past != -1)
-						sb.AppendLine($"Past -> {GetStageName(stg.Past)}");
-					if (stg.GoodFuture != -1)
-					{
-						sb.AppendLine($"Bad Future -> {GetStageName(stg.Future)}");
-						sb.AppendLine($"Good Future -> {GetStageName(stg.GoodFuture)}");
-					}
-					else if (stg.Future != -1)
-						sb.AppendLine($"Future -> {GetStageName(stg.Future)}");
+							shortestPath = FindShortestPath(stageids[spoilerLevelList.SelectedIndex]);
+						for (int i = 0; i < shortestPath.Length - 1; i++)
+						{
+							string exit;
+							if (stages[shortestPath[i]].Clear == shortestPath[i + 1])
+								exit = "Clear";
+							else if (stages[shortestPath[i]].Past == shortestPath[i + 1])
+								exit = "Past";
+							else
+								exit = "Future";
+							sb.AppendFormat("{0} ({1}) -> ", GetStageName(shortestPath[i]), exit);
+						}
+						sb.AppendFormat("Ending ({0} levels)", shortestPath.Length);
+						break;
+					case Modes.ReverseBranching:
+						sb.AppendLine($"Clear -> {GetStageName(stg.Clear)}");
+						if (stg.Past != -1)
+							sb.AppendLine($"Past -> {GetStageName(stg.Past)}");
+						if (stg.Future != -1)
+							sb.AppendLine($"Future -> {GetStageName(stg.Future)}");
+						sb.Append("Shortest Path: ");
+						shortestPath = FindShortestPath(stageids[spoilerLevelList.SelectedIndex]);
+						for (int i = 0; i < shortestPath.Length - 1; i++)
+						{
+							string exit;
+							if (stages[shortestPath[i]].Clear == shortestPath[i + 1])
+								exit = "Clear";
+							else if (stages[shortestPath[i]].Past == shortestPath[i + 1])
+								exit = "Past";
+							else
+								exit = "Future";
+							sb.AppendFormat("{0} ({1}) -> ", GetStageName(shortestPath[i]), exit);
+						}
+						sb.AppendFormat("Ending ({0} levels)", shortestPath.Length);
+						break;
+					default:
+						sb.AppendLine($"Clear -> {GetStageName(stg.Clear)}");
+						if (stg.ClearGF != -1)
+							sb.AppendLine($"Clear (Good Future) -> {GetStageName(stg.ClearGF)}");
+						if (stg.Past != -1)
+							sb.AppendLine($"Past -> {GetStageName(stg.Past)}");
+						if (stg.GoodFuture != -1)
+						{
+							sb.AppendLine($"Bad Future -> {GetStageName(stg.Future)}");
+							sb.AppendLine($"Good Future -> {GetStageName(stg.GoodFuture)}");
+						}
+						else if (stg.Future != -1)
+							sb.AppendLine($"Future -> {GetStageName(stg.Future)}");
+						break;
 				}
 				spoilerLevelInfo.Text = sb.ToString();
 			}
@@ -1920,6 +2050,32 @@ namespace SCDSteamRando
 						levels[stagecount] = new ChartNode(0, ++row);
 						gridmaxv = row + 1;
 						levels[stagecount + 1] = new ChartNode(0, 0);
+					}
+					break;
+				case Modes.ReverseBranching: // reverse branching
+					{
+						List<List<int>> depthstages = new List<List<int>>() { new List<int>() { stagecount } };
+						List<Stage> stages2 = new List<Stage>(stages);
+						while (stages2.Count > 0)
+						{
+							var next = stages2.Where(a => depthstages[depthstages.Count - 1].Contains(a.Clear) || depthstages[depthstages.Count - 1].Contains(a.Past) || depthstages[depthstages.Count - 1].Contains(a.Future)).Select(a => a.ID).ToList();
+							depthstages.Add(next);
+							stages2.RemoveAll(a => next.Contains(a.ID));
+						}
+						depthstages.Add(new List<int>() { stagecount + 1 });
+						depthstages.Reverse();
+						gridmaxh = depthstages.Max(a => a.Count);
+						gridmaxv = depthstages.Count;
+						int row = 0;
+						int col = 0;
+						foreach (var ds in depthstages)
+						{
+							foreach (var id in ds)
+								levels[id] = new ChartNode(col++, row);
+							gridmaxh = Math.Max(col, gridmaxh);
+							++row;
+							col = 0;
+						}
 					}
 					break;
 				case Modes.Shadow: // shadow
@@ -2719,6 +2875,16 @@ namespace SCDSteamRando
 					break;
 			}
 		}
+
+		public int CountExits()
+		{
+			int ex = 1;
+			if (HasPastPost)
+				ex++;
+			if (HasFuturePost)
+				ex++;
+			return ex;
+		}
 	}
 
 	enum TimePeriods { Present, Past, GoodFuture, BadFuture }
@@ -3046,6 +3212,7 @@ namespace SCDSteamRando
 		TimePeriods,
 		BranchingPaths,
 		Segments,
+		ReverseBranching,
 		Wild,
 		Shadow
 	}

@@ -59,6 +59,7 @@ namespace SCDSteamRando
 			this.ufoDifficulty = new System.Windows.Forms.ComboBox();
 			this.randomUFOs = new System.Windows.Forms.CheckBox();
 			this.randomWater = new System.Windows.Forms.CheckBox();
+			this.addWaterOnly = new System.Windows.Forms.CheckBox();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabPage1 = new System.Windows.Forms.TabPage();
 			this.label7 = new System.Windows.Forms.Label();
@@ -71,7 +72,6 @@ namespace SCDSteamRando
 			this.spoilerLevelList = new System.Windows.Forms.ListBox();
 			this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
 			this.saveFileDialog2 = new System.Windows.Forms.SaveFileDialog();
-			this.addWaterOnly = new System.Windows.Forms.CheckBox();
 			label1 = new System.Windows.Forms.Label();
 			label2 = new System.Windows.Forms.Label();
 			label3 = new System.Windows.Forms.Label();
@@ -313,6 +313,7 @@ namespace SCDSteamRando
             "Shuffle Time Periods",
             "Branching Paths",
             "Segments",
+            "Reverse Branching",
             "Wild",
             "Shadow"});
 			this.modeSelector.Location = new System.Drawing.Point(49, 32);
@@ -452,6 +453,18 @@ namespace SCDSteamRando
 			this.toolTip1.SetToolTip(this.randomWater, "Water will be randomly added, removed, or adjusted in levels.\r\nMay make the game " +
         "unwinnable.");
 			this.randomWater.UseVisualStyleBackColor = true;
+			// 
+			// addWaterOnly
+			// 
+			this.addWaterOnly.AutoSize = true;
+			this.addWaterOnly.Location = new System.Drawing.Point(123, 127);
+			this.addWaterOnly.Name = "addWaterOnly";
+			this.addWaterOnly.Size = new System.Drawing.Size(101, 17);
+			this.addWaterOnly.TabIndex = 18;
+			this.addWaterOnly.Text = "Only Add Water";
+			this.toolTip1.SetToolTip(this.addWaterOnly, "If checked, water will only be added to levels that didn\'t have it.\r\nIt will not " +
+        "be altered in levels that already had water.");
+			this.addWaterOnly.UseVisualStyleBackColor = true;
 			// 
 			// tabControl1
 			// 
@@ -599,18 +612,6 @@ namespace SCDSteamRando
 			// 
 			this.saveFileDialog2.DefaultExt = "png";
 			this.saveFileDialog2.Filter = "PNG Files|*.png";
-			// 
-			// addWaterOnly
-			// 
-			this.addWaterOnly.AutoSize = true;
-			this.addWaterOnly.Location = new System.Drawing.Point(123, 127);
-			this.addWaterOnly.Name = "addWaterOnly";
-			this.addWaterOnly.Size = new System.Drawing.Size(101, 17);
-			this.addWaterOnly.TabIndex = 18;
-			this.addWaterOnly.Text = "Only Add Water";
-			this.toolTip1.SetToolTip(this.addWaterOnly, "If checked, water will only be added to levels that didn\'t have it.\r\nIt will not " +
-        "be altered in levels that already had water.");
-			this.addWaterOnly.UseVisualStyleBackColor = true;
 			// 
 			// MainForm
 			// 
