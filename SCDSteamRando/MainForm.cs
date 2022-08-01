@@ -1430,6 +1430,23 @@ namespace SCDSteamRando
 								musicFiles.Add(match.Groups[1].Value, match.Groups[3].Value);
 					}
 				}
+				if (Directory.Exists("RandoMusic"))
+				{
+					foreach (var file in Directory.GetFiles("RandoMusic", "*.ogg", SearchOption.AllDirectories))
+					{
+						string relpath = file.Substring(file.IndexOf("RandoMusic") + 11);
+						if (relpath.IndexOfAny(new[] { '/', '\\' }) != -1)
+							Directory.CreateDirectory(Path.Combine(path, @"Data\Music", Path.GetDirectoryName(relpath)));
+						File.Copy(Path.Combine("RandoMusic", relpath), Path.Combine(path, @"Data\Music", relpath));
+						musicFiles[$"\"Data/Music/{relpath.Replace('\\', '/')}\""] = "0";
+					}
+					if (File.Exists("RandoMusic\\MusicLoops.ini"))
+					{
+						Dictionary<string, int> musicLoops = IniSerializer.Deserialize<Dictionary<string, int>>("RandoMusic/MusicLoops.ini");
+						foreach (var item in musicLoops)
+							musicFiles[$"\"Data/Music/{item.Key}\""] = item.Value.ToString();
+					}
+				}
 				var loopmuslist = musicFiles.Where(a => a.Value != "0").ToArray();
 				var muslist = musicFiles.Where(a => a.Value == "0").ToArray();
 				var loopmuslistjp = loopmuslist.Where(a => !a.Key.StartsWith("\"US/", StringComparison.OrdinalIgnoreCase)).ToArray();

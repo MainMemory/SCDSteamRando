@@ -111,6 +111,9 @@
     <None Include="Resources\Invincibility.txt" />
     <None Include="Resources\CreditsControl.txt" />
     <None Include="Resources\TailsUnlock.template.txt" />
+    <Content Include="RandoMusic\Readme.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\StageSetup.txt" />
     <Content Include="SonicCD.ico" />
   </ItemGroup>
