@@ -1438,13 +1438,13 @@ namespace SCDSteamRando
 						if (relpath.IndexOfAny(new[] { '/', '\\' }) != -1)
 							Directory.CreateDirectory(Path.Combine(path, @"Data\Music", Path.GetDirectoryName(relpath)));
 						File.Copy(Path.Combine("RandoMusic", relpath), Path.Combine(path, @"Data\Music", relpath));
-						musicFiles[$"\"Data/Music/{relpath.Replace('\\', '/')}\""] = "0";
+						musicFiles[$"\"{relpath.Replace('\\', '/')}\""] = "0";
 					}
 					if (File.Exists("RandoMusic\\MusicLoops.ini"))
 					{
 						Dictionary<string, int> musicLoops = IniSerializer.Deserialize<Dictionary<string, int>>("RandoMusic/MusicLoops.ini");
 						foreach (var item in musicLoops)
-							musicFiles[$"\"Data/Music/{item.Key}\""] = item.Value.ToString();
+							musicFiles[$"\"{item.Key}\""] = item.Value.ToString();
 					}
 				}
 				var loopmuslist = musicFiles.Where(a => a.Value != "0").ToArray();
