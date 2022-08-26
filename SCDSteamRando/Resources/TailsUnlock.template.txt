@@ -446,7 +446,7 @@ sub ObjectDraw
 			DrawNumbers(55,TempValue1,TempValue0,Object.Value7,2,8,0)
 		else
 			switch TempValue2
-			case 45
+			case 44
 				TempValue1+=9
 				break
 			default
