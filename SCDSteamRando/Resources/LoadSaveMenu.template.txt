@@ -795,7 +795,7 @@ sub ObjectMain
 			SaveRAM[ArrayPos1]=50000
 			ArrayPos1++
 			SaveRAM[ArrayPos1]=0
-			ArrayPos1=Options.SaveSlot
+			ArrayPos1=Object.Value1
 			ArrayPos1*=400
 			ArrayPos1+=200
 			SaveRAM[ArrayPos1]=0
