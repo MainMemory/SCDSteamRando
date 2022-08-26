@@ -157,12 +157,12 @@ namespace SCDSteamRando
 			VirtualDirectory vdir = new VirtualDirectory("Data");
 			if (Directory.Exists("Scripts"))
 				vdir.AddDirectory("Scripts").ScanDirectory("Scripts");
-			RSDKv3.DataFile dataFile = null;
+			RSDKv3.DataPack dataFile = null;
 			if (File.Exists("Data.rsdk"))
 			{
-				dataFile = new RSDKv3.DataFile("Data.rsdk");
+				dataFile = new RSDKv3.DataPack("Data.rsdk");
 				foreach (var item in dataFile.files)
-					vdir.AddFile(item.fullFilename.Substring(item.fullFilename.IndexOf('/') + 1), "Data.rsdk");
+					vdir.AddFile(item.fullName.Substring(item.fullName.IndexOf('/') + 1), "Data.rsdk");
 			}
 			else if (Directory.Exists("Data"))
 				vdir.ScanDirectory("Data");
@@ -185,7 +185,7 @@ namespace SCDSteamRando
 			VirtualFile vfile = vdir.GetFile("Game/GameConfig.bin");
 			RSDKv3.GameConfig gc;
 			if (vfile.SourcePath == "Data.rsdk")
-				using (MemoryStream ms = new MemoryStream(dataFile.files.Single(a => a.fullFilename == vfile.FullName).fileData))
+				using (MemoryStream ms = new MemoryStream(dataFile.files.Single(a => a.fullName == vfile.FullName).data))
 					gc = new RSDKv3.GameConfig(ms);
 			else
 				gc = new RSDKv3.GameConfig(vfile.SourcePath);
@@ -228,7 +228,7 @@ namespace SCDSteamRando
 					vfile = vdir.GetFile($"Stages/{regstg[i].folder}/Act{regstg[i].id}.bin");
 					RSDKv3.Scene scn;
 					if (vfile.SourcePath == "Data.rsdk")
-						using (MemoryStream ms = new MemoryStream(dataFile.files.Single(a => a.fullFilename == vfile.FullName).fileData))
+						using (MemoryStream ms = new MemoryStream(dataFile.files.Single(a => a.fullName == vfile.FullName).data))
 							scn = new RSDKv3.Scene(ms);
 					else
 						scn = new RSDKv3.Scene(vfile.SourcePath);
@@ -270,7 +270,7 @@ namespace SCDSteamRando
 							stages[i].HasFuturePost = hasfuture;
 							vfile.SourcePath = Path.Combine(path, vfile.FullName);
 							Directory.CreateDirectory(Path.GetDirectoryName(vfile.SourcePath));
-							scn.write(vfile.SourcePath);
+							scn.Write(vfile.SourcePath);
 						}
 					}
 				}
@@ -1494,7 +1494,7 @@ namespace SCDSteamRando
 					vfile = vdir.GetFile($"Stages/{stginf.folder}/Act{stginf.id}.bin");
 					RSDKv3.Scene scn;
 					if (vfile.SourcePath == "Data.rsdk")
-						using (MemoryStream ms = new MemoryStream(dataFile.files.Single(a => a.fullFilename == vfile.FullName).fileData))
+						using (MemoryStream ms = new MemoryStream(dataFile.files.Single(a => a.fullName == vfile.FullName).data))
 							scn = new RSDKv3.Scene(ms);
 					else
 						scn = new RSDKv3.Scene(vfile.SourcePath);
@@ -1518,7 +1518,7 @@ namespace SCDSteamRando
 					}
 					vfile.SourcePath = Path.Combine(path, vfile.FullName);
 					Directory.CreateDirectory(Path.GetDirectoryName(vfile.SourcePath));
-					scn.write(vfile.SourcePath);
+					scn.Write(vfile.SourcePath);
 				}
 			}
 			if (randomUFOs.Checked)
@@ -1528,7 +1528,7 @@ namespace SCDSteamRando
 					vfile = vdir.GetFile($"Stages/{stginf.folder}/StageConfig.bin");
 					RSDKv3.StageConfig stgcnf;
 					if (vfile.SourcePath == "Data.rsdk")
-						using (MemoryStream ms = new MemoryStream(dataFile.files.Single(a => a.fullFilename == vfile.FullName).fileData))
+						using (MemoryStream ms = new MemoryStream(dataFile.files.Single(a => a.fullName == vfile.FullName).data))
 							stgcnf = new RSDKv3.StageConfig(ms);
 					else
 						stgcnf = new RSDKv3.StageConfig(vfile.SourcePath);
@@ -1590,7 +1590,7 @@ namespace SCDSteamRando
 					vfile = vdir.GetFile($"Stages/{stginf.folder}/Act{stginf.id}.bin");
 					RSDKv3.Scene scn;
 					if (vfile.SourcePath == "Data.rsdk")
-						using (MemoryStream ms = new MemoryStream(dataFile.files.Single(a => a.fullFilename == vfile.FullName).fileData))
+						using (MemoryStream ms = new MemoryStream(dataFile.files.Single(a => a.fullName == vfile.FullName).data))
 							scn = new RSDKv3.Scene(ms);
 					else
 						scn = new RSDKv3.Scene(vfile.SourcePath);
@@ -1629,7 +1629,7 @@ namespace SCDSteamRando
 					}
 					vfile.SourcePath = Path.Combine(path, vfile.FullName);
 					Directory.CreateDirectory(Path.GetDirectoryName(vfile.SourcePath));
-					scn.write(vfile.SourcePath);
+					scn.Write(vfile.SourcePath);
 				}
 			}
 			if (randomWater.Checked)
@@ -1641,7 +1641,7 @@ namespace SCDSteamRando
 					vfile = vdir.GetFile($"Stages/{stginf.folder}/StageConfig.bin");
 					RSDKv3.StageConfig stgcnf;
 					if (vfile.SourcePath == "Data.rsdk")
-						using (MemoryStream ms = new MemoryStream(dataFile.files.Single(a => a.fullFilename == vfile.FullName).fileData))
+						using (MemoryStream ms = new MemoryStream(dataFile.files.Single(a => a.fullName == vfile.FullName).data))
 							stgcnf = new RSDKv3.StageConfig(ms);
 					else
 						stgcnf = new RSDKv3.StageConfig(vfile.SourcePath);
@@ -1669,7 +1669,7 @@ namespace SCDSteamRando
 						sb.AppendLine("\t\t\t\tbreak");
 						vfile.SourcePath = Path.Combine(path, vfile.FullName);
 						Directory.CreateDirectory(Path.GetDirectoryName(vfile.SourcePath));
-						stgcnf.write(vfile.SourcePath);
+						stgcnf.Write(vfile.SourcePath);
 					}
 					else if (addWaterOnly.Checked)
 						continue;
@@ -1680,7 +1680,7 @@ namespace SCDSteamRando
 					vfile = vdir.GetFile($"Stages/{stginf.folder}/Act{stginf.id}.bin");
 					RSDKv3.Scene scn;
 					if (vfile.SourcePath == "Data.rsdk")
-						using (MemoryStream ms = new MemoryStream(dataFile.files.Single(a => a.fullFilename == vfile.FullName).fileData))
+						using (MemoryStream ms = new MemoryStream(dataFile.files.Single(a => a.fullName == vfile.FullName).data))
 							scn = new RSDKv3.Scene(ms);
 					else
 						scn = new RSDKv3.Scene(vfile.SourcePath);
@@ -1701,13 +1701,13 @@ namespace SCDSteamRando
 					}
 					vfile.SourcePath = Path.Combine(path, vfile.FullName);
 					Directory.CreateDirectory(Path.GetDirectoryName(vfile.SourcePath));
-					scn.write(vfile.SourcePath);
+					scn.Write(vfile.SourcePath);
 					if (!haswater)
 					{
 						vfile = vdir.GetFile($"Stages/{stginf.folder}/Backgrounds.bin");
 						RSDKv3.Backgrounds bg;
 						if (vfile.SourcePath == "Data.rsdk")
-							using (MemoryStream ms = new MemoryStream(dataFile.files.Single(a => a.fullFilename == vfile.FullName).fileData))
+							using (MemoryStream ms = new MemoryStream(dataFile.files.Single(a => a.fullName == vfile.FullName).data))
 								bg = new RSDKv3.Backgrounds(ms);
 						else
 							bg = new RSDKv3.Backgrounds(vfile.SourcePath);
@@ -1715,7 +1715,7 @@ namespace SCDSteamRando
 							item.deform = true;
 						vfile.SourcePath = Path.Combine(path, vfile.FullName);
 						Directory.CreateDirectory(Path.GetDirectoryName(vfile.SourcePath));
-						bg.write(vfile.SourcePath);
+						bg.Write(vfile.SourcePath);
 					}
 				}
 				newpath = Path.Combine(path, @"Data\Scripts\Global\Water.txt");
@@ -1729,7 +1729,7 @@ namespace SCDSteamRando
 					HueRotation hr = new HueRotation(r);
 					byte[] pal;
 					if (file.SourcePath == "Data.rsdk")
-						pal = dataFile.files.Single(a => a.fullFilename == file.FullName).fileData;
+						pal = dataFile.files.Single(a => a.fullName == file.FullName).data;
 					else
 						pal = File.ReadAllBytes(file.SourcePath);
 					hr.ApplyRotation(pal);
@@ -1745,7 +1745,7 @@ namespace SCDSteamRando
 						case "16x16Tiles.gif":
 							byte[] gif;
 							if (file.SourcePath == "Data.rsdk")
-								gif = dataFile.files.Single(a => a.fullFilename == file.FullName).fileData;
+								gif = dataFile.files.Single(a => a.fullName == file.FullName).data;
 							else
 								gif = File.ReadAllBytes(file.SourcePath);
 							var pal = new byte[(1 << ((gif[0xA] & 7) + 1)) * 3];
@@ -1759,14 +1759,14 @@ namespace SCDSteamRando
 						case "StageConfig.bin":
 							RSDKv3.StageConfig stgcnf;
 							if (file.SourcePath == "Data.rsdk")
-								using (MemoryStream ms = new MemoryStream(dataFile.files.Single(a => a.fullFilename == file.FullName).fileData))
+								using (MemoryStream ms = new MemoryStream(dataFile.files.Single(a => a.fullName == file.FullName).data))
 									stgcnf = new RSDKv3.StageConfig(ms);
 							else
 								stgcnf = new RSDKv3.StageConfig(file.SourcePath);
 							hr.ApplyRotation(stgcnf.stagePalette);
 							file.SourcePath = Path.Combine(path, file.FullName);
 							Directory.CreateDirectory(Path.GetDirectoryName(file.SourcePath));
-							stgcnf.write(file.SourcePath);
+							stgcnf.Write(file.SourcePath);
 							break;
 					}
 				}
@@ -2988,10 +2988,10 @@ namespace SCDSteamRando
 		{
 			foreach (var color in palette)
 			{
-				ApplyRotationInternal(color.R, color.G, color.B, out byte r, out byte g, out byte b);
-				color.R = r;
-				color.G = g;
-				color.B = b;
+				ApplyRotationInternal(color.r, color.g, color.b, out byte r, out byte g, out byte b);
+				color.r = r;
+				color.g = g;
+				color.b = b;
 			}
 		}
 
