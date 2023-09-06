@@ -49,6 +49,7 @@ namespace SCDSteamRando
 			ufoDifficulty.SelectedIndex = (int)settings.UFODifficulty;
 			randomWater.Checked = settings.RandomWater;
 			addWaterOnly.Checked = settings.AddWaterOnly;
+			randomPlayer.Checked = settings.RandomPlayer;
 		}
 
 		private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -71,6 +72,7 @@ namespace SCDSteamRando
 			settings.UFODifficulty = (UFODifficulty)ufoDifficulty.SelectedIndex;
 			settings.RandomWater = randomWater.Checked;
 			settings.AddWaterOnly = addWaterOnly.Checked;
+			settings.RandomPlayer = randomPlayer.Checked;
 			settings.Save();
 		}
 
@@ -978,7 +980,7 @@ namespace SCDSteamRando
 			else
 				tmpstr = Properties.Resources.CreditsControl;
 			newpath = Path.Combine(path, @"Data\Scripts\Credits\CreditsControl.txt");
-			File.WriteAllText(newpath, tmpstr.Replace("Stage.ListPos=1", "Stage.ListPos=8"));
+			File.WriteAllText(newpath, tmpstr.Replace("Stage.ListPos=10", "Stage.ListPos=8"));
 			vdir.AddFile("Scripts/Credits/CreditsControl.txt", newpath);
 			if (vdir.FileExists("Scripts/Global/StageSetup.txt"))
 				tmpstr = File.ReadAllText(vdir.GetFile("Scripts/Global/StageSetup.txt").SourcePath);
@@ -1190,6 +1192,8 @@ namespace SCDSteamRando
 					}
 					sb.AppendLine("\t\t\t\t\tendswitch");
 					tmpstr = tmpstr.Replace("//SPECIAL", sb.ToString());
+					if (randomPlayer.Checked)
+						tmpstr = tmpstr.Replace("//PLAYER", "Rand(Stage.PlayerListPos, 3)");
 					newpath = Path.Combine(path, @"Data\Scripts\Global\ActFinish.txt");
 					File.WriteAllText(newpath, tmpstr);
 					vdir.AddFile("Scripts/Global/ActFinish.txt", newpath);
@@ -1313,7 +1317,10 @@ namespace SCDSteamRando
 						sb.AppendLine("\t\tbreak");
 					}
 					newpath = Path.Combine(path, @"Data\Scripts\Global\ActFinish.txt");
-					File.WriteAllText(newpath, Properties.Resources.ActFinish_template.Replace("//REPLACE", sb.ToString()));
+					tmpstr = Properties.Resources.ActFinish_template.Replace("//REPLACE", sb.ToString());
+					if (randomPlayer.Checked)
+						tmpstr = tmpstr.Replace("//PLAYER", "Rand(Stage.PlayerListPos, 3)");
+					File.WriteAllText(newpath, tmpstr);
 					vdir.AddFile("Scripts/Global/ActFinish.txt", newpath);
 					sb.Clear();
 					for (int i = 0; i < 29; i++)
@@ -1360,7 +1367,10 @@ namespace SCDSteamRando
 						sb.AppendLine("\t\tbreak");
 					}
 					newpath = Path.Combine(path, @"Data\Scripts\Global\ActFinish.txt");
-					File.WriteAllText(newpath, Properties.Resources.ActFinish_template.Replace("//REPLACE", sb.ToString()));
+					tmpstr = Properties.Resources.ActFinish_template.Replace("//REPLACE", sb.ToString());
+					if (randomPlayer.Checked)
+						tmpstr = tmpstr.Replace("//PLAYER", "Rand(Stage.PlayerListPos, 3)");
+					File.WriteAllText(newpath, tmpstr);
 					vdir.AddFile("Scripts/Global/ActFinish.txt", newpath);
 					break;
 			}
@@ -1411,7 +1421,10 @@ namespace SCDSteamRando
 					sb.AppendLine("\t\t\t\tbreak");
 				}
 				newpath = Path.Combine(path, @"Data\Scripts\Global\TimeWarp.txt");
-				File.WriteAllText(newpath, Properties.Resources.TimeWarp_template.Replace("//REPLACE", sb.ToString()));
+				tmpstr = Properties.Resources.TimeWarp_template.Replace("//REPLACE", sb.ToString());
+				if (randomPlayer.Checked)
+					tmpstr = tmpstr.Replace("//PLAYER", "Rand(Stage.PlayerListPos, 3)");
+				File.WriteAllText(newpath, tmpstr);
 				vdir.AddFile("Scripts/Global/TimeWarp.txt", newpath);
 			}
 			if (randomMusic.Checked)
@@ -3207,6 +3220,9 @@ namespace SCDSteamRando
 		public bool RandomWater { get; set; }
 		[IniAlwaysInclude]
 		public bool AddWaterOnly { get; set; }
+		[System.ComponentModel.DefaultValue(true)]
+		[IniAlwaysInclude]
+		public bool RandomPlayer { get; set; } = true;
 
 		public static Settings Load()
 		{

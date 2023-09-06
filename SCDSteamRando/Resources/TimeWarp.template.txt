@@ -7,26 +7,27 @@
 #alias Player.Value0:Player.Rings
 #alias Player.Value4:Player.Invincible
 #alias Player.Value6:Player.MinRollSpeed
+#alias Object.Value3:Object.FadeA
+#alias Object.Value4:Object.FadeR
+#alias Object.Value5:Object.FadeG
+#alias Object.Value6:Object.FadeB
 
 
 sub ObjectDraw
 	switch Object.State
 	case 0
 		if Object.Value1<320
-			if Object.Value1==0
-				Player.Invincible=1000
-				Player.ControlMode=-1
-#platform: Mobile
-				Player.Visible=false
-#endplatform
-			endif
-			Music.Volume-=8
+			Music.Volume-=4
 			SetScreenFade(208,255,224,Object.Value1)
-			Object.Value1+=10
+			Object.Value1+=16
 		else
 			if Stage.PlayerListPos==0
 				if Stage.DebugMode==0
+				 if Options.GameMode==1
+					SaveRAM[257]=1
+					WriteSaveRAM()
 					SetAchievement(0,100)
+				 endif
 				endif
 			endif
 #platform: Use_Haptics
@@ -40,6 +41,7 @@ sub ObjectDraw
 			Rec_Milliseconds=Stage.MilliSeconds
 			Rec_Seconds=Stage.Seconds
 			Rec_Minutes=Stage.Minutes
+			Warp.Rings=Player.Rings
 			TempValue2=Object[24].PropertyValue
 			TempValue0=0
 			while TempValue0<1184
@@ -53,190 +55,121 @@ sub ObjectDraw
 			Stage[2].ActiveLayer=9
 			Stage[3].ActiveLayer=9
 			ArrayPos0=0
+			Rand(Stage.PlayerListPos, 3)
 			Object[ArrayPos0].Type=TypeName[TimeWarp]
 			Object[ArrayPos0].State=1
 			Object[ArrayPos0].Value1=320
 			Object[ArrayPos0].Value7=TempValue2
-			ArrayPos0++
-			TempValue0=-32
-			while TempValue0<256
-				TempValue1=0
-				while TempValue1<Screen.XSize
-					Object[ArrayPos0].Type=TypeName[TimeWarp]
-					Object[ArrayPos0].State=2
-					Rand(Object[ArrayPos0].Frame,27)
-					Object[ArrayPos0].Frame>>=2
-					Object[ArrayPos0].Frame<<=2
-					Object[ArrayPos0].iXPos=TempValue1
-					Object[ArrayPos0].iYPos=TempValue0
-					Object[ArrayPos0].iXPos+=16
-					Object[ArrayPos0].iYPos+=16
-					Rand(Object[ArrayPos0].Direction,15)
-					Object[ArrayPos0].Direction>>=2
-					ArrayPos0++
-					TempValue1+=32
-				loop
-				TempValue0+=32
-			loop
-			Object[ArrayPos0].Type=TypeName[WarpSonic]
-			Object[ArrayPos0].iXPos=Screen.CenterX
-			Object[ArrayPos0].iYPos=480
 			SetScreenFade(208,255,224,255)
-			PlaySfx(14,0)
 		endif
 		break
 	case 1
-		if Object.Value1>0
-			SetScreenFade(208,255,224,Object.Value1)
-			Object.Value1-=10
-		else
-			Object.State=3
-		endif
-		break
-	case 2
-		TempValue0=Object.Frame
-		TempValue0>>=1
-		DrawSpriteFX(TempValue0,FX_FLIP,Object.XPos,Object.YPos)
-		Object.Frame++
-		if Object.Frame==28
-			Object.Frame=0
-		endif
-		Object.YPos+=262144
-		if Object.YPos>=16777216
-			Object.YPos-=18874368
-		endif
-		break
-	case 3
-		break
-	case 4
-		Object.Value1++
-		if Object.Value1==40
-			Object.Value1=0
-			Object.State=5
-		endif
-		break
-	case 5
-		if Object.Value1<1800
-			SetScreenFade(208,255,224,Object.Value1)
-			Object.Value1+=10
-		else
-			SetScreenFade(208,255,224,255)
-			switch Stage.ListPos
+		switch Stage.ListPos
 //REPLACE
-			endswitch
-			ArrayPos0=Options.SaveSlot
-			ArrayPos0*=400
-			ArrayPos0+=200
-			TempValue2=Stage.Seconds
-			TempValue2*=100
-			TempValue3=Stage.Minutes
-			TempValue3*=6000
-			TempValue2+=TempValue3
-			TempValue2+=Stage.MilliSeconds
-			SaveRAM[ArrayPos0]+=TempValue2
-			ArrayPos0++
-			TempValue3=SaveRAM[ArrayPos0]
-			SaveRAM[ArrayPos0]++
-			ArrayPos0++
-			SaveRAM[ArrayPos0]++
-			ArrayPos0+=2
-			SaveRAM[ArrayPos0]+=Transporter_Destroyed
-			ArrayPos0++
-			TempValue3*=3
-			ArrayPos0+=TempValue3
-			SaveRAM[ArrayPos0]=Stage.ListPos
-			ArrayPos0++
-			SaveRAM[ArrayPos0]=TempValue1
-			ArrayPos0++
-			SaveRAM[ArrayPos0]=TempValue2
-			if TempValue0==70
+		endswitch
+		ArrayPos0=Options.SaveSlot
+		ArrayPos0*=800
+		ArrayPos0+=800
+		TempValue2=Stage.Seconds
+		TempValue2*=100
+		TempValue3=Stage.Minutes
+		TempValue3*=6000
+		TempValue2+=TempValue3
+		TempValue2+=Stage.MilliSeconds
+		SaveRAM[ArrayPos0]+=TempValue2
+		ArrayPos0++
+		TempValue3=SaveRAM[ArrayPos0]
+		SaveRAM[ArrayPos0]++
+		ArrayPos0++
+		SaveRAM[ArrayPos0]++
+		ArrayPos0+=2
+		SaveRAM[ArrayPos0]+=Transporter_Destroyed
+		ArrayPos0++
+		TempValue3*=3
+		ArrayPos0+=TempValue3
+		SaveRAM[ArrayPos0]=Stage.ListPos
+		ArrayPos0++
+		SaveRAM[ArrayPos0]=TempValue1
+		ArrayPos0++
+		SaveRAM[ArrayPos0]=TempValue2
+		if TempValue0==70
+			ArrayPos1=Options.SaveSlot
+			ArrayPos1<<=3
+			ArrayPos1+=3
+			SaveRAM[ArrayPos1]=71
+			if Stage.PlayerListPos!=1
+				EngineCallback(4)
+				if SpecialStage.TimeStones>126
+					Options.Soundtrack=SaveRAM[38]
+					LoadVideo("Good_Ending")
+					if SaveRAM[362]==0
+						SaveRAM[38]=0
+					else
+						SaveRAM[38]-=1
+					endif
+				else
+					if Good_Future_List>16382
+						Options.Soundtrack=SaveRAM[38]
+						LoadVideo("Good_Ending")
+						if SaveRAM[362]==0
+							SaveRAM[38]=0
+						else
+							SaveRAM[38]-=1
+						endif
+					else
+						Options.Soundtrack=SaveRAM[38]
+						LoadVideo("Bad_Ending")
+						if SaveRAM[362]==0
+							SaveRAM[38]=0
+						else
+							SaveRAM[38]-=1
+						endif
+					endif
+				endif
+				if SaveRAM[36]==0
+					SaveRAM[36]=1
+				endif
+				Stage.ListPos=8
+			else
+				Stage.ListPos=7
+			endif
+			Stage.ActiveList=PRESENTATION_STAGE
+		else
+			Stage.ListPos=TempValue0
+			Fade_Colour=208
+			Fade_Colour<<=16
+			TempValue0=255
+			TempValue0<<=8
+			Fade_Colour+=TempValue0
+			Fade_Colour+=224
+			LampPost.Check=0
+			Transporter_Destroyed=0
+			MetalSonic_Destroyed=0
+			if Options.GameMode==1
 				ArrayPos1=Options.SaveSlot
 				ArrayPos1<<=3
-				ArrayPos1+=3
-				SaveRAM[ArrayPos1]=71
-				if Stage.PlayerListPos==0
-					EngineCallback(4)
-					if SpecialStage.TimeStones>126
-#platform: Standard
-						LoadVideo("Good_Ending")
-#endplatform
-#platform: Mobile
-						if Options.Soundtrack==0
-							LoadVideo("Good_Ending")
-						else
-							LoadVideo("Good_EndingUS")
-						endif
-#endplatform
-					else
-						if Good_Future_List>16382
-#platform: Standard
-							LoadVideo("Good_Ending")
-#endplatform
-#platform: Mobile
-							if Options.Soundtrack==0
-								LoadVideo("Good_Ending")
-							else
-								LoadVideo("Good_EndingUS")
-							endif
-#endplatform
-						else
-#platform: Standard
-							LoadVideo("Bad_Ending")
-#endplatform
-#platform: Mobile
-							if Options.Soundtrack==0
-								LoadVideo("Bad_Ending")
-							else
-								LoadVideo("Bad_EndingUS")
-							endif
-#endplatform
-						endif
-					endif
-					if SaveRAM[36]==0
-						SaveRAM[36]=1
-					endif
-					Stage.ListPos=8
-				else
-					Stage.ListPos=7
-				endif
-				Stage.ActiveList=PRESENTATION_STAGE
-			else
-				Stage.ListPos=TempValue0
-				Fade_Colour=208
-				Fade_Colour<<=16
-				TempValue0=255
-				TempValue0<<=8
-				Fade_Colour+=TempValue0
-				Fade_Colour+=224
-				LampPost.Check=0
-				Transporter_Destroyed=0
-				MetalSonic_Destroyed=0
-				if Options.GameMode==1
-					ArrayPos1=Options.SaveSlot
-					ArrayPos1<<=3
-					SaveRAM[ArrayPos1]=Stage.PlayerListPos
-					ArrayPos1++
-					SaveRAM[ArrayPos1]=Player.Lives
-					ArrayPos1++
-					SaveRAM[ArrayPos1]=Player.Score
-					ArrayPos1++
-					SaveRAM[ArrayPos1]=Stage.ListPos
-					SaveRAM[ArrayPos1]++
-					ArrayPos1++
-					SaveRAM[ArrayPos1]=SpecialStage.TimeStones
-					ArrayPos1++
-					SaveRAM[ArrayPos1]=SpecialStage.ListPos
-					ArrayPos1++
-					SaveRAM[ArrayPos1]=Player.ScoreBonus
-					ArrayPos1++
-					SaveRAM[ArrayPos1]=MetalSonic_List
-					SaveRAM[ArrayPos1]<<=16
-					SaveRAM[ArrayPos1]+=Good_Future_List
-				endif
+				SaveRAM[ArrayPos1]=Stage.PlayerListPos
+				ArrayPos1++
+				SaveRAM[ArrayPos1]=Player.Lives
+				ArrayPos1++
+				SaveRAM[ArrayPos1]=Player.Score
+				ArrayPos1++
+				SaveRAM[ArrayPos1]=Stage.ListPos
+				SaveRAM[ArrayPos1]++
+				ArrayPos1++
+				SaveRAM[ArrayPos1]=SpecialStage.TimeStones
+				ArrayPos1++
+				SaveRAM[ArrayPos1]=SpecialStage.ListPos
+				ArrayPos1++
+				SaveRAM[ArrayPos1]=Player.ScoreBonus
+				ArrayPos1++
+				SaveRAM[ArrayPos1]=MetalSonic_List
+				SaveRAM[ArrayPos1]<<=16
+				SaveRAM[ArrayPos1]+=Good_Future_List
 			endif
-			WriteSaveRAM()
-			LoadStage()
 		endif
+		WriteSaveRAM()
+		LoadStage()
 		break
 	endswitch
 endsub

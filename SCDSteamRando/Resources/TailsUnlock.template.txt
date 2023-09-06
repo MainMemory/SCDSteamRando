@@ -26,7 +26,7 @@ sub ObjectMain
 			if Object.Value0>0
 				Object.Value0-=8
 			else
-				PlayMusic(Options.Soundtrack)
+				PlayMusic(1)
 				Object.State++
 			endif
 			SetScreenFade(0,0,0,Object.Value0)
@@ -96,7 +96,8 @@ sub ObjectMain
 				if CheckResult>-1
 					if SelectedOption==4
 						Object.State++
-						PlayStageSfx(1,0)
+						Music.Volume-=50
+						PlaySfx(27,0)
 					else
 						SelectedOption=4
 						PlaySfx(23,0)
@@ -134,13 +135,15 @@ sub ObjectMain
 				case 3
 					if KeyPress.Start==1
 						Object.State++
+						Music.Volume-=50
 						PlaySfx(19,0)
 					endif
 					break
 				case 4
 					if KeyPress.Start==1
 						Object.State++
-						PlayStageSfx(1,0)
+						Music.Volume-=50
+						PlaySfx(27,0)
 					endif
 					break
 				endswitch
@@ -159,9 +162,15 @@ sub ObjectMain
 			TempValue0*=RouteIndex
 			if Object.Value4>TempValue0
 				Object.Value4-=8
+				if Object.Value4<TempValue0
+					Object.Value4=TempValue0
+				endif
 			else
 				if Object.Value4<TempValue0
 					Object.Value4+=8
+					if Object.Value4>TempValue0
+						Object.Value4=TempValue0
+					endif
 				endif
 			endif
 			TempValue0=Screen.XSize
@@ -169,9 +178,15 @@ sub ObjectMain
 			TempValue0*=OptsIndex
 			if Object.Value7>TempValue0
 				Object.Value7-=8
+				if Object.Value7<TempValue0
+					Object.Value7=TempValue0
+				endif
 			else
 				if Object.Value7<TempValue0
 					Object.Value7+=8
+					if Object.Value7>TempValue0
+						Object.Value7=TempValue0
+					endif
 				endif
 			endif
 			break
@@ -197,8 +212,8 @@ sub ObjectMain
 					ArrayPos1++
 					SaveRAM[ArrayPos1]=0
 					ArrayPos1=Options.SaveSlot
-					ArrayPos1*=400
-					ArrayPos1+=200
+					ArrayPos1*=800
+					ArrayPos1+=800
 					SaveRAM[ArrayPos1]=0
 					ArrayPos1++
 					SaveRAM[ArrayPos1]=0
@@ -247,11 +262,11 @@ sub ObjectMain
 		TempValue0*=24
 		TempValue0+=48
 		if Object.YPos<TempValue0
-			Object.YPos+=4
+			Object.YPos+=2
 			Object.Animation=1
 		else
 			if Object.YPos>TempValue0
-				Object.YPos-=4
+				Object.YPos-=2
 				Object.Animation=1
 			else
 				Object.Animation=0
@@ -279,10 +294,14 @@ sub ObjectMain
 					endif
 				endif
 			else
-				if Object.Frame==117
-					Object.Frame=115
-				else
-					Object.Frame++
+				Object.AnimationTimer++
+				if Object.AnimationTimer>1
+					Object.AnimationTimer=0
+					if Object.Frame==117
+						Object.Frame=115
+					else
+						Object.Frame++
+					endif
 				endif
 			endif
 		endif
@@ -346,13 +365,13 @@ sub ObjectDraw
 		TempValue0+=11
 		DrawNumbers(43,Object.Value1,TempValue0,Object.Value2,2,8,1)
 		TempValue1=Object.Value1
-		TempValue1-=14
+		TempValue1-=16
 		DrawSpriteScreenXY(54,TempValue1,TempValue0)
-		TempValue1-=8
+		TempValue1-=7
 		DrawNumbers(43,TempValue1,TempValue0,Object.Value3,2,8,1)
 		TempValue1-=14
 		DrawSpriteScreenXY(53,TempValue1,TempValue0)
-		TempValue1-=8
+		TempValue1-=9
 		if Object.Value5>0
 			DrawNumbers(43,TempValue1,TempValue0,Object.Value4,2,8,1)
 			TempValue1-=14
@@ -446,7 +465,7 @@ sub ObjectDraw
 			DrawNumbers(55,TempValue1,TempValue0,Object.Value7,2,8,0)
 		else
 			switch TempValue2
-			case 44
+			case 45
 				TempValue1+=9
 				break
 			default
@@ -602,8 +621,8 @@ sub ObjectStartup
 	TempValue1=Screen.XSize
 	TempValue1-=17
 	ArrayPos0=Options.SaveSlot
-	ArrayPos0*=400
-	ArrayPos0+=200
+	ArrayPos0*=800
+	ArrayPos0+=800
 	ArrayPos1=32
 	// Left menu
 	Object[ArrayPos1].Priority=1
@@ -611,11 +630,7 @@ sub ObjectStartup
 	Object[ArrayPos1].YPos=0
 	Object[ArrayPos1].DrawOrder=4
 	// Menu cursor
-	if Stage.PlayerListPos==0
-		LoadSpriteSheet("Players/Sonic1.gif")
-	else
-		LoadSpriteSheet("Players/Tails2.gif")
-	endif
+	LoadSpriteSheet("Global/Pause_EN.gif")
 	ArrayPos1++
 	ResetObjectEntity(ArrayPos1,TypeName[Tails Unlock Scr],1,80,48)
 	Object[ArrayPos1].Priority=1
@@ -623,20 +638,34 @@ sub ObjectStartup
 	Object[ArrayPos1].Direction=FACING_LEFT
 	Object[ArrayPos1].Frame=112
 	Object[ArrayPos1].Value7=Object.SpriteSheet
-	if Stage.PlayerListPos==1
+	switch stage.PlayerListPos
+	case 0
+		LoadSpriteSheet("Players/Sonic1.gif")
+		break
+	case 1
 		LoadSpriteSheet("Players/Tails3.gif")
-	endif
+		break
+	case 2
+		LoadSpriteSheet("Players/Amy1.gif")
+		break
+	endswitch
 	Object[ArrayPos1].Value6=Object.SpriteSheet
 	// Backdrop
 	ArrayPos1++
 	ResetObjectEntity(ArrayPos1,TypeName[Tails Unlock Scr],2,88,0)
 	Object[ArrayPos1].Priority=1
 	// Player icon
-	if Stage.PlayerListPos==0
+	switch stage.PlayerListPos
+	case 0
 		LoadSpriteSheet("Global/Display.gif")
-	else
+		break
+	case 1
 		LoadSpriteSheet("Global/Display_t.gif")
-	endif
+		break
+	case 2
+		LoadSpriteSheet("Global/Display_a.gif")
+		break
+	endswitch
 	ArrayPos1++
 	ResetObjectEntity(ArrayPos1,TypeName[Tails Unlock Scr],3,100,7)
 	Object[ArrayPos1].Priority=1
@@ -792,203 +821,225 @@ sub ObjectStartup
 	Object[ArrayPos1].Priority=1
 	Object[ArrayPos1].Value0=111
 	LoadSpriteSheet("Secrets/RandoSummary.gif")
-	SpriteFrame(0,0,88,240,1,1) // 0: Left Menu
-	SpriteFrame(0,0,96,96,90,1) // 1: Backdrop
-	SpriteFrame(16,56,48,16,187,1) // 2: "STATS" (sel)
-	SpriteFrame(16,80,48,16,187,18) // 3: "ROUTE" (sel)
-	SpriteFrame(16,104,48,16,187,35) // 4: "OPTS" (sel)
-	SpriteFrame(16,128,48,16,187,52) // 5: "RETRY" (sel)
-	SpriteFrame(16,152,48,16,187,69) // 6: "EXIT" (sel)
-	SpriteFrame(0,0,18,18,236,1) // 7: Player icon box
-	SpriteFrame(1,1,16,16,187,189) // 8: Player icon
-	SpriteFrame(0,0,186,26,1,261) // 9: Info box
-	TempValue0=Screen.XSize
-	TempValue0-=276
-	SpriteFrame(TempValue0,0,169,26,18,261) // 10: Info box extension
-	SpriteFrame(9,2,65,13,189,149) // 11: "PLAY TIME:"
-	SpriteFrame(9,2,97,13,90,197) // 12: "LEVELS VISITED:"
-	SpriteFrame(9,2,82,13,90,211) // 13: "TIME STONES:"
-	TempValue1=Screen.XSize
-	if Screen.XSize>=360
-		TempValue1-=268
-		TempValue2=24
-	else
-		TempValue1-=220
-		TempValue2=16
+	if Stage.ListPos==8
+		SpriteFrame(0,0,88,240,1,1) // 0: Left Menu
+		SpriteFrame(0,0,96,96,90,1) // 1: Backdrop
+		SpriteFrame(16,56,48,16,187,1) // 2: "STATS" (sel)
+		SpriteFrame(16,80,48,16,187,18) // 3: "ROUTE" (sel)
+		SpriteFrame(16,104,48,16,187,35) // 4: "OPTS" (sel)
+		SpriteFrame(16,128,48,16,187,52) // 5: "RETRY" (sel)
+		SpriteFrame(16,152,48,16,187,69) // 6: "EXIT" (sel)
+		SpriteFrame(0,0,18,18,236,1) // 7: Player icon box
+		SpriteFrame(1,1,16,16,187,189) // 8: Player icon
+		SpriteFrame(0,0,186,26,1,261) // 9: Info box
+		TempValue0=Screen.XSize
+		TempValue0-=276
+		SpriteFrame(TempValue0,0,169,26,18,261) // 10: Info box extension
+		SpriteFrame(9,2,65,13,189,149) // 11: "PLAY TIME:"
+		SpriteFrame(9,2,97,13,90,197) // 12: "LEVELS VISITED:"
+		SpriteFrame(9,2,82,13,90,211) // 13: "TIME STONES:"
+		TempValue1=Screen.XSize
+		if Screen.XSize>=360
+			TempValue1-=268
+			TempValue2=24
+		else
+			TempValue1-=220
+			TempValue2=16
+		endif
+		SpriteFrame(TempValue1,9,16,16,189,163) // 14: Time Stone 1
+		TempValue1+=TempValue2
+		SpriteFrame(TempValue1,9,16,16,206,163) // 15: Time Stone 2
+		TempValue1+=TempValue2
+		SpriteFrame(TempValue1,9,16,16,223,163) // 16: Time Stone 3
+		TempValue1+=TempValue2
+		SpriteFrame(TempValue1,9,16,16,189,180) // 17: Time Stone 4
+		TempValue1+=TempValue2
+		SpriteFrame(TempValue1,9,16,16,206,180) // 18: Time Stone 5
+		TempValue1+=TempValue2
+		SpriteFrame(TempValue1,9,16,16,223,180) // 19: Time Stone 6
+		TempValue1+=TempValue2
+		SpriteFrame(TempValue1,9,16,16,189,197) // 20: Time Stone 7
+		SpriteFrame(9,2,114,13,90,225) // 21: "TIME TRAVEL USES:"
+		SpriteFrame(9,2,103,13,1,315) // 22: "LEVELS CLEARED:"
+		SpriteFrame(9,2,99,13,1,329) // 23: "TRANSPORTERS:"
+		SpriteFrame(17,25,175,7,12,280) // 24: Info box BL extension
+		SpriteFrame(TempValue0,25,169,7,18,280) // 25: Info box BR extension
+		SpriteFrame(0,0,101,13,105,315) // 26: "PALMTREE PANIC"
+		SpriteFrame(0,0,105,13,1,343) // 27: "COLLISION CHAOS"
+		SpriteFrame(0,0,92,13,107,343) // 28: "TIDAL TEMPEST"
+		SpriteFrame(0,0,116,13,1,357) // 29: "QUARTZ QUADRANT"
+		SpriteFrame(0,0,118,13,118,357) // 30: "WACKY WORKBENCH"
+		SpriteFrame(0,0,129,13,1,371) // 31: "STARDUST SPEEDWAY"
+		SpriteFrame(0,0,117,13,131,371) // 32: "METALLIC MADNESS"
+		SpriteFrame(0,0,30,13,205,225) // 33: "ZONE"
+		SpriteFrame(0,0,54,13,188,261) // 34: "PRESENT"
+		SpriteFrame(0,0,31,13,206,197) // 35: "PAST"
+		SpriteFrame(0,0,80,13,174,329) // 36: "GOOD FUTURE"
+		SpriteFrame(0,0,72,13,1,385) // 37: "BAD FUTURE"
+		SpriteFrame(0,0,70,8,173,214) // 38: "LEVEL CLEAR"
+		SpriteFrame(0,0,59,8,188,275) // 39: "PAST WARP"
+		SpriteFrame(0,0,72,8,31,302) // 40: "FUTURE WARP"
+		SpriteFrame(0,0,102,8,1,302) // 41: "GOOD FUTURE WARP"
+		SpriteFrame(0,0,95,8,104,302) // 42: "BAD FUTURE WARP"
+		SpriteFrame(0,0,7,13,193,393) // 43: "0"
+		SpriteFrame(0,0,5,13,202,393) // 44: "1"
+		SpriteFrame(0,0,7,13,211,393) // 45: "2"
+		SpriteFrame(0,0,7,13,220,393) // 46: "3"
+		SpriteFrame(0,0,8,13,229,393) // 47: "4"
+		SpriteFrame(0,0,7,13,238,393) // 48: "5"
+		SpriteFrame(0,0,7,13,247,393) // 49: "6"
+		SpriteFrame(0,0,7,13,193,410) // 50: "7"
+		SpriteFrame(0,0,7,13,202,410) // 51: "8"
+		SpriteFrame(0,0,7,13,211,410) // 52: "9"
+		SpriteFrame(1,4,3,9,205,499) // 53: ":"
+		SpriteFrame(3,8,3,4,223,486) // 54: "."
+		SpriteFrame(1,0,6,8,190,86) // 55: "0"
+		SpriteFrame(3,0,3,8,201,86) // 56: "1"
+		SpriteFrame(1,0,6,8,208,86) // 57: "2"
+		SpriteFrame(1,0,6,8,217,86) // 58: "3"
+		SpriteFrame(1,0,6,8,226,86) // 59: "4"
+		SpriteFrame(1,0,6,8,235,86) // 60: "5"
+		SpriteFrame(0,0,7,8,243,86) // 61: "6"
+		SpriteFrame(1,0,6,8,190,95) // 62: "7"
+		SpriteFrame(0,0,7,7,198,95) // 63: "8"
+		SpriteFrame(1,0,6,8,208,95) // 64: "9"
+		SpriteFrame(3,0,3,8,201,140) // 65: ":"
+		SpriteFrame(4,5,3,2,220,136) // 66: "."
+		TempValue0-=24
+		SpriteFrame(TempValue0,0,169,26,18,261) // 67: Info box extension short
+		SpriteFrame(9,2,82,13,79,469) // 68: "PROJECTORS:"
+		SpriteFrame(9,2,38,13,122,455) // 69: "BUILD:"
+		SpriteFrame(9,2,33,13,1,288) // 70: "SEED:"
+		SpriteFrame(9,2,35,13,35,288) // 71: "MODE:"
+		SpriteFrame(9,2,68,13,52,427) // 72: "MAIN PATH:"
+		SpriteFrame(9,2,85,13,90,98) // 73: "MAX BW JUMP:"
+		SpriteFrame(9,2,84,13,90,112) // 74: "MAX FW JUMP:"
+		SpriteFrame(9,2,55,13,66,455) // 75: "BW PROB:"
+		SpriteFrame(9,2,77,13,1,469) // 76: "ALLOW SAME:"
+		SpriteFrame(9,2,40,13,207,315) // 77: "MUSIC:"
+		SpriteFrame(9,2,39,13,141,497) // 78: "ITEMS:"
+		SpriteFrame(9,2,74,13,90,126) // 79: "TIME POSTS:"
+		SpriteFrame(9,2,88,13,90,140) // 80: "CHECKPOINTS:"
+		SpriteFrame(9,2,64,13,90,154) // 81: "PALETTES:"
+		SpriteFrame(9,2,34,13,149,182) // 82: "UFOS:"
+		SpriteFrame(9,2,43,13,135,168) // 83: "WATER:"
+		SpriteFrame(1,1,6,12,212,479) // 84: "/"
+		SpriteFrame(1,5,6,3,230,483) // 85: "-"
+		TempValue0=Screen.XSize
+		TempValue0-=109
+		TempValue1=TempValue0
+		TempValue1-=71
+		SpriteFrame(TempValue1,11,71,13,71,288) // 86: "ALL STAGES"
+		TempValue1=TempValue0
+		TempValue1-=48
+		SpriteFrame(TempValue1,11,48,13,143,288) // 87: "ROUNDS"
+		TempValue1=TempValue0
+		TempValue1-=31
+		SpriteFrame(TempValue1,11,31,13,192,288) // 88: "ACTS"
+		TempValue1=TempValue0
+		TempValue1-=81
+		SpriteFrame(TempValue1,11,81,13,74,385) // 89: "TIME PERIODS"
+		TempValue1=TempValue0
+		TempValue1-=112
+		SpriteFrame(TempValue1,11,112,13,57,399) // 90: "BRANCHING PATHS"
+		TempValue1=TempValue0
+		TempValue1-=63
+		SpriteFrame(TempValue1,11,63,13,52,413) // 91: "SEGMENTS"
+		TempValue1=TempValue0
+		TempValue1-=27
+		SpriteFrame(TempValue1,11,27,13,220,239) // 92: "WILD"
+		TempValue1=TempValue0
+		TempValue1-=48
+		SpriteFrame(TempValue1,11,48,13,116,413) // 93: "SHADOW"
+		TempValue1=TempValue0
+		TempValue1-=64
+		SpriteFrame(TempValue1,11,64,13,1,455) // 94: "ACT CLEAR"
+		TempValue1=TempValue0
+		TempValue1-=76
+		SpriteFrame(TempValue1,11,76,13,90,225) // 95: "TIME TRAVEL"
+		TempValue1=TempValue0
+		TempValue1-=55
+		SpriteFrame(TempValue1,11,55,13,136,441) // 96: "ANY EXIT"
+		TempValue1=TempValue0
+		TempValue1-=22
+		SpriteFrame(TempValue1,11,22,13,165,126) // 97: "YES"
+		TempValue1=TempValue0
+		TempValue1-=16
+		SpriteFrame(TempValue1,11,16,13,236,225) // 98: "NO"
+		SpriteFrame(TempValue1,11,16,13,212,225) // 99: "ON"
+		TempValue1=TempValue0
+		TempValue1-=21
+		SpriteFrame(TempValue1,11,21,13,224,288) // 100: "OFF"
+		TempValue1=TempValue0
+		TempValue1-=61
+		SpriteFrame(TempValue1,11,61,13,101,329) // 101: "SEPARATE"
+		TempValue1=TempValue0
+		TempValue1-=36
+		SpriteFrame(TempValue1,11,36,13,200,343) // 102: "MIXED"
+		TempValue1=TempValue0
+		TempValue1-=15
+		SpriteFrame(TempValue1,11,15,13,52,441) // 103: "1:1"
+		TempValue1=TempValue0
+		TempValue1-=83
+		SpriteFrame(TempValue1,11,83,13,52,441) // 104: "1:1 PER STAGE"
+		TempValue1=TempValue0
+		TempValue1-=30
+		SpriteFrame(TempValue1,11,30,13,161,455) // 105: "EASY"
+		TempValue1=TempValue0
+		TempValue1-=44
+		SpriteFrame(TempValue1,11,44,13,90,168) // 106: "MEDIUM"
+		TempValue1=TempValue0
+		TempValue1-=31
+		SpriteFrame(TempValue1,11,31,13,155,154) // 107: "HARD"
+		TempValue1=TempValue0
+		TempValue1-=58
+		SpriteFrame(TempValue1,11,58,13,90,182) // 108: "ADD ONLY"
+		SpriteFrame(-109,-9,218,18,1,242) // 109: Info bar
+		SpriteFrame(-85,-7,170,13,1,483) // 110: "RESTART FROM FIRST LEVEL."
+		SpriteFrame(-70,-7,139,13,1,497) // 111: "RETURN TO MAIN MENU."
+		switch stage.PlayerListPos
+		case 0
+			SpriteFrame(0,0,16,24,1,103) // 112: Sonic Idle 1
+			SpriteFrame(0,0,16,24,18,103) // 113: Sonic Idle 2
+			SpriteFrame(0,0,16,24,35,103) // 114: Sonic Idle 3
+			SpriteFrame(0,0,16,24,36,232) // 115: Sonic Walk 1
+			SpriteFrame(0,0,16,24,53,232) // 116: Sonic Walk 2
+			SpriteFrame(0,0,16,24,70,232) // 117: Sonic Walk 3
+			break
+		case 1
+			SpriteFrame(0,0,16,24,52,103) // 112: Tails Idle 1
+			SpriteFrame(0,0,16,24,69,103) // 113: Tails Idle 2
+			SpriteFrame(0,0,16,24,86,103) // 114: Tails Idle 3
+			SpriteFrame(0,0,16,24,172,1) // 115: Tails Walk 1
+			SpriteFrame(0,0,16,24,189,1) // 116: Tails Walk 2
+			SpriteFrame(0,0,16,24,206,1) // 117: Tails Walk 3
+			break
+		case 2
+			SpriteFrame(0,0,16,24,103,103) // 112: Amy Idle 1
+			SpriteFrame(0,0,16,24,120,103) // 113: Amy Idle 2
+			SpriteFrame(0,0,16,24,137,103) // 114: Amy Idle 3
+			SpriteFrame(0,0,16,24,36,232) // 115: Amy Walk 1
+			SpriteFrame(0,0,16,24,53,232) // 116: Amy Walk 2
+			SpriteFrame(0,0,16,24,70,232) // 117: Amy Walk 3
+			break
+		endswitch
+		SpriteFrame(2,1,5,6,209,132) // 118: "/"
+		TempValue1=TempValue0
+		TempValue1-=125
+		SpriteFrame(TempValue1,11,125,13,1,399) // 119: "REVERSE BRANCHING
 	endif
-	SpriteFrame(TempValue1,9,16,16,189,163) // 14: Time Stone 1
-	TempValue1+=TempValue2
-	SpriteFrame(TempValue1,9,16,16,206,163) // 15: Time Stone 2
-	TempValue1+=TempValue2
-	SpriteFrame(TempValue1,9,16,16,223,163) // 16: Time Stone 3
-	TempValue1+=TempValue2
-	SpriteFrame(TempValue1,9,16,16,189,180) // 17: Time Stone 4
-	TempValue1+=TempValue2
-	SpriteFrame(TempValue1,9,16,16,206,180) // 18: Time Stone 5
-	TempValue1+=TempValue2
-	SpriteFrame(TempValue1,9,16,16,223,180) // 19: Time Stone 6
-	TempValue1+=TempValue2
-	SpriteFrame(TempValue1,9,16,16,189,197) // 20: Time Stone 7
-	SpriteFrame(9,2,114,13,90,225) // 21: "TIME TRAVEL USES:"
-	SpriteFrame(9,2,103,13,1,315) // 22: "LEVELS CLEARED:"
-	SpriteFrame(9,2,99,13,1,329) // 23: "TRANSPORTERS:"
-	SpriteFrame(17,25,175,7,12,280) // 24: Info box BL extension
-	SpriteFrame(TempValue0,25,169,7,18,280) // 25: Info box BR extension
-	SpriteFrame(0,0,101,13,105,315) // 26: "PALMTREE PANIC"
-	SpriteFrame(0,0,105,13,1,343) // 27: "COLLISION CHAOS"
-	SpriteFrame(0,0,92,13,107,343) // 28: "TIDAL TEMPEST"
-	SpriteFrame(0,0,116,13,1,357) // 29: "QUARTZ QUADRANT"
-	SpriteFrame(0,0,118,13,118,357) // 30: "WACKY WORKBENCH"
-	SpriteFrame(0,0,129,13,1,371) // 31: "STARDUST SPEEDWAY"
-	SpriteFrame(0,0,117,13,131,371) // 32: "METALLIC MADNESS"
-	SpriteFrame(0,0,30,13,205,225) // 33: "ZONE"
-	SpriteFrame(0,0,54,13,188,261) // 34: "PRESENT"
-	SpriteFrame(0,0,31,13,206,197) // 35: "PAST"
-	SpriteFrame(0,0,80,13,174,329) // 36: "GOOD FUTURE"
-	SpriteFrame(0,0,72,13,1,385) // 37: "BAD FUTURE"
-	SpriteFrame(0,0,70,8,173,214) // 38: "LEVEL CLEAR"
-	SpriteFrame(0,0,59,8,188,275) // 39: "PAST WARP"
-	SpriteFrame(0,0,72,8,31,302) // 40: "FUTURE WARP"
-	SpriteFrame(0,0,102,8,1,302) // 41: "GOOD FUTURE WARP"
-	SpriteFrame(0,0,95,8,104,302) // 42: "BAD FUTURE WARP"
-	SpriteFrame(0,0,7,13,193,393) // 43: "0"
-	SpriteFrame(0,0,5,13,202,393) // 44: "1"
-	SpriteFrame(0,0,7,13,211,393) // 45: "2"
-	SpriteFrame(0,0,7,13,220,393) // 46: "3"
-	SpriteFrame(0,0,8,13,229,393) // 47: "4"
-	SpriteFrame(0,0,7,13,238,393) // 48: "5"
-	SpriteFrame(0,0,7,13,247,393) // 49: "6"
-	SpriteFrame(0,0,7,13,193,410) // 50: "7"
-	SpriteFrame(0,0,7,13,202,410) // 51: "8"
-	SpriteFrame(0,0,7,13,211,410) // 52: "9"
-	SpriteFrame(1,4,3,9,205,499) // 53: ":"
-	SpriteFrame(3,8,3,4,223,486) // 54: "."
-	SpriteFrame(1,0,6,8,190,86) // 55: "0"
-	SpriteFrame(3,0,3,8,201,86) // 56: "1"
-	SpriteFrame(1,0,6,8,208,86) // 57: "2"
-	SpriteFrame(1,0,6,8,217,86) // 58: "3"
-	SpriteFrame(1,0,6,8,226,86) // 59: "4"
-	SpriteFrame(1,0,6,8,235,86) // 60: "5"
-	SpriteFrame(0,0,7,8,243,86) // 61: "6"
-	SpriteFrame(1,0,6,8,190,95) // 62: "7"
-	SpriteFrame(0,0,7,7,198,95) // 63: "8"
-	SpriteFrame(1,0,6,8,208,95) // 64: "9"
-	SpriteFrame(3,0,3,8,201,140) // 65: ":"
-	SpriteFrame(4,5,3,2,220,136) // 66: "."
-	TempValue0-=24
-	SpriteFrame(TempValue0,0,169,26,18,261) // 67: Info box extension short
-	SpriteFrame(9,2,82,13,79,469) // 68: "PROJECTORS:"
-	SpriteFrame(9,2,38,13,122,455) // 69: "BUILD:"
-	SpriteFrame(9,2,33,13,1,288) // 70: "SEED:"
-	SpriteFrame(9,2,35,13,35,288) // 71: "MODE:"
-	SpriteFrame(9,2,68,13,52,427) // 72: "MAIN PATH:"
-	SpriteFrame(9,2,85,13,90,98) // 73: "MAX BW JUMP:"
-	SpriteFrame(9,2,84,13,90,112) // 74: "MAX FW JUMP:"
-	SpriteFrame(9,2,55,13,66,455) // 75: "BW PROB:"
-	SpriteFrame(9,2,77,13,1,469) // 76: "ALLOW SAME:"
-	SpriteFrame(9,2,40,13,207,315) // 77: "MUSIC:"
-	SpriteFrame(9,2,39,13,141,497) // 78: "ITEMS:"
-	SpriteFrame(9,2,74,13,90,126) // 79: "TIME POSTS:"
-	SpriteFrame(9,2,88,13,90,140) // 80: "CHECKPOINTS:"
-	SpriteFrame(9,2,64,13,90,154) // 81: "PALETTES:"
-	SpriteFrame(9,2,34,13,149,182) // 82: "UFOS:"
-	SpriteFrame(9,2,43,13,135,168) // 83: "WATER:"
-	SpriteFrame(1,1,6,12,212,479) // 84: "/"
-	SpriteFrame(1,5,6,3,230,483) // 85: "-"
-	TempValue0=Screen.XSize
-	TempValue0-=109
-	TempValue1=TempValue0
-	TempValue1-=71
-	SpriteFrame(TempValue1,11,71,13,71,288) // 86: "ALL STAGES"
-	TempValue1=TempValue0
-	TempValue1-=48
-	SpriteFrame(TempValue1,11,48,13,143,288) // 87: "ROUNDS"
-	TempValue1=TempValue0
-	TempValue1-=31
-	SpriteFrame(TempValue1,11,31,13,192,288) // 88: "ACTS"
-	TempValue1=TempValue0
-	TempValue1-=81
-	SpriteFrame(TempValue1,11,81,13,74,385) // 89: "TIME PERIODS"
-	TempValue1=TempValue0
-	TempValue1-=112
-	SpriteFrame(TempValue1,11,112,13,57,399) // 90: "BRANCHING PATHS"
-	TempValue1=TempValue0
-	TempValue1-=63
-	SpriteFrame(TempValue1,11,63,13,52,413) // 91: "SEGMENTS"
-	TempValue1=TempValue0
-	TempValue1-=27
-	SpriteFrame(TempValue1,11,27,13,220,239) // 92: "WILD"
-	TempValue1=TempValue0
-	TempValue1-=48
-	SpriteFrame(TempValue1,11,48,13,116,413) // 93: "SHADOW"
-	TempValue1=TempValue0
-	TempValue1-=64
-	SpriteFrame(TempValue1,11,64,13,1,455) // 94: "ACT CLEAR"
-	TempValue1=TempValue0
-	TempValue1-=76
-	SpriteFrame(TempValue1,11,76,13,90,225) // 95: "TIME TRAVEL"
-	TempValue1=TempValue0
-	TempValue1-=55
-	SpriteFrame(TempValue1,11,55,13,136,441) // 96: "ANY EXIT"
-	TempValue1=TempValue0
-	TempValue1-=22
-	SpriteFrame(TempValue1,11,22,13,165,126) // 97: "YES"
-	TempValue1=TempValue0
-	TempValue1-=16
-	SpriteFrame(TempValue1,11,16,13,236,225) // 98: "NO"
-	SpriteFrame(TempValue1,11,16,13,212,225) // 99: "ON"
-	TempValue1=TempValue0
-	TempValue1-=21
-	SpriteFrame(TempValue1,11,21,13,224,288) // 100: "OFF"
-	TempValue1=TempValue0
-	TempValue1-=61
-	SpriteFrame(TempValue1,11,61,13,101,329) // 101: "SEPARATE"
-	TempValue1=TempValue0
-	TempValue1-=36
-	SpriteFrame(TempValue1,11,36,13,200,343) // 102: "MIXED"
-	TempValue1=TempValue0
-	TempValue1-=15
-	SpriteFrame(TempValue1,11,15,13,52,441) // 103: "1:1"
-	TempValue1=TempValue0
-	TempValue1-=83
-	SpriteFrame(TempValue1,11,83,13,52,441) // 104: "1:1 PER STAGE"
-	TempValue1=TempValue0
-	TempValue1-=30
-	SpriteFrame(TempValue1,11,30,13,161,455) // 105: "EASY"
-	TempValue1=TempValue0
-	TempValue1-=44
-	SpriteFrame(TempValue1,11,44,13,90,168) // 106: "MEDIUM"
-	TempValue1=TempValue0
-	TempValue1-=31
-	SpriteFrame(TempValue1,11,31,13,155,154) // 107: "HARD"
-	TempValue1=TempValue0
-	TempValue1-=58
-	SpriteFrame(TempValue1,11,58,13,90,182) // 108: "ADD ONLY"
-	SpriteFrame(-109,-9,218,18,1,242) // 109: Info bar
-	SpriteFrame(-85,-7,170,13,1,483) // 110: "RESTART FROM FIRST LEVEL."
-	SpriteFrame(-70,-7,139,13,1,497) // 111: "RETURN TO MAIN MENU."
-	if Stage.PlayerListPos==0
-		SpriteFrame(0,0,16,24,173,232) // 112: Sonic Idle 1
-		SpriteFrame(0,0,16,24,190,232) // 113: Sonic Idle 2
-		SpriteFrame(0,0,16,24,207,232) // 114: Sonic Idle 3
-		SpriteFrame(0,0,16,24,36,232) // 115: Sonic Walk 1
-		SpriteFrame(0,0,16,24,53,232) // 116: Sonic Walk 2
-		SpriteFrame(0,0,16,24,70,232) // 117: Sonic Walk 3
-	else
-		SpriteFrame(0,0,16,24,236,44) // 112: Tails Idle 1
-		SpriteFrame(0,0,16,24,236,69) // 113: Tails Idle 2
-		SpriteFrame(0,0,16,24,232,130) // 114: Tails Idle 3
-		SpriteFrame(0,0,16,24,172,1) // 115: Tails Walk 1
-		SpriteFrame(0,0,16,24,189,1) // 116: Tails Walk 2
-		SpriteFrame(0,0,16,24,206,1) // 117: Tails Walk 3
-	endif
-	SpriteFrame(2,1,5,6,209,132) // 118: "/"
-	TempValue1=TempValue0
-	TempValue1-=125
-	SpriteFrame(TempValue1,11,125,13,1,399) // 119: "REVERSE BRANCHING
 	LoadPalette("RandoSummary.act",0,128,0,128)
-	SetMusicTrack("JP/DAGarden.ogg",0,1)
-	SetMusicTrack("US/DAGarden.ogg",1,117382)
+	switch SaveRAM[366]
+		case 0
+			SetMusicTrack("Results.ogg",1,1)
+			break						
+		case 1
+			SetMusicTrack("JP/DAGarden.ogg",1,1)
+			break
+		case 2
+			SetMusicTrack("US/Invincibility.ogg",1,1)
+			break
+	endswitch
 endsub
 
 sub RSDK

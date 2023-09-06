@@ -65,6 +65,7 @@ namespace SCDSteamRando
 			this.label7 = new System.Windows.Forms.Label();
 			this.panel1 = new System.Windows.Forms.Panel();
 			this.tabPage3 = new System.Windows.Forms.TabPage();
+			this.randomPlayer = new System.Windows.Forms.CheckBox();
 			this.label9 = new System.Windows.Forms.Label();
 			this.label8 = new System.Windows.Forms.Label();
 			this.tabPage2 = new System.Windows.Forms.TabPage();
@@ -526,6 +527,7 @@ namespace SCDSteamRando
 			// 
 			// tabPage3
 			// 
+			this.tabPage3.Controls.Add(this.randomPlayer);
 			this.tabPage3.Controls.Add(this.addWaterOnly);
 			this.tabPage3.Controls.Add(this.randomWater);
 			this.tabPage3.Controls.Add(this.ufoDifficulty);
@@ -545,6 +547,17 @@ namespace SCDSteamRando
 			this.tabPage3.TabIndex = 2;
 			this.tabPage3.Text = "Misc";
 			this.tabPage3.UseVisualStyleBackColor = true;
+			// 
+			// randomPlayer
+			// 
+			this.randomPlayer.AutoSize = true;
+			this.randomPlayer.Location = new System.Drawing.Point(6, 150);
+			this.randomPlayer.Name = "randomPlayer";
+			this.randomPlayer.Size = new System.Drawing.Size(111, 17);
+			this.randomPlayer.TabIndex = 19;
+			this.randomPlayer.Text = "Randomize Player";
+			this.toolTip1.SetToolTip(this.randomPlayer, "If checked, player character will be randomized after every act or time warp.");
+			this.randomPlayer.UseVisualStyleBackColor = true;
 			// 
 			// label9
 			// 
@@ -624,7 +637,7 @@ namespace SCDSteamRando
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "MainForm";
-			this.Text = "Sonic CD 2011 Randomizer";
+			this.Text = "Sonic CD Restored Randomizer";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
 			this.Load += new System.EventHandler(this.MainForm_Load);
 			((System.ComponentModel.ISupportInitialize)(this.seedSelector)).EndInit();
@@ -681,5 +694,6 @@ namespace SCDSteamRando
 		private System.Windows.Forms.ComboBox ufoDifficulty;
 		private System.Windows.Forms.CheckBox randomWater;
 		private System.Windows.Forms.CheckBox addWaterOnly;
+		private System.Windows.Forms.CheckBox randomPlayer;
 	}
 }

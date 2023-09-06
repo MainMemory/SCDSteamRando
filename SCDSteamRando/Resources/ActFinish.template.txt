@@ -29,63 +29,39 @@ function ActFinish_LoadEnding
 		ArrayPos1<<=3
 		ArrayPos1+=3
 		SaveRAM[ArrayPos1]=71
-		if Stage.PlayerListPos==0
-#platform: Mobile
-			EngineCallback(4)
-#endplatform
-#platform: Standard
+		if Stage.PlayerListPos!=1
 			if Stage.DebugMode==0
 				SetAchievement(7,100)
 			endif
-#endplatform
 			if Player.Score>0
-#platform: Mobile
-				if Options.GameMode==1
-					if Stage.DebugMode==0
-#endplatform
 						SetLeaderboard(0,Player.Score)
-#platform: Mobile
-					endif
-				endif
-#endplatform
 			endif
-#platform: Standard
 			EngineCallback(4)
-#endplatform
 			if SpecialStage.TimeStones>126
-#platform: Standard
+				Options.Soundtrack=SaveRAM[38]
 				LoadVideo("Good_Ending")
-#endplatform
-#platform: Mobile
-				if Options.Soundtrack==0
-					LoadVideo("Good_Ending")
+				if SaveRAM[362]==0
+					SaveRAM[38]=0
 				else
-					LoadVideo("Good_EndingUS")
+					SaveRAM[38]-=1
 				endif
-#endplatform
 			else
 				if Good_Future_List>16382
-#platform: Standard
+					Options.Soundtrack=SaveRAM[38]
 					LoadVideo("Good_Ending")
-#endplatform
-#platform: Mobile
-					if Options.Soundtrack==0
-						LoadVideo("Good_Ending")
+					if SaveRAM[362]==0
+						SaveRAM[38]=0
 					else
-						LoadVideo("Good_EndingUS")
+						SaveRAM[38]-=1
 					endif
-#endplatform
 				else
-#platform: Standard
+					Options.Soundtrack=SaveRAM[38]
 					LoadVideo("Bad_Ending")
-#endplatform
-#platform: Mobile
-					if Options.Soundtrack==0
-						LoadVideo("Bad_Ending")
+					if SaveRAM[362]==0
+						SaveRAM[38]=0
 					else
-						LoadVideo("Bad_EndingUS")
+						SaveRAM[38]-=1
 					endif
-#endplatform
 				endif
 			endif
 			if SaveRAM[36]==0
@@ -104,6 +80,7 @@ endfunction
 sub ObjectMain
 	switch Object.State
 	case 0
+		Player.2UpCounter=0
 		Object.XPos=-799
 		Object.Value1=1168
 		Object.Value2=1255
@@ -195,31 +172,59 @@ sub ObjectMain
 		break
 	case 2
 		Object.Value0++
-		if Options.Soundtrack==0
+		switch SaveRAM[352]
+			case 0
+			if Object.Value0>320
+				Object.Value0=0
+				Object.State=3
+				if Stage.PlayerListPos==0
+					if Object[24].PropertyValue==2
+						if Stage.DebugMode==0
+							if Options.GameMode==1
+								SaveRAM[259]=1
+								WriteSaveRAM()
+								SetAchievement(2,100)
+							endif
+						endif
+					endif
+				endif
+			endif
+			break
+			case 1
 			if Object.Value0>299
 				Object.Value0=0
 				Object.State=3
 				if Stage.PlayerListPos==0
 					if Object[24].PropertyValue==2
 						if Stage.DebugMode==0
-							SetAchievement(2,100)
+							if Options.GameMode==1
+								SaveRAM[259]=1
+								WriteSaveRAM()
+								SetAchievement(2,100)
+							endif
 						endif
 					endif
 				endif
 			endif
-		else
+			break
+			case 2
 			if Object.Value0>429
 				Object.Value0=0
 				Object.State=3
 				if Stage.PlayerListPos==0
 					if Object[24].PropertyValue==2
 						if Stage.DebugMode==0
-							SetAchievement(2,100)
+							if Options.GameMode==1
+								SaveRAM[259]=1
+								WriteSaveRAM()
+								SetAchievement(2,100)
+							endif
 						endif
 					endif
 				endif
 			endif
-		endif
+			break
+		endswitch
 		break
 	case 3
 		if Object.Value6>0
@@ -244,6 +249,7 @@ sub ObjectMain
 			Object.State=4
 			Object.Value0=0
 			PlaySfx(17,0)
+			Rand(Stage.PlayerListPos, 3)
 		endif
 		break
 	case 4
@@ -286,8 +292,8 @@ sub ObjectMain
 				endif
 #endplatform
 				ArrayPos0=Options.SaveSlot
-				ArrayPos0*=400
-				ArrayPos0+=200
+				ArrayPos0*=800
+				ArrayPos0+=800
 				TempValue1=Stage.Seconds
 				TempValue1*=100
 				TempValue2=Stage.Minutes
@@ -400,8 +406,8 @@ sub ObjectMain
 				endif
 #endplatform
 				ArrayPos0=Options.SaveSlot
-				ArrayPos0*=400
-				ArrayPos0+=200
+				ArrayPos0*=800
+				ArrayPos0+=800
 				TempValue1=Stage.Seconds
 				TempValue1*=100
 				TempValue2=Stage.Minutes
@@ -566,7 +572,7 @@ sub ObjectDraw
 	DrawSpriteScreenXY(6,Object.Value2,121)
 	TempValue0=Object.Value2
 	TempValue0+=163
-	DrawNumbers(10,TempValue0,121,Player.Score,6,8,0)
+	DrawNumbers(10,TempValue0,121,Player.Score,7,8,0)
 	DrawSpriteScreenXY(7,Object.Value3,145)
 	TempValue0=Object.Value3
 	TempValue0+=40
@@ -583,17 +589,44 @@ endsub
 
 
 sub ObjectStartup
-	if Stage.PlayerListPos==0
-		LoadSpriteSheet("Global/Display.gif")
-	else
-		LoadSpriteSheet("Global/Display_t.gif")
+	if Object[24].PropertyValue==2 // If you're in a good future
+		if Stage.ActNo<3 // If it's not Act 3
+			if Stage.MilliSeconds==0 //If the act just started
+				if Stage.Seconds==0
+					if Stage.Minutes==0
+						TempValue0=Stage.ListPos
+						TempValue0-- //Subtract 1 because you spawned in a good future, and are not in the past
+						TempValue0/=10
+						TempValue0<<=1
+						TempValue0+=Stage.ActNo
+						TempValue0--
+						GetBit(TempValue1,Good_Future_List,TempValue0)
+						if TempValue1==0
+							SetBit(Good_Future_List,TempValue0,1) //Actually Award the Good Future
+							//PlaySfx(21,0) // Good Future Sound Effect (considered but disabled because annoying.)
+						endif
+					endif
+				endif
+			endif
+		endif
 	endif
+	switch stage.PlayerListPos
+	case 0
+		LoadSpriteSheet("Global/Display.gif")
+		break
+	case 1
+		LoadSpriteSheet("Global/Display_t.gif")
+		break
+	case 2
+		LoadSpriteSheet("Global/Display_a.gif")
+		break
+	endswitch
 	SpriteFrame(0,0,136,16,0,206)
-	SpriteFrame(0,0,8,16,194,223)
-	SpriteFrame(0,0,16,16,203,223)
-	SpriteFrame(0,0,16,16,220,223)
+	SpriteFrame(-8,0,8,16,194,223)
+	SpriteFrame(-9,0,16,16,203,223)
+	SpriteFrame(-9,0,16,16,220,223)
 	SpriteFrame(0,0,113,16,137,206)
-	SpriteFrame(0,0,56,16,137,223)
+	SpriteFrame(0,0,40,16,137,223)
 	SpriteFrame(0,0,39,11,1,1)
 	SpriteFrame(0,0,31,11,1,33)
 	SpriteFrame(0,0,31,11,1,17)

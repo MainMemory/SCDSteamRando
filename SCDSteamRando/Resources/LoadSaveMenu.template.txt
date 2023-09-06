@@ -38,7 +38,9 @@ function LoadSaveMenu_Function2
 				endif
 				TempValue0+=21
 				TempValue1+=67
-				DrawSpriteScreenFX(TempValue1,FX_INK,Object.XPos,Object.YPos)
+				if Object[+ArrayPos0].Value2!=71
+					DrawSpriteScreenFX(TempValue1,FX_INK,Object.XPos,Object.YPos)
+				endif
 			else
 				TempValue0+=20
 			endif
@@ -61,7 +63,9 @@ function LoadSaveMenu_Function2
 				endif
 				TempValue0+=11
 				TempValue1+=59
-				DrawSpriteScreenFX(TempValue1,FX_INK,Object.XPos,Object.YPos)
+				if Object[+ArrayPos0].Value2!=71
+					DrawSpriteScreenFX(TempValue1,FX_INK,Object.XPos,Object.YPos)
+				endif
 			else
 				TempValue0+=10
 			endif
@@ -86,9 +90,11 @@ function LoadSaveMenu_Function2
 					TempValue1-=TempValue2
 					TempValue1>>=2
 				endif
-				TempValue0+=21
-				TempValue1+=67
-				DrawSpriteScreenFX(TempValue1,FX_INK,Object.XPos,Object.YPos)
+				TempValue0+=21 // stage name highlighted
+				TempValue1+=67 // act number highlighted
+				if Object[+ArrayPos0].Value2!=71
+					DrawSpriteScreenFX(TempValue1,FX_INK,Object.XPos,Object.YPos)
+				endif
 			else
 				TempValue0+=20
 			endif
@@ -109,9 +115,11 @@ function LoadSaveMenu_Function2
 					TempValue1-=TempValue2
 					TempValue1>>=2
 				endif
-				TempValue0+=11
-				TempValue1+=59
-				DrawSpriteScreenFX(TempValue1,FX_INK,Object.XPos,Object.YPos)
+				TempValue0+=11 // stage name unhighlighted
+				TempValue1+=59 // act number unhighlighted
+				if Object[+ArrayPos0].Value2!=71
+					DrawSpriteScreenFX(TempValue1,FX_INK,Object.XPos,Object.YPos)
+				endif
 			else
 				TempValue0+=10
 			endif
@@ -144,7 +152,9 @@ function LoadSaveMenu_Function2
 				endif
 				TempValue0+=21
 				TempValue1+=67
-				DrawSpriteScreenFX(TempValue1,FX_INK,Object.XPos,Object.YPos)
+				if Object[+ArrayPos0].Value2!=71
+					DrawSpriteScreenFX(TempValue1,FX_INK,Object.XPos,Object.YPos)
+				endif
 			else
 				TempValue0+=20
 			endif
@@ -174,7 +184,9 @@ function LoadSaveMenu_Function2
 				endif
 				TempValue0+=21
 				TempValue1+=67
-				DrawSpriteScreenFX(TempValue1,FX_INK,Object.XPos,Object.YPos)
+				if Object[+ArrayPos0].Value2!=71
+					DrawSpriteScreenFX(TempValue1,FX_INK,Object.XPos,Object.YPos)
+				endif
 			else
 				TempValue0+=20
 			endif
@@ -189,7 +201,10 @@ function LoadSaveMenu_Function2
 		TempValue0+=4
 		TempValue1=Object.AnimationTimer
 		TempValue1>>=5
-		TempValue0+=TempValue1
+		TempValue0+=TempValue1		
+		if Object[+ArrayPos0].Value3==2
+			TempValue0+=76
+		endif
 		DrawSpriteScreenFX(TempValue0,FX_INK,Object.XPos,Object.YPos)
 		TempValue0=0
 		TempValue1=38
@@ -649,13 +664,13 @@ sub ObjectMain
 				Object[+ArrayPos0].Value3--
 				PlaySfx(23,0)
 				if Object[+ArrayPos0].Value3<0
-					Object[+ArrayPos0].Value3=1
+					Object[+ArrayPos0].Value3=2
 				endif
 			endif
 			if KeyPress.Right==1
 				Object[+ArrayPos0].Value3++
 				PlaySfx(23,0)
-				if Object[+ArrayPos0].Value3>1
+				if Object[+ArrayPos0].Value3>2
 					Object[+ArrayPos0].Value3=0
 				endif
 			endif
@@ -795,9 +810,9 @@ sub ObjectMain
 			SaveRAM[ArrayPos1]=50000
 			ArrayPos1++
 			SaveRAM[ArrayPos1]=0
-			ArrayPos1=Object.Value1
-			ArrayPos1*=400
-			ArrayPos1+=200
+			ArrayPos1=Options.SaveSlot
+			ArrayPos1*=800
+			ArrayPos1+=800
 			SaveRAM[ArrayPos1]=0
 			ArrayPos1++
 			SaveRAM[ArrayPos1]=0
@@ -830,17 +845,21 @@ sub ObjectMain
 			Stage.PlayerListPos=Object[+ArrayPos0].Value3
 			LoadStage()
 			if Stage.PlayerListPos==0
-#platform: Standard
-				LoadVideo("Opening")
-#endplatform
-
-#platform: Mobile
-				if Options.Soundtrack==0
-					LoadVideo("Opening")
+				if SaveRAM[361]==0
+					SaveRAM[38]=0
 				else
-					LoadVideo("OpeningUS")
+					SaveRAM[38]+=1
 				endif
-#endplatform
+				Options.Soundtrack=SaveRAM[38]
+				LoadVideo("Opening")
+				if SaveRAM[361]==0
+					SaveRAM[38]=0
+				else
+					SaveRAM[38]-=1
+				endif
+			endif
+			if Stage.PlayerListPos==2
+				LoadVideo("Amy")
 			endif
 		endif
 		SetScreenFade(0,0,0,Object.Value0)
@@ -1193,7 +1212,7 @@ sub ObjectDraw
 	case 10
 		DrawSpriteScreenFX(30,FX_INK,Screen.CenterX,84)
 		TempValue0=Screen.CenterX
-		TempValue0-=32
+		TempValue0-=64
 		ArrayPos0=Object.Value1
 		if Object[+ArrayPos0].Value3==0
 			DrawSpriteScreenFX(31,FX_INK,TempValue0,136)
@@ -1211,6 +1230,15 @@ sub ObjectDraw
 		else
 			DrawSpriteScreenFX(32,FX_INK,TempValue0,136)
 			DrawSpriteScreenFX(35,FX_INK,TempValue0,164)
+		endif		
+		TempValue0+=64
+		if Object[+ArrayPos0].Value3==2
+			DrawSpriteScreenFX(81,FX_INK,TempValue0,136)
+			DrawSpriteScreenFX(82,FX_INK,TempValue0,164)
+			DrawSpriteScreenFX(33,FX_INK,TempValue0,136)
+		else
+			DrawSpriteScreenFX(81,FX_INK,TempValue0,136)
+			DrawSpriteScreenFX(83,FX_INK,TempValue0,164)
 		endif
 		Object.Alpha=255
 		CallFunction(LoadSaveMenu_Function2)
@@ -1218,7 +1246,7 @@ sub ObjectDraw
 	case 7
 		DrawSpriteScreenFX(30,FX_INK,Screen.CenterX,84)
 		TempValue0=Screen.CenterX
-		TempValue0-=32
+		TempValue0-=64
 		ArrayPos0=Object.Value1
 		TempValue1=Object.Value0
 		TempValue1&=3
@@ -1243,6 +1271,18 @@ sub ObjectDraw
 		else
 			DrawSpriteScreenFX(32,FX_INK,TempValue0,136)
 			DrawSpriteScreenFX(35,FX_INK,TempValue0,164)
+		
+		endif		
+		TempValue0+=64
+		if Object[+ArrayPos0].Value3==2
+			if TempValue1==0
+				DrawSpriteScreenFX(81,FX_INK,TempValue0,136)
+			endif
+			DrawSpriteScreenFX(82,FX_INK,TempValue0,164)
+			DrawSpriteScreenFX(33,FX_INK,TempValue0,136)
+		else
+			DrawSpriteScreenFX(81,FX_INK,TempValue0,136)
+			DrawSpriteScreenFX(83,FX_INK,TempValue0,164)
 		endif
 		Object.Alpha=255
 		CallFunction(LoadSaveMenu_Function2)
@@ -1443,7 +1483,20 @@ sub ObjectStartup
 	SpriteFrame(-32,0,64,21,404,319)
 	SpriteFrame(-32,0,64,21,404,341)
 	SpriteFrame(-32,0,64,21,404,363)
-	SpriteFrame(-32,0,64,21,404,385)
+	SpriteFrame(-32,0,64,21,404,385)    
+	SpriteFrame(0,0,64,18,430,525)//No Save 79
+    SpriteFrame(0,0,64,18,430,544)//No Save Highlight 80
+	if Options.TailsUnlocked==1
+		SpriteFrame(-16,-20,32,40,162,648)
+		SpriteFrame(-12,0,24,8,470,79)
+		SpriteFrame(-12,0,24,8,470,70)
+	else
+		SpriteFrame(-16,-20,32,40,195,648)
+		SpriteFrame(-12,0,24,8,442,79)
+		SpriteFrame(-12,0,24,8,442,70)
+	endif
+	SpriteFrame(3,2,40,32,199,615)
+	SpriteFrame(3,2,64,32,199,615)
 endsub
 
 sub RSDK
