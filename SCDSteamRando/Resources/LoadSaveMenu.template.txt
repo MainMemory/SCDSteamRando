@@ -757,20 +757,22 @@ sub ObjectMain
 		if KeyPress.ButtonA==1
 			CheckResult=1
 		endif
-		if CheckResult==1
-			if Options.TailsUnlocked==1
-				PlaySfx(27,0)
-				StopMusic()
-				Object.State++
-			else
-				if Object[+ArrayPos0].Value3==0
+		if CheckResult==1 //mark
+			if Object[+ArrayPos0].Value3 !=3
+				if Options.TailsUnlocked==1
 					PlaySfx(27,0)
 					StopMusic()
 					Object.State++
 				else
+					if Object[+ArrayPos0].Value3==0
+						PlaySfx(27,0)
+						StopMusic()
+						Object.State++
+					else
 #platform: Mobile
-					Object[+ArrayPos0].Value3=-1	
+						Object[+ArrayPos0].Value3=-1	
 #endplatform					
+					endif
 				endif
 			endif
 		endif
@@ -1212,7 +1214,7 @@ sub ObjectDraw
 	case 10
 		DrawSpriteScreenFX(30,FX_INK,Screen.CenterX,84)
 		TempValue0=Screen.CenterX
-		TempValue0-=64
+		TempValue0-=96
 		ArrayPos0=Object.Value1
 		if Object[+ArrayPos0].Value3==0
 			DrawSpriteScreenFX(31,FX_INK,TempValue0,136)
@@ -1240,13 +1242,22 @@ sub ObjectDraw
 			DrawSpriteScreenFX(81,FX_INK,TempValue0,136)
 			DrawSpriteScreenFX(83,FX_INK,TempValue0,164)
 		endif
+		TempValue0+=64
+		if Object[+ArrayPos0].Value3==3
+			DrawSpriteScreenFX(86,FX_INK,TempValue0,136)
+			DrawSpriteScreenFX(87,FX_INK,TempValue0,164)
+			DrawSpriteScreenFX(33,FX_INK,TempValue0,136)
+		else
+			DrawSpriteScreenFX(86,FX_INK,TempValue0,136)
+			DrawSpriteScreenFX(88,FX_INK,TempValue0,164)
+		endif
 		Object.Alpha=255
 		CallFunction(LoadSaveMenu_Function2)
 		break
 	case 7
 		DrawSpriteScreenFX(30,FX_INK,Screen.CenterX,84)
 		TempValue0=Screen.CenterX
-		TempValue0-=64
+		TempValue0-=96
 		ArrayPos0=Object.Value1
 		TempValue1=Object.Value0
 		TempValue1&=3
@@ -1283,6 +1294,14 @@ sub ObjectDraw
 		else
 			DrawSpriteScreenFX(81,FX_INK,TempValue0,136)
 			DrawSpriteScreenFX(83,FX_INK,TempValue0,164)
+		endif
+		TempValue0+=64
+		if Object[+ArrayPos0].Value3==3
+			DrawSpriteScreenFX(87,FX_INK,TempValue0,164)
+			DrawSpriteScreenFX(33,FX_INK,TempValue0,136)
+		else
+			DrawSpriteScreenFX(86,FX_INK,TempValue0,136)
+			DrawSpriteScreenFX(88,FX_INK,TempValue0,164)
 		endif
 		Object.Alpha=255
 		CallFunction(LoadSaveMenu_Function2)
@@ -1483,20 +1502,23 @@ sub ObjectStartup
 	SpriteFrame(-32,0,64,21,404,319)
 	SpriteFrame(-32,0,64,21,404,341)
 	SpriteFrame(-32,0,64,21,404,363)
-	SpriteFrame(-32,0,64,21,404,385)    
+	SpriteFrame(-32,0,64,21,404,385)     	
 	SpriteFrame(0,0,64,18,430,525)//No Save 79
-    SpriteFrame(0,0,64,18,430,544)//No Save Highlight 80
+    	SpriteFrame(0,0,64,18,430,544)//No Save Highlight 80
 	if Options.TailsUnlocked==1
-		SpriteFrame(-16,-20,32,40,162,648)
-		SpriteFrame(-12,0,24,8,470,79)
-		SpriteFrame(-12,0,24,8,470,70)
+		SpriteFrame(-16,-20,32,40,162,648) //Amy
+		SpriteFrame(-10,0,20,8,488,24) //Amy Selected UnLocked
+		SpriteFrame(-10,0,20,8,488,15) //Amy UnSelected UnLocked
 	else
-		SpriteFrame(-16,-20,32,40,195,648)
-		SpriteFrame(-12,0,24,8,442,79)
-		SpriteFrame(-12,0,24,8,442,70)
+		SpriteFrame(-16,-20,32,40,195,648) //Amy Locked
+		SpriteFrame(-10,0,20,8,454,115) //Amy Selected Locked
+		SpriteFrame(-10,0,20,8,454,106) //Amy UnSelected Locked
 	endif
 	SpriteFrame(3,2,40,32,199,615)
 	SpriteFrame(3,2,64,32,199,615)
+	SpriteFrame(-13,-20,27,40,228,648)	//Knux Locked
+	SpriteFrame(-23,0,46,8,405,79)		//Knux Locked Selected
+	SpriteFrame(-23,0,46,8,405,70)		//Knux Locked UnSelected
 endsub
 
 sub RSDK
