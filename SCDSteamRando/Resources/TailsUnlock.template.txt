@@ -250,7 +250,7 @@ sub ObjectMain
 				TempValue0=255
 			endif
 			if SelectedOption==3
-				SetScreenFade(208,255,224,TempValue0)
+				SetScreenFade(224,224,224,TempValue0)
 			else
 				SetScreenFade(0,0,0,TempValue0)
 			endif
@@ -647,6 +647,8 @@ sub ObjectStartup
 		break
 	case 2
 		LoadSpriteSheet("Players/Amy1.gif")
+	case 3
+		LoadSpriteSheet("Players/KTE5.gif")
 		break
 	endswitch
 	Object[ArrayPos1].Value6=Object.SpriteSheet
@@ -664,6 +666,8 @@ sub ObjectStartup
 		break
 	case 2
 		LoadSpriteSheet("Global/Display_a.gif")
+	case 3
+		LoadSpriteSheet("Global/Display_k.gif")
 		break
 	endswitch
 	ArrayPos1++
@@ -1021,6 +1025,14 @@ sub ObjectStartup
 			SpriteFrame(0,0,16,24,36,232) // 115: Amy Walk 1
 			SpriteFrame(0,0,16,24,53,232) // 116: Amy Walk 2
 			SpriteFrame(0,0,16,24,70,232) // 117: Amy Walk 3
+			break
+		case 3
+			SpriteFrame(0,0,16,24,129,1) // 112: KTE Idle 1
+			SpriteFrame(0,0,16,24,129,26) // 113: KTE Idle 2
+			SpriteFrame(0,0,16,24,129,51) // 114: KTE Idle 3
+			SpriteFrame(0,0,16,23,1,139) // 115: KTE Walk 1
+			SpriteFrame(0,0,16,23,18,139) // 116: KTE Walk 2
+			SpriteFrame(0,0,18,23,35,139) // 117: KTE Walk 3
 			break
 		endswitch
 		SpriteFrame(2,1,5,6,209,132) // 118: "/"

@@ -18,7 +18,7 @@ sub ObjectDraw
 	case 0
 		if Object.Value1<320
 			Music.Volume-=4
-			SetScreenFade(208,255,224,Object.Value1)
+			SetScreenFade(224,224,224,Object.Value1)
 			Object.Value1+=16
 		else
 			if Stage.PlayerListPos==0
@@ -60,7 +60,7 @@ sub ObjectDraw
 			Object[ArrayPos0].State=1
 			Object[ArrayPos0].Value1=320
 			Object[ArrayPos0].Value7=TempValue2
-			SetScreenFade(208,255,224,255)
+			SetScreenFade(224,224,224,255)
 		endif
 		break
 	case 1

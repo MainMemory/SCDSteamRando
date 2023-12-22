@@ -207,7 +207,8 @@ sub ObjectMain
 				endif
 			endif
 			break
-			case 2
+		endswitch
+		if SaveRAM[352]>=2
 			if Object.Value0>429
 				Object.Value0=0
 				Object.State=3
@@ -223,8 +224,24 @@ sub ObjectMain
 					endif
 				endif
 			endif
-			break
-		endswitch
+		endif
+		if SaveRAM[352]<0
+			if Object.Value0>429
+				Object.Value0=0
+				Object.State=3
+				if Stage.PlayerListPos==0
+					if Object[24].PropertyValue==2
+						if Stage.DebugMode==0
+							if Options.GameMode==1
+								SaveRAM[259]=1
+								WriteSaveRAM()
+								SetAchievement(2,100)
+							endif
+						endif
+					endif
+				endif
+			endif
+		endif
 		break
 	case 3
 		if Object.Value6>0
@@ -265,7 +282,7 @@ sub ObjectMain
 	case 5
 		if Object[0].Type==TypeName[BlankObject]
 			Object.Value0+=8
-			SetScreenFade(208,255,224,Object.Value0)
+			SetScreenFade(224,224,224,Object.Value0)
 			if Engine.TrialMode==1
 				if Object.Value0==1016
 					EngineCallback(11)
@@ -561,7 +578,12 @@ sub ObjectDraw
 		TempValue0+=128
 		DrawSpriteScreenXY(5,TempValue0,89)
 	else
-		DrawSpriteScreenXY(20,Object.XPos,65)
+		TempValue0 = Object.XPos
+		if stage.PlayerListPos == 3
+			TempValue0 += 16
+			DrawSpriteScreenXY(22,TempValue0,65)
+		endif
+		DrawSpriteScreenXY(20,TempValue0,65)
 		DrawSpriteScreenXY(21,Object.Value1,89)
 		TempValue0=Object.Value1
 		TempValue0+=140
@@ -613,12 +635,19 @@ sub ObjectStartup
 	switch stage.PlayerListPos
 	case 0
 		LoadSpriteSheet("Global/Display.gif")
+		SpriteFrame(0,0,136,16,0,206)
 		break
 	case 1
 		LoadSpriteSheet("Global/Display_t.gif")
+		SpriteFrame(0,0,136,16,0,206)
 		break
 	case 2
 		LoadSpriteSheet("Global/Display_a.gif")
+		SpriteFrame(0,0,136,16,0,206)
+		break
+	case 3
+		LoadSpriteSheet("Global/Display_k.gif")
+		SpriteFrame(-30,0,190,16,35,257)
 		break
 	endswitch
 	SpriteFrame(0,0,136,16,0,206)
@@ -643,6 +672,7 @@ sub ObjectStartup
 	SpriteFrame(0,0,8,11,10,74)
 	SpriteFrame(-60,0,256,16,0,240)
 	SpriteFrame(-12,0,136,16,0,223)
+	SpriteFrame(-100,0,127,16,35,257)
 endsub
 
 sub RSDK
