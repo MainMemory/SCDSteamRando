@@ -266,7 +266,11 @@ sub ObjectMain
 			Object.State=4
 			Object.Value0=0
 			PlaySfx(17,0)
-			Rand(Stage.PlayerListPos, 3)
+			if game.hasPlusDLC == 0
+				Rand(Stage.PlayerListPos, 3)
+			else
+				Rand(Stage.PlayerListPos, 4)
+			endif
 		endif
 		break
 	case 4
@@ -333,9 +337,9 @@ sub ObjectMain
 				SaveRAM[ArrayPos0]=0
 				ArrayPos0++
 				SaveRAM[ArrayPos0]=TempValue1
-				Fade_Colour=208
+				Fade_Colour=224
 				Fade_Colour<<=16
-				TempValue0=255
+				TempValue0=224
 				TempValue0<<=8
 				Fade_Colour+=TempValue0
 				Fade_Colour+=224
@@ -650,7 +654,6 @@ sub ObjectStartup
 		SpriteFrame(-30,0,190,16,35,257)
 		break
 	endswitch
-	SpriteFrame(0,0,136,16,0,206)
 	SpriteFrame(-8,0,8,16,194,223)
 	SpriteFrame(-9,0,16,16,203,223)
 	SpriteFrame(-9,0,16,16,220,223)

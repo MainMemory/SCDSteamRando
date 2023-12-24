@@ -237,17 +237,12 @@ function LoadSaveMenu_Function3
 			DrawSpriteScreenXY(54,Object[+1].XPos,Object[+1].YPos)
 		endif
 	else
-		if Object.Value1==5
+		if Object.Value1==4
 			DrawSpriteScreenXY(53,Object[+1].XPos,Object[+1].YPos)
 		else
 			DrawSpriteScreenXY(52,Object[+1].XPos,Object[+1].YPos)
 		endif
-		endif
-		if Object.Value1==4
-			DrawSpriteScreenXY(80,Object[+2].XPos,Object[+2].YPos)
-		else
-			DrawSpriteScreenXY(79,Object[+2].XPos,Object[+2].YPos)
-		endif
+	endif
 	if Object.Direction==FACING_LEFT
 		if Object[+1].YPos>14
 			Object[+1].YPos-=2
@@ -259,38 +254,6 @@ function LoadSaveMenu_Function3
 		endif
 		DrawRect(Object[+1].XPos,32,64,18,96,96,128,255)
 	endif
-	switch Object.State
-		default
-			if Object[+2].YPos>174
-				Object[+2].YPos-=2
-			endif
-		break
-		case 1
-			if Object.Value1==5
-				if Object[+2].YPos>174
-					Object[+2].YPos-=2
-				endif
-			else
-				if Object[+4].Rotation>1
-					if Object[+2].YPos>174
-						Object[+2].YPos-=2
-					endif
-				else
-					if Object[+2].YPos<190
-						Object[+2].YPos+=2
-					endif
-				endif
-			endif
-		break
-		case 2
-		case 8
-			if Object[+2].YPos<190
-				Object[+2].YPos+=2
-			endif
-		break
-	endswitch
-	DrawRect(Object[+1].XPos,32,64,18,96,96,128,255)
-	DrawRect(Object[+2].XPos,174,62,16,96,96,128,255)						  
 endfunction
 
 
@@ -358,9 +321,6 @@ sub ObjectMain
 		Object[+1].XPos=Screen.CenterX
 		Object[+1].XPos-=120
 		Object[+1].YPos=32
-		Object[+2].XPos=Screen.CenterX
-		Object[+2].XPos+=64
-		Object[+2].YPos=174
 		if Object.Value0<256
 			Object.Alpha=Object.Value0
 			Object.Value0+=6
@@ -380,23 +340,22 @@ sub ObjectMain
 #platform: Mobile
 		if Options.PhysicalControls==1
 #endplatform
-            if Object[+4].Rotation>1
-                if KeyPress.Up==1
-                    Object.Value1--
-                    PlaySfx(23,0)
-                    if Object.Value1<0
-                        Object.Value1=4
-                    endif
-                endif
-                if KeyPress.Down==1
-                    Object.Value1++
-                    PlaySfx(23,0)
-                    if Object.Value1>4
-                        Object.Value1=0
-                    endif
-                endif
-            else
 			if Object.Direction==FACING_RIGHT
+				if KeyPress.Up==1
+					Object.Value1--
+					PlaySfx(23,0)
+					if Object.Value1<0
+						Object.Value1=3
+					endif
+				endif
+				if KeyPress.Down==1
+					Object.Value1++
+					PlaySfx(23,0)
+					if Object.Value1>3
+						Object.Value1=0
+					endif
+				endif
+			else
 				if KeyPress.Up==1
 					Object.Value1--
 					PlaySfx(23,0)
@@ -408,21 +367,6 @@ sub ObjectMain
 					Object.Value1++
 					PlaySfx(23,0)
 					if Object.Value1>4
-						Object.Value1=0
-					endif
-				endif
-			else
-				if KeyPress.Up==1
-					Object.Value1--
-					PlaySfx(23,0)
-					if Object.Value1<0
-						Object.Value1=5
-					endif
-				endif
-				if KeyPress.Down==1
-					Object.Value1++
-					PlaySfx(23,0)
-					if Object.Value1>5
 						Object.Value1=0
 					endif
 				endif
@@ -506,7 +450,7 @@ sub ObjectMain
 			TempValue0=3
 			CallFunction(LoadSaveMenu_Function4)
 			if CheckResult>-1
-				Object.Value1=4
+				Object.Value1=3
 			else
 				if TempValue3<0
 					if Object.Value1==3
@@ -520,7 +464,7 @@ sub ObjectMain
 			endif
 			CallFunction(MenuHeading_Function0)
 			if KeyPress.Up==1
-				Object.Value1=4
+				Object.Value1=3
 				Options.PhysicalControls=1
 			endif
 			if KeyPress.Down==1
@@ -620,57 +564,10 @@ sub ObjectMain
 					endif
 					break
 				endswitch
-			if Object.Value1==5
-				PlaySfx(9,0)
-				Object.State=12
 			endif
 			if Object.Value1==4
-			    if Object.Rotation==2
 				PlaySfx(9,0)
 				Object.State=12
-				else
-				switch Object[+4].Rotation
-				case 0
-					Object.Direction=FACING_RIGHT
-					ArrayPos0=Object.Value1
-					Object[+ArrayPos0].Rotation=1
-					Object.State++
-					PlaySfx(27,0)
-					if Object[+ArrayPos0].Value2>0
-						StopMusic()
-					else
-						if Options.TailsUnlocked==2
-							StopMusic()
-						endif
-					endif
-					break
-				case 2
-					ArrayPos0=Object.Value1
-					if Object[+ArrayPos0].Value2>0
-						Object.Direction=FACING_RIGHT
-						Object.State=13
-						Object.Rotation=0
-						Object[+1].Rotation=0
-						Object[+2].Rotation=0
-						Object[+3].Rotation=0
-						Object[+ArrayPos0].Rotation=3
-						Object[+4].Rotation=0
-						PlaySfx(9,0)
-					else
-						Object.Rotation=0
-						Object[+1].Rotation=0
-						Object[+2].Rotation=0
-						Object[+3].Rotation=0
-						Object[+4].Rotation=0
-#platform: Mobile
-						if Options.PhysicalControls==0
-							Object.Value1=-1
-						endif
-#endplatform
-					endif
-					break
-				endswitch
-				endif
 			endif
 		endif
 		if KeyPress.ButtonB==1
@@ -773,10 +670,9 @@ sub ObjectMain
 			if Object.YPos<TempValue0
 				Object.YPos=TempValue0
 			endif
-            if Object[+2].YPos==174
-				Object.State++
-				Object.Alpha=0
-            endif
+		else
+			Object.State++
+			Object.Alpha=0
 #platform: Mobile
 			if Options.PhysicalControls==0
 				ArrayPos0=Object.Value1
@@ -801,7 +697,7 @@ sub ObjectMain
 		if Options.PhysicalControls==1
 #endplatform
 			TempValue0 = 2
-			TempValue0 += game.hasPlusDLC
+			TempValue0 += game.hasPlusDLC	
 			if KeyPress.Left==1
 				Object[+ArrayPos0].Value3--
 				PlaySfx(23,0)
@@ -903,8 +799,6 @@ sub ObjectMain
 			CheckResult=1
 		endif
 		if CheckResult==1 //mark
-				  
-	   
 			//if Object[+ArrayPos0].Value3 !=3
 				if Options.TailsUnlocked==1
 					PlaySfx(27,0)
@@ -1248,6 +1142,7 @@ sub ObjectMain
 			endif
 			if KeyPress.ButtonA==1
 				CheckResult=1
+			endif
 			if KeyPress.ButtonC==1
 				CheckResult=1
 			endif
@@ -1333,6 +1228,7 @@ sub ObjectDraw
 	case 13
 		if Object.State>0
 			CallFunction(LoadSaveMenu_Function3)
+		endif
         if Object.State==2
             if Object.Value1==4
                 TempValue0=Object.Value0
@@ -1379,11 +1275,12 @@ sub ObjectDraw
 		DrawSpriteScreenFX(30,FX_INK,Screen.CenterX,84)
 		TempValue0=Screen.CenterX
 		if game.hasPlusDLC == 1
-			TempValue0-=96
+			TempValue0-=97
 		else
 			TempValue0-=64
 		endif
 		ArrayPos0=Object.Value1
+
 		if Object[+ArrayPos0].Value3==0
 			DrawSpriteScreenFX(31,FX_INK,TempValue0,136)
 			DrawSpriteScreenFX(36,FX_INK,TempValue0,164)
@@ -1392,6 +1289,7 @@ sub ObjectDraw
 			DrawSpriteScreenFX(31,FX_INK,TempValue0,136)
 			DrawSpriteScreenFX(34,FX_INK,TempValue0,164)
 		endif
+
 		TempValue0+=64
 		if Object[+ArrayPos0].Value3==1
 			DrawSpriteScreenFX(32,FX_INK,TempValue0,136)
@@ -1400,7 +1298,8 @@ sub ObjectDraw
 		else
 			DrawSpriteScreenFX(32,FX_INK,TempValue0,136)
 			DrawSpriteScreenFX(35,FX_INK,TempValue0,164)
-		endif		
+		endif
+		
 		TempValue0+=64
 		if Object[+ArrayPos0].Value3==2
 			DrawSpriteScreenFX(81,FX_INK,TempValue0,136)
@@ -1409,6 +1308,7 @@ sub ObjectDraw
 		else
 			DrawSpriteScreenFX(81,FX_INK,TempValue0,136)
 			DrawSpriteScreenFX(83,FX_INK,TempValue0,164)
+		endif
 
 		if game.hasPlusDLC == 1
 			TempValue0+=64
@@ -1433,12 +1333,13 @@ sub ObjectDraw
 		if game.hasPlusDLC==0
 			TempValue0-=64
 		else
-			TempValue0-=96
+			TempValue0-=97
 		endif
 		ArrayPos0=Object.Value1
 		TempValue1=Object.Value0
 		TempValue1&=3
 		TempValue1>>=1
+
 		if Object[+ArrayPos0].Value3==0
 			if TempValue1==0
 				DrawSpriteScreenFX(31,FX_INK,TempValue0,136)
@@ -1449,6 +1350,7 @@ sub ObjectDraw
 			DrawSpriteScreenFX(31,FX_INK,TempValue0,136)
 			DrawSpriteScreenFX(34,FX_INK,TempValue0,164)
 		endif
+
 		TempValue0+=64
 		if Object[+ArrayPos0].Value3==1
 			if TempValue1==0
@@ -1459,8 +1361,9 @@ sub ObjectDraw
 		else
 			DrawSpriteScreenFX(32,FX_INK,TempValue0,136)
 			DrawSpriteScreenFX(35,FX_INK,TempValue0,164)
-		
-		endif		
+  
+		endif	
+	
 		TempValue0+=64
 		if Object[+ArrayPos0].Value3==2
 			if TempValue1==0
@@ -1471,6 +1374,7 @@ sub ObjectDraw
 		else
 			DrawSpriteScreenFX(81,FX_INK,TempValue0,136)
 			DrawSpriteScreenFX(83,FX_INK,TempValue0,164)
+		endif
 
 		if game.hasPlusDLC == 1
 			TempValue0+=64

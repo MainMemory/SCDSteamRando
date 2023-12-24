@@ -394,15 +394,12 @@ namespace SCDSteamRando.Properties {
         ///#alias 5: TYPE_TAILSUNLOCKSCR
         ///#alias Object.Value1: SelectedOption
         ///#alias Object.Value2: RouteIndex
+        ///#alias Object.Value5: OptsIndex
+        ///#alias Object.Value6: SpriteSheet3
         ///#alias Object.Value7: SpriteSheet2
-        ///#alias Object[32].XPos: MainXPos
-        ///#alias Object[32].YPos: MainYPos
-        ///
-        ///sub ObjectMain
-        ///	switch Object.PropertyValue
-        ///	case 0
-        ///		switch Object.State
-        ///	 [rest of string was truncated]&quot;;.
+        ///#alias Object[32].Value4: RouteXPos
+        ///#alias Object[32].Value7: OptsXPos
+        ///#alias  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string TailsUnlock_template {
             get {
@@ -420,15 +417,37 @@ namespace SCDSteamRando.Properties {
         ///#alias Player.Value0:Player.Rings
         ///#alias Player.Value4:Player.Invincible
         ///#alias Player.Value6:Player.MinRollSpeed
+        ///#alias Object.Value3:Object.FadeA
+        ///#alias Object.Value4:Object.FadeR
+        ///#alias Object.Value5:Object.FadeG
+        ///#alias Object.Value6:Object.FadeB
         ///
         ///
-        ///sub ObjectDraw
-        ///	switch Object.State
-        ///	case 0
-        ///		if Object.Value1&lt;320
-        ///			if Object.Value1==0
-        ///				Player.Invincible=1000
-        ///				Player.ControlMode=-1        /// [rest of string was truncated]&quot;;.
+        ///sub Objec [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string TimeWarp {
+            get {
+                return ResourceManager.GetString("TimeWarp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to //------------Sonic CD TimeWarp Script-------------//
+        /////--------Scripted by Christian Whitehead &apos;The Taxman&apos;--------//
+        /////-------Unpacked By Rubberduckycooly&apos;s Script Unpacker-------//
+        ///
+        /////-------Aliases-------//
+        ///#alias 28: TYPE_TIMEWARP
+        ///#alias Player.Value0:Player.Rings
+        ///#alias Player.Value4:Player.Invincible
+        ///#alias Player.Value6:Player.MinRollSpeed
+        ///#alias Object.Value3:Object.FadeA
+        ///#alias Object.Value4:Object.FadeR
+        ///#alias Object.Value5:Object.FadeG
+        ///#alias Object.Value6:Object.FadeB
+        ///
+        ///
+        ///sub Objec [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string TimeWarp_template {
             get {

@@ -647,6 +647,7 @@ sub ObjectStartup
 		break
 	case 2
 		LoadSpriteSheet("Players/Amy1.gif")
+		break
 	case 3
 		LoadSpriteSheet("Players/KTE5.gif")
 		break
@@ -666,6 +667,7 @@ sub ObjectStartup
 		break
 	case 2
 		LoadSpriteSheet("Global/Display_a.gif")
+		break
 	case 3
 		LoadSpriteSheet("Global/Display_k.gif")
 		break

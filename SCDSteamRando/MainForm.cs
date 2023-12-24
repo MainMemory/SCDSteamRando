@@ -1427,6 +1427,12 @@ namespace SCDSteamRando
 				File.WriteAllText(newpath, tmpstr);
 				vdir.AddFile("Scripts/Global/TimeWarp.txt", newpath);
 			}
+			else
+			{
+				newpath = Path.Combine(path, @"Data\Scripts\Global\TimeWarp.txt");
+				File.WriteAllText(newpath, Properties.Resources.TimeWarp);
+				vdir.AddFile("Scripts/Global/TimeWarp.txt", newpath);
+			}
 			if (randomMusic.Checked)
 			{
 				var scripts = new List<(VirtualFile file, string script)>();
