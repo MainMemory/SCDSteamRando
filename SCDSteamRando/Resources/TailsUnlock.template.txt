@@ -241,7 +241,7 @@ sub ObjectMain
 					LoadStage()
 				else
 					Stage.ActiveList=PRESENTATION_STAGE
-					Stage.ListPos=1
+					Stage.ListPos=11
 					LoadStage()
 				endif
 			endif
@@ -424,62 +424,94 @@ sub ObjectDraw
 		TempValue1+=9
 		TempValue2=Object.Value2
 		TempValue2/=10
-		TempValue2+=26
-		DrawSpriteScreenXY(TempValue2,TempValue1,TempValue0)
-		TempValue1+=Object.Value3
-		DrawSpriteScreenXY(33,TempValue1,TempValue0)
-		TempValue1+=34
-		TempValue2=Object.Value2
-		TempValue2%=10
-		TempValue2/=4
-		TempValue2+=44
-		DrawSpriteScreenXY(TempValue2,TempValue1,TempValue0)
-		if Screen.XSize<377
-			TempValue0+=15
-			TempValue1=Object.XPos
-			TempValue1-=RouteXPos
-			TempValue1+=23
-			TempValue2=Object.Value2
-			TempValue2%=10
-			if TempValue2<8
-				TempValue2%=4
-			else
-				TempValue2-=6
-			endif
-			TempValue2+=34
+		if TempValue2!=8
+			TempValue2+=26
 			DrawSpriteScreenXY(TempValue2,TempValue1,TempValue0)
-			TempValue0-=1
-			TempValue1+=81
-			DrawSpriteScreenXY(Object.Value4,TempValue1,TempValue0)
-			TempValue0+=7
-			TempValue1=Object.Value1
-			TempValue1-=RouteXPos
-			DrawNumbers(55,TempValue1,TempValue0,Object.Value5,2,8,1)
-			TempValue1-=15
-			DrawSpriteScreenXY(66,TempValue1,TempValue0)
-			TempValue1-=5
-			DrawNumbers(55,TempValue1,TempValue0,Object.Value6,2,8,1)
-			TempValue1-=15
-			DrawSpriteScreenXY(65,TempValue1,TempValue0)
-			TempValue1-=5
-			DrawNumbers(55,TempValue1,TempValue0,Object.Value7,2,8,0)
-		else
-			switch TempValue2
-			case 45
-				TempValue1+=9
-				break
-			default
-				TempValue1+=11
-				break
-			endswitch
+			TempValue1+=Object.Value3
+			DrawSpriteScreenXY(33,TempValue1,TempValue0)
+			TempValue1+=27
 			TempValue2=Object.Value2
 			TempValue2%=10
-			if TempValue2<8
-				TempValue2%=4
+			TempValue2/=4
+			TempValue2+=44
+			DrawSpriteScreenXY(TempValue2,TempValue1,TempValue0)
+			if Screen.XSize<377
+				TempValue0+=15
+				TempValue1=Object.XPos
+				TempValue1-=RouteXPos
+				TempValue1+=23
+				TempValue2=Object.Value2
+				TempValue2%=10
+				if TempValue2<8
+					TempValue2%=4
+				else
+					TempValue2-=6
+				endif
+				TempValue2+=34
+				DrawSpriteScreenXY(TempValue2,TempValue1,TempValue0)
+				TempValue0-=1
+				TempValue1+=81
+				DrawSpriteScreenXY(Object.Value4,TempValue1,TempValue0)
+				TempValue0+=7
+				TempValue1=Object.Value1
+				TempValue1-=RouteXPos
+				DrawNumbers(55,TempValue1,TempValue0,Object.Value5,2,8,1)
+				TempValue1-=15
+				DrawSpriteScreenXY(66,TempValue1,TempValue0)
+				TempValue1-=5
+				DrawNumbers(55,TempValue1,TempValue0,Object.Value6,2,8,1)
+				TempValue1-=15
+				DrawSpriteScreenXY(65,TempValue1,TempValue0)
+				TempValue1-=5
+				DrawNumbers(55,TempValue1,TempValue0,Object.Value7,2,8,0)
 			else
-				TempValue2-=6
+				switch TempValue2
+				case 44
+					TempValue1+=10
+					break
+				case 45
+					TempValue1+=12
+					break
+				case 46
+					TempValue1+=12
+					break
+				default
+					TempValue1+=11
+					break
+				endswitch
+				TempValue2=Object.Value2
+				TempValue2%=10
+				if TempValue2<8
+					TempValue2%=4
+				else
+					TempValue2-=6
+				endif
+				TempValue2+=34
+				DrawSpriteScreenXY(TempValue2,TempValue1,TempValue0)
+				TempValue0+=18
+				TempValue1=Object.XPos
+				TempValue1-=RouteXPos
+				TempValue1+=23
+				DrawSpriteScreenXY(Object.Value4,TempValue1,TempValue0)
+				TempValue1=Object.Value1
+				TempValue1-=RouteXPos
+				DrawNumbers(55,TempValue1,TempValue0,Object.Value5,2,8,1)
+				TempValue1-=15
+				DrawSpriteScreenXY(66,TempValue1,TempValue0)
+				TempValue1-=5
+				DrawNumbers(55,TempValue1,TempValue0,Object.Value6,2,8,1)
+				TempValue1-=15
+				DrawSpriteScreenXY(65,TempValue1,TempValue0)
+				TempValue1-=5
+				DrawNumbers(55,TempValue1,TempValue0,Object.Value7,2,8,0)
 			endif
-			TempValue2+=34
+		else
+			DrawSpriteScreenXY(120,TempValue1,TempValue0)
+			TempValue1+=Object.Value3
+			TempValue2=Object.Value2
+			TempValue2%=10
+			TempValue2+=44
+			TempValue1+=95
 			DrawSpriteScreenXY(TempValue2,TempValue1,TempValue0)
 			TempValue0+=18
 			TempValue1=Object.XPos
@@ -732,14 +764,30 @@ sub ObjectStartup
 	Object[ArrayPos1].Priority=1
 	Object[ArrayPos1].Value1=TempValue1
 	Object[ArrayPos1].Value2=23
-	Object[ArrayPos1].Value3=SaveRAM[ArrayPos0]
+	TempValue0=0
+	TempValue3=0
+	TempValue4=0
+	while TempValue3<14
+		GetBit(TempValue0,Good_Future_List,TempValue3)
+		TempValue4+=TempValue0
+		TempValue3++
+	loop
+	Object[ArrayPos1].Value3=TempValue4
 	// Projectors destroyed
 	ArrayPos1++
 	ResetObjectEntity(ArrayPos1,TypeName[Tails Unlock Scr],5,100,206)
 	Object[ArrayPos1].Priority=1
 	Object[ArrayPos1].Value1=TempValue1
 	Object[ArrayPos1].Value2=68
-	Object[ArrayPos1].Value3=MetalSonic_List
+	TempValue0=0
+	TempValue3=0
+	TempValue4=0
+	while TempValue3<14
+		GetBit(TempValue0,MetalSonic_List,TempValue3)
+		TempValue4+=TempValue0
+		TempValue3++
+	loop
+	Object[ArrayPos1].Value3=TempValue4
 	// Route
 	TempValue3=247
 	TempValue4=100
@@ -852,19 +900,20 @@ sub ObjectStartup
 			TempValue1-=220
 			TempValue2=16
 		endif
-		SpriteFrame(TempValue1,9,16,16,189,163) // 14: Time Stone 1
+		TempValue1-=1
+		SpriteFrame(TempValue1,8,16,16,189,163) // 14: Time Stone 1
 		TempValue1+=TempValue2
-		SpriteFrame(TempValue1,9,16,16,206,163) // 15: Time Stone 2
+		SpriteFrame(TempValue1,8,16,16,206,163) // 15: Time Stone 2
 		TempValue1+=TempValue2
-		SpriteFrame(TempValue1,9,16,16,223,163) // 16: Time Stone 3
+		SpriteFrame(TempValue1,8,16,16,223,163) // 16: Time Stone 3
 		TempValue1+=TempValue2
-		SpriteFrame(TempValue1,9,16,16,189,180) // 17: Time Stone 4
+		SpriteFrame(TempValue1,8,16,16,189,180) // 17: Time Stone 4
 		TempValue1+=TempValue2
-		SpriteFrame(TempValue1,9,16,16,206,180) // 18: Time Stone 5
+		SpriteFrame(TempValue1,8,16,16,206,180) // 18: Time Stone 5
 		TempValue1+=TempValue2
-		SpriteFrame(TempValue1,9,16,16,223,180) // 19: Time Stone 6
+		SpriteFrame(TempValue1,8,16,16,223,180) // 19: Time Stone 6
 		TempValue1+=TempValue2
-		SpriteFrame(TempValue1,9,16,16,189,197) // 20: Time Stone 7
+		SpriteFrame(TempValue1,8,16,16,189,197) // 20: Time Stone 7
 		SpriteFrame(9,2,114,13,90,225) // 21: "TIME TRAVEL USES:"
 		SpriteFrame(9,2,103,13,1,315) // 22: "LEVELS CLEARED:"
 		SpriteFrame(9,2,99,13,1,329) // 23: "TRANSPORTERS:"
@@ -877,7 +926,7 @@ sub ObjectStartup
 		SpriteFrame(0,0,118,13,118,357) // 30: "WACKY WORKBENCH"
 		SpriteFrame(0,0,129,13,1,371) // 31: "STARDUST SPEEDWAY"
 		SpriteFrame(0,0,117,13,131,371) // 32: "METALLIC MADNESS"
-		SpriteFrame(0,0,30,13,205,225) // 33: "ZONE"
+		SpriteFrame(0,0,23,13,205,225) // 33: "ZONE"
 		SpriteFrame(0,0,54,13,188,261) // 34: "PRESENT"
 		SpriteFrame(0,0,31,13,206,197) // 35: "PAST"
 		SpriteFrame(0,0,80,13,174,329) // 36: "GOOD FUTURE"
@@ -917,7 +966,7 @@ sub ObjectStartup
 		SpriteFrame(9,2,38,13,122,455) // 69: "BUILD:"
 		SpriteFrame(9,2,33,13,1,288) // 70: "SEED:"
 		SpriteFrame(9,2,35,13,35,288) // 71: "MODE:"
-		SpriteFrame(9,2,68,13,52,427) // 72: "MAIN PATH:"
+		SpriteFrame(9,2,68,13,93,427) // 72: "MAIN PATH:"
 		SpriteFrame(9,2,85,13,90,98) // 73: "MAX BW JUMP:"
 		SpriteFrame(9,2,84,13,90,112) // 74: "MAX FW JUMP:"
 		SpriteFrame(9,2,55,13,66,455) // 75: "BW PROB:"
@@ -937,8 +986,8 @@ sub ObjectStartup
 		TempValue1-=71
 		SpriteFrame(TempValue1,11,71,13,71,288) // 86: "ALL STAGES"
 		TempValue1=TempValue0
-		TempValue1-=48
-		SpriteFrame(TempValue1,11,48,13,143,288) // 87: "ROUNDS"
+		TempValue1-=38
+		SpriteFrame(TempValue1,11,38,13,143,288) // 87: "ZONES"
 		TempValue1=TempValue0
 		TempValue1-=31
 		SpriteFrame(TempValue1,11,31,13,192,288) // 88: "ACTS"
@@ -1041,6 +1090,7 @@ sub ObjectStartup
 		TempValue1=TempValue0
 		TempValue1-=125
 		SpriteFrame(TempValue1,11,125,13,1,399) // 119: "REVERSE BRANCHING
+		SpriteFrame(0,0,91,13,1,427) // 120: "SPECIAL STAGE"
 	endif
 	LoadPalette("RandoSummary.act",0,128,0,128)
 	switch SaveRAM[366]
