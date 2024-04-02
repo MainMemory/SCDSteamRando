@@ -60,12 +60,12 @@ namespace SCDSteamRando
 			this.randomUFOs = new System.Windows.Forms.CheckBox();
 			this.randomWater = new System.Windows.Forms.CheckBox();
 			this.addWaterOnly = new System.Windows.Forms.CheckBox();
+			this.randomPlayer = new System.Windows.Forms.CheckBox();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabPage1 = new System.Windows.Forms.TabPage();
 			this.label7 = new System.Windows.Forms.Label();
 			this.panel1 = new System.Windows.Forms.Panel();
 			this.tabPage3 = new System.Windows.Forms.TabPage();
-			this.randomPlayer = new System.Windows.Forms.CheckBox();
 			this.label9 = new System.Windows.Forms.Label();
 			this.label8 = new System.Windows.Forms.Label();
 			this.tabPage2 = new System.Windows.Forms.TabPage();
@@ -309,7 +309,7 @@ namespace SCDSteamRando
 			this.modeSelector.FormattingEnabled = true;
 			this.modeSelector.Items.AddRange(new object[] {
             "Shuffle All Stages w/ Warps",
-            "Shuffle Rounds",
+            "Shuffle Zones",
             "Shuffle Acts",
             "Shuffle Time Periods",
             "Branching Paths",
@@ -467,6 +467,17 @@ namespace SCDSteamRando
         "be altered in levels that already had water.");
 			this.addWaterOnly.UseVisualStyleBackColor = true;
 			// 
+			// randomPlayer
+			// 
+			this.randomPlayer.AutoSize = true;
+			this.randomPlayer.Location = new System.Drawing.Point(6, 150);
+			this.randomPlayer.Name = "randomPlayer";
+			this.randomPlayer.Size = new System.Drawing.Size(111, 17);
+			this.randomPlayer.TabIndex = 19;
+			this.randomPlayer.Text = "Randomize Player";
+			this.toolTip1.SetToolTip(this.randomPlayer, "If checked, player character will be randomized after every act or time warp.");
+			this.randomPlayer.UseVisualStyleBackColor = true;
+			// 
 			// tabControl1
 			// 
 			this.tabControl1.Controls.Add(this.tabPage1);
@@ -547,17 +558,6 @@ namespace SCDSteamRando
 			this.tabPage3.TabIndex = 2;
 			this.tabPage3.Text = "Misc";
 			this.tabPage3.UseVisualStyleBackColor = true;
-			// 
-			// randomPlayer
-			// 
-			this.randomPlayer.AutoSize = true;
-			this.randomPlayer.Location = new System.Drawing.Point(6, 150);
-			this.randomPlayer.Name = "randomPlayer";
-			this.randomPlayer.Size = new System.Drawing.Size(111, 17);
-			this.randomPlayer.TabIndex = 19;
-			this.randomPlayer.Text = "Randomize Player";
-			this.toolTip1.SetToolTip(this.randomPlayer, "If checked, player character will be randomized after every act or time warp.");
-			this.randomPlayer.UseVisualStyleBackColor = true;
 			// 
 			// label9
 			// 
