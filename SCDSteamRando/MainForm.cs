@@ -1154,6 +1154,15 @@ namespace SCDSteamRando
 			newpath = Path.Combine(path, @"Data\Sprites\Secrets\RandoSummary.gif");
 			File.WriteAllBytes(newpath, Properties.Resources.RandoSummaryImg);
 			vdir.AddFile("Sprites/Secrets/RandoSummary.gif", newpath);
+			newpath = Path.Combine(path, @"Data\Scripts\Global\DeathEvent.txt");
+			File.WriteAllText(newpath, Properties.Resources.DeathEvent);
+			vdir.AddFile("Scripts/Global/DeathEvent.txt", newpath);
+			newpath = Path.Combine(path, @"Data\Scripts\Global\PauseMenu.txt");
+			File.WriteAllText(newpath, Properties.Resources.PauseMenu);
+			vdir.AddFile("Scripts/Global/PauseMenu.txt", newpath);
+			newpath = Path.Combine(path, @"Data\Scripts\Special\PauseMenu.txt");
+			File.WriteAllText(newpath, Properties.Resources.SpecialPauseMenu);
+			vdir.AddFile("Scripts/Special/PauseMenu.txt", newpath);
 			sb.Clear();
 			switch (settings.Mode)
 			{

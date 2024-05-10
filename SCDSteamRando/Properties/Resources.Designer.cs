@@ -175,6 +175,36 @@ namespace SCDSteamRando.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to //------------Sonic CD DeathEvent Script-------------//
+        /////--------Scripted by Christian Whitehead &apos;The Taxman&apos;--------//
+        /////-------Unpacked By Rubberduckycooly&apos;s Script Unpacker-------//
+        ///
+        /////-------Aliases-------//
+        ///#alias 5: TYPE_DEATHEVENT
+        ///
+        ///
+        ///sub ObjectMain
+        ///	switch Object.State
+        ///	case 0
+        ///	case 1
+        ///		TempValue0=Screen.CenterX
+        ///		TempValue0-=72
+        ///		if Object.Value1&lt;TempValue0
+        ///			Object.Value1+=16
+        ///			if Object.Value1&gt;TempValue0
+        ///				Object.Value1=TempValue0
+        ///			endif
+        ///		endif
+        ///		TempValue0+=80
+        ///		if Obj [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string DeathEvent {
+            get {
+                return ResourceManager.GetString("DeathEvent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to //------------Sonic CD FuturePost Script-------------//
         /////--------Scripted by Christian Whitehead &apos;The Taxman&apos;--------//
         /////-------Unpacked By Rubberduckycooly&apos;s Script Unpacker-------//
@@ -319,6 +349,36 @@ namespace SCDSteamRando.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to //------------Sonic CD PauseMenu Script-------------//
+        /////--------Scripted by Christian Whitehead &apos;The Taxman&apos;--------//
+        /////-------Unpacked By Rubberduckycooly&apos;s Script Unpacker-------//
+        ///
+        /////-------Aliases-------//
+        ///#alias 7: TYPE_PAUSEMENU
+        ///#alias 27: TYPE_WARPSTAR
+        ///
+        ///#alias 48: TIME_WARPFRAME
+        ///
+        ///#alias 88: TIMEWARP_LIMIT
+        ///
+        ///sub ObjectMain
+        ///	switch Object.State
+        ///	case 0
+        ///		PauseMusic()
+        ///		Object.XPos=Screen.XSize
+        ///		Object.Value3=0
+        ///		Object.Value0=0
+        ///		Object.Value1=0
+        ///		Object.InkEffect=2
+        ///		Object.Alph [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string PauseMenu {
+            get {
+                return ResourceManager.GetString("PauseMenu", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
         internal static byte[] RandoSummaryImg {
@@ -335,6 +395,37 @@ namespace SCDSteamRando.Properties {
             get {
                 object obj = ResourceManager.GetObject("RandoSummaryPal", resourceCulture);
                 return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to //------------Sonic CD PauseMenu Script-------------//
+        /////--------Scripted by Christian Whitehead &apos;The Taxman&apos;--------//
+        /////-------Unpacked By Rubberduckycooly&apos;s Script Unpacker-------//
+        ///
+        /////-------Aliases-------//
+        ///#alias 9: TYPE_PAUSEMENU
+        ///
+        ///
+        ///sub ObjectMain
+        ///	switch Object.State
+        ///	case 0
+        ///		Object.XPos=Screen.XSize
+        ///		Object.Value3=0
+        ///		Object.Value0=0
+        ///		Object.Value1=0
+        ///		Object.InkEffect=2
+        ///		Object.Alpha=0
+        ///		switch Engine.Language
+        ///		case 0
+        ///		case 5
+        ///			Object.PropertyValue=12
+        ///			break
+        ///		case 1        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string SpecialPauseMenu {
+            get {
+                return ResourceManager.GetString("SpecialPauseMenu", resourceCulture);
             }
         }
         

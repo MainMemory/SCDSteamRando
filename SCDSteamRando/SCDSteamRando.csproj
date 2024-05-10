@@ -114,6 +114,9 @@
     <Content Include="RandoMusic\Readme.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\DeathEvent.txt" />
+    <None Include="Resources\PauseMenu.txt" />
+    <None Include="Resources\SpecialPauseMenu.txt" />
     <Content Include="Resources\StageSetup.txt" />
     <None Include="Resources\TimeWarp.txt" />
     <Content Include="SonicCD.ico" />

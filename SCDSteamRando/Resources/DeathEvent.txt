@@ -1,0 +1,164 @@
+//------------Sonic CD DeathEvent Script-------------//
+//--------Scripted by Christian Whitehead 'The Taxman'--------//
+//-------Unpacked By Rubberduckycooly's Script Unpacker-------//
+
+//-------Aliases-------//
+#alias 5: TYPE_DEATHEVENT
+
+
+sub ObjectMain
+	switch Object.State
+	case 0
+	case 1
+		TempValue0=Screen.CenterX
+		TempValue0-=72
+		if Object.Value1<TempValue0
+			Object.Value1+=16
+			if Object.Value1>TempValue0
+				Object.Value1=TempValue0
+			endif
+		endif
+		TempValue0+=80
+		if Object.Value2>TempValue0
+			Object.Value2-=16
+			if Object.Value2<TempValue0
+				Object.Value2=TempValue0
+			endif
+		endif
+		if Object.Value3<288
+			Object.Value3+=4
+		else
+			if Options.GameMode==1
+				ArrayPos0=Options.SaveSlot
+				ArrayPos0*=800
+				ArrayPos0+=800
+				TempValue2=Stage.Seconds
+				TempValue2*=100
+				TempValue3=Stage.Minutes
+				TempValue3*=6000
+				TempValue2+=TempValue3
+				TempValue2+=Stage.MilliSeconds
+				SaveRAM[ArrayPos0]+=TempValue2
+				ArrayPos0++
+				TempValue3=SaveRAM[ArrayPos0]
+				SaveRAM[ArrayPos0]++
+				ArrayPos0+=2
+				SaveRAM[ArrayPos0]++
+				ArrayPos0+=2
+				TempValue3*=3
+				ArrayPos0+=TempValue3
+				SaveRAM[ArrayPos0]=Stage.ListPos
+				ArrayPos0++
+				SaveRAM[ArrayPos0]=83
+				ArrayPos0++
+				SaveRAM[ArrayPos0]=TempValue2
+			endif
+			if Object.State==0
+				Stage.ActiveList=PRESENTATION_STAGE
+				Stage.ListPos=11
+				LampPost.Check=0
+				Transporter_Destroyed=0
+				MetalSonic_Destroyed=0
+				if Options.GameMode==1
+					ArrayPos1=Options.SaveSlot
+					ArrayPos1<<=3
+					ArrayPos1++
+					if SaveRAM[ArrayPos1]<3
+						SaveRAM[ArrayPos1]=3
+					endif
+					WriteSaveRAM()
+				endif
+			endif
+			if Object.State==1
+				Rec_Milliseconds=0
+				Rec_Seconds=0
+				Rec_Minutes=0
+			endif
+			EngineCallback(6)
+		endif
+		if Object.Value3>0
+			SetScreenFade(0,0,0,Object.Value3)
+		endif
+		break
+	case 2
+		if Object.Value3<288
+			Music.Volume-=2
+			Object.Value3+=4
+		else
+			if Options.GameMode==1
+				ArrayPos0=Options.SaveSlot
+				ArrayPos0*=800
+				ArrayPos0+=800
+				TempValue2=Stage.Seconds
+				TempValue2*=100
+				TempValue3=Stage.Minutes
+				TempValue3*=6000
+				TempValue2+=TempValue3
+				TempValue2+=Stage.MilliSeconds
+				SaveRAM[ArrayPos0]+=TempValue2
+				ArrayPos0++
+				TempValue3=SaveRAM[ArrayPos0]
+				SaveRAM[ArrayPos0]++
+				ArrayPos0+=2
+				SaveRAM[ArrayPos0]++
+				ArrayPos0+=2
+				TempValue3*=3
+				ArrayPos0+=TempValue3
+				SaveRAM[ArrayPos0]=Stage.ListPos
+				ArrayPos0++
+				SaveRAM[ArrayPos0]=83
+				ArrayPos0++
+				SaveRAM[ArrayPos0]=TempValue2
+				WriteSaveRAM()
+			endif
+			EngineCallback(6)
+		endif
+		SetScreenFade(0,0,0,Object.Value3)
+		break
+	case 3
+		if Object.Value3<288
+			Music.Volume-=2
+			Object.Value3+=4
+		else
+			TimeAttack.Result=0
+			LampPost.Check=0
+			Stage.ActiveList=PRESENTATION_STAGE
+			Stage.ListPos=2
+			LoadStage()
+		endif
+		SetScreenFade(0,0,0,Object.Value3)
+		break
+	endswitch
+endsub
+
+
+sub ObjectDraw
+	switch Object.State
+	case 0
+		DrawSpriteScreenXY(0,Object.Value1,96)
+		DrawSpriteScreenXY(2,Object.Value2,96)
+		break
+	case 1
+		DrawSpriteScreenXY(1,Object.Value1,96)
+		DrawSpriteScreenXY(2,Object.Value2,96)
+		break
+
+	endswitch
+endsub
+
+
+sub ObjectStartup
+	if Stage.PlayerListPos==0
+		LoadSpriteSheet("Global/Display.gif")
+	else
+		LoadSpriteSheet("Global/Display_t.gif")
+	endif
+	SpriteFrame(0,0,64,16,0,189)
+	SpriteFrame(0,0,56,16,65,189)
+	SpriteFrame(0,0,64,16,122,189)
+endsub
+
+sub RSDK
+	LoadSpriteSheet("Global/Display.gif")
+	SetEditorIcon(Icon0,SingleIcon,-16,-16,32,32,1,143)
+endsub

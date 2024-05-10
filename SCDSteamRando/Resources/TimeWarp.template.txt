@@ -38,9 +38,9 @@ sub ObjectDraw
 			Stage.State=STAGE_RUNNING
 			Stage.TimeEnabled=0
 			CallFunction(StageSetup_SaveStageState)
-			Rec_Milliseconds=Stage.MilliSeconds
-			Rec_Seconds=Stage.Seconds
-			Rec_Minutes=Stage.Minutes
+			Rec_Milliseconds=0
+			Rec_Seconds=0
+			Rec_Minutes=0
 			Warp.Rings=Player.Rings
 			TempValue2=Object[24].PropertyValue
 			TempValue0=0
