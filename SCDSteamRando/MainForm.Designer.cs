@@ -148,12 +148,12 @@ namespace SCDSteamRando
 			// 
 			this.seedSelector.Location = new System.Drawing.Point(47, 6);
 			this.seedSelector.Maximum = new decimal(new int[] {
-            999999999,
+            99999999,
             0,
             0,
             0});
 			this.seedSelector.Minimum = new decimal(new int[] {
-            999999999,
+            99999999,
             0,
             0,
             -2147483648});

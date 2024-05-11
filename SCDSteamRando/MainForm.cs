@@ -29,7 +29,7 @@ namespace SCDSteamRando
 				ufoDifficulty.Enabled = false;
 			}
 			settings = Settings.Load();
-			seedSelector.Value = settings.Seed;
+			seedSelector.Value = settings.Seed % 100000000;
 			randomSeed.Checked = settings.RandomSeed;
 			modeSelector.SelectedIndex = (int)settings.Mode;
 			mainPathSelector.SelectedIndex = (int)settings.MainPath;
@@ -147,7 +147,7 @@ namespace SCDSteamRando
 			int seed;
 			if (randomSeed.Checked)
 			{
-				seed = (int)DateTime.Now.Ticks % 1000000000;
+				seed = (int)DateTime.Now.Ticks % 100000000;
 				seedSelector.Value = seed;
 			}
 			else
