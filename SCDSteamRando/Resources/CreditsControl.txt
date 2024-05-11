@@ -67,7 +67,11 @@ sub ObjectMain
 		else
 			StopMusic()
 			Stage.ActiveList=PRESENTATION_STAGE
-			Stage.ListPos=1
+			if Options.GameMode!=0
+				Stage.ListPos=8
+			else
+				Stage.ListPos=11
+			endif
 			LoadStage()
 		endif
 		TempValue0=Object.Value0
@@ -76,6 +80,7 @@ sub ObjectMain
 		endif
 		SetScreenFade(0,0,0,TempValue0)
 		break
+
 	endswitch
 endsub
 
@@ -86,11 +91,18 @@ endsub
 
 
 sub ObjectStartup
-	if Options.Soundtrack==0
-		SetMusicTrack("JP/TimeAttack.ogg",0,100512)
-	else
-		SetMusicTrack("US/DAGarden.ogg",0,117382)
-	endif
+	LoadPalette("Credits.act",0,0,0,256)
+	switch SaveRAM[363]
+		case 0
+			SetMusicTrack("AR/Credits.ogg",0,1)//Hybrid
+			break
+		case 1
+			SetMusicTrack("JP/TimeAttack.ogg",0,100512)//JP
+			break
+		case 2
+			SetMusicTrack("US/DAGarden.ogg",0,117382)//US
+			break
+	endswitch
 #platform: Standard
 	LoadTextFile(MENU_1,"Data/Game/Credits_Console.txt",0)
 #endplatform

@@ -147,7 +147,7 @@ namespace SCDSteamRando
 			int seed;
 			if (randomSeed.Checked)
 			{
-				seed = (int)DateTime.Now.Ticks;
+				seed = (int)DateTime.Now.Ticks % 1000000000;
 				seedSelector.Value = seed;
 			}
 			else
@@ -197,6 +197,7 @@ namespace SCDSteamRando
 			Directory.CreateDirectory(Path.Combine(path, @"Data\Scripts\Menu"));
 			Directory.CreateDirectory(Path.Combine(path, @"Data\Scripts\R8"));
 			Directory.CreateDirectory(Path.Combine(path, @"Data\Scripts\Secrets"));
+			Directory.CreateDirectory(Path.Combine(path, @"Data\Scripts\Special"));
 			Directory.CreateDirectory(Path.Combine(path, @"Data\Sprites\Secrets"));
 			Random r = new Random(seed);
 			for (int i = 0; i < stagecount; i++)

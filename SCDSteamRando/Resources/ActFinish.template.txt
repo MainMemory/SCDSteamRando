@@ -266,11 +266,6 @@ sub ObjectMain
 			Object.State=4
 			Object.Value0=0
 			PlaySfx(17,0)
-			if game.hasPlusDLC == 0
-				Rand(Stage.PlayerListPos, 3)
-			else
-				Rand(Stage.PlayerListPos, 4)
-			endif
 		endif
 		break
 	case 4
@@ -390,10 +385,15 @@ sub ObjectMain
 						TempValue0=1
 					endif
 					if TempValue0==0
+						if game.hasPlusDLC == 0
+							Rand(Stage.PlayerListPos, 3)
+						else
+							Rand(Stage.PlayerListPos, 4)
+						endif
 						LoadStage()
 					else
 						Stage.ActiveList=PRESENTATION_STAGE
-						Stage.ListPos=1
+						Stage.ListPos=11
 						LoadStage()
 					endif
 				endif
@@ -559,10 +559,15 @@ sub ObjectMain
 							TempValue0=1
 						endif
 						if TempValue0==0
+							if game.hasPlusDLC == 0
+								Rand(Stage.PlayerListPos, 3)
+							else
+								Rand(Stage.PlayerListPos, 4)
+							endif
 							LoadStage()
 						else
 							Stage.ActiveList=PRESENTATION_STAGE
-							Stage.ListPos=1
+							Stage.ListPos=11
 							LoadStage()
 						endif
 					endif

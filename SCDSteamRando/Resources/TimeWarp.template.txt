@@ -71,31 +71,33 @@ sub ObjectDraw
 		switch Stage.ListPos
 //REPLACE
 		endswitch
-		ArrayPos0=Options.SaveSlot
-		ArrayPos0*=800
-		ArrayPos0+=800
-		TempValue2=Stage.Seconds
-		TempValue2*=100
-		TempValue3=Stage.Minutes
-		TempValue3*=6000
-		TempValue2+=TempValue3
-		TempValue2+=Stage.MilliSeconds
-		SaveRAM[ArrayPos0]+=TempValue2
-		ArrayPos0++
-		TempValue3=SaveRAM[ArrayPos0]
-		SaveRAM[ArrayPos0]++
-		ArrayPos0++
-		SaveRAM[ArrayPos0]++
-		ArrayPos0+=2
-		SaveRAM[ArrayPos0]+=Transporter_Destroyed
-		ArrayPos0++
-		TempValue3*=3
-		ArrayPos0+=TempValue3
-		SaveRAM[ArrayPos0]=Stage.ListPos
-		ArrayPos0++
-		SaveRAM[ArrayPos0]=TempValue1
-		ArrayPos0++
-		SaveRAM[ArrayPos0]=TempValue2
+		if Options.GameMode==1
+			ArrayPos0=Options.SaveSlot
+			ArrayPos0*=800
+			ArrayPos0+=800
+			TempValue2=Stage.Seconds
+			TempValue2*=100
+			TempValue3=Stage.Minutes
+			TempValue3*=6000
+			TempValue2+=TempValue3
+			TempValue2+=Stage.MilliSeconds
+			SaveRAM[ArrayPos0]+=TempValue2
+			ArrayPos0++
+			TempValue3=SaveRAM[ArrayPos0]
+			SaveRAM[ArrayPos0]++
+			ArrayPos0++
+			SaveRAM[ArrayPos0]++
+			ArrayPos0+=2
+			SaveRAM[ArrayPos0]+=Transporter_Destroyed
+			ArrayPos0++
+			TempValue3*=3
+			ArrayPos0+=TempValue3
+			SaveRAM[ArrayPos0]=Stage.ListPos
+			ArrayPos0++
+			SaveRAM[ArrayPos0]=TempValue1
+			ArrayPos0++
+			SaveRAM[ArrayPos0]=TempValue2
+		endif
 		if TempValue0==70
 			ArrayPos1=Options.SaveSlot
 			ArrayPos1<<=3
@@ -146,9 +148,6 @@ sub ObjectDraw
 			TempValue0<<=8
 			Fade_Colour+=TempValue0
 			Fade_Colour+=224
-			LampPost.Check=0
-			Transporter_Destroyed=0
-			MetalSonic_Destroyed=0
 			if Options.GameMode==1
 				ArrayPos1=Options.SaveSlot
 				ArrayPos1<<=3
@@ -166,10 +165,6 @@ sub ObjectDraw
 				SaveRAM[ArrayPos1]=SpecialStage.ListPos
 				ArrayPos1++
 				SaveRAM[ArrayPos1]=Player.ScoreBonus
-				ArrayPos1++
-				SaveRAM[ArrayPos1]=MetalSonic_List
-				SaveRAM[ArrayPos1]<<=16
-				SaveRAM[ArrayPos1]+=Good_Future_List
 			endif
 		endif
 		WriteSaveRAM()
