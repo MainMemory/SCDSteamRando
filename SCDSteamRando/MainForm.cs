@@ -976,12 +976,8 @@ namespace SCDSteamRando
 			newpath = Path.Combine(path, @"Data\Scripts\R8\Amy.txt");
 			File.WriteAllText(newpath, Properties.Resources.Amy);
 			vdir.AddFile("Scripts/R8/Amy.txt", newpath);
-			if (vdir.FileExists("Scripts/Credits/CreditsControl.txt"))
-				tmpstr = File.ReadAllText(vdir.GetFile("Scripts/Credits/CreditsControl.txt").SourcePath);
-			else
-				tmpstr = Properties.Resources.CreditsControl;
 			newpath = Path.Combine(path, @"Data\Scripts\Credits\CreditsControl.txt");
-			File.WriteAllText(newpath, tmpstr.Replace("Stage.ListPos=10", "Stage.ListPos=8"));
+			File.WriteAllText(newpath, Properties.Resources.CreditsControl);
 			vdir.AddFile("Scripts/Credits/CreditsControl.txt", newpath);
 			if (vdir.FileExists("Scripts/Global/StageSetup.txt"))
 				tmpstr = File.ReadAllText(vdir.GetFile("Scripts/Global/StageSetup.txt").SourcePath);
