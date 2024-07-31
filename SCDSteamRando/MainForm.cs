@@ -448,9 +448,8 @@ namespace SCDSteamRando
 									break;
 							}
 						}
-						int[] rounds = new int[8];
+						int[] rounds = Enumerable.Range(0, 8).ToArray();
 						Shuffle(r, rounds, 7);
-						rounds[7] = 7;
 						for (int i = 0; i < 7; i++)
 						{
 							for (int j = 0; j < 10; j++)
