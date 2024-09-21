@@ -257,7 +257,7 @@ sub ObjectMain
 				ArrayPos1++
 				SaveRAM[ArrayPos1]=0
 				ArrayPos1++
-				SaveRAM[ArrayPos1]=0
+				//REPLACE1
 				ArrayPos1++
 				SaveRAM[ArrayPos1]=0
 				ArrayPos1++
@@ -294,12 +294,14 @@ sub ObjectMain
 				SpecialStage.TimeStones=0
 				SpecialStage.ListPos=0
 				LampPost.Check=0
+				MetalSonicKidnappedAmy=0
+				Options.SaveComplete=1
 				if Options.GameMode!=-2
 					Stage.ActiveList=REGULAR_STAGE
 				else
 					Stage.ActiveList=SPECIAL_STAGE
 				endif
-				Stage.ListPos=0
+				//REPLACE2
 				LoadStage()
 				if Options.GameMode!=-2
 					if Stage.PlayerListPos==0

@@ -236,6 +236,8 @@ sub ObjectMain
 					SpecialStage.TimeStones=0
 					SpecialStage.ListPos=0
 					LampPost.Check=0
+					MetalSonicKidnappedAmy=0
+					Options.SaveComplete=1
 					Stage.ActiveList=REGULAR_STAGE
 					//REPLACE2
 					LoadStage()
@@ -571,7 +573,7 @@ sub ObjectDraw
 		TempValue0+=11
 		TempValue1=Object.Value1
 		TempValue1-=OptsXPos
-		DrawNumbers(43,TempValue1,TempValue0,Object.Value2,9,8,0)
+		DrawNumbers(43,TempValue1,TempValue0,Object.Value2,10,8,0)
 		if Object.Value3!=0
 			TempValue1-=Object.Value3
 			DrawSpriteScreenXY(85,TempValue1,TempValue0)
@@ -1091,8 +1093,6 @@ sub ObjectStartup
 		TempValue1-=125
 		SpriteFrame(TempValue1,11,125,13,1,399) // 119: "REVERSE BRANCHING
 		SpriteFrame(0,0,91,13,1,427) // 120: "SPECIAL STAGE"
-		SpriteFrame(0,0,36,8,1,441) // 121: "DEATH"
-		SpriteFrame(0,0,50,8,1,413) // 122: "RESTART"
 	endif
 	LoadPalette("RandoSummary.act",0,128,0,128)
 	switch SaveRAM[366]

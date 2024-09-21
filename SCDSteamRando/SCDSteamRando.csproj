@@ -115,8 +115,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="Resources\DeathEvent.txt" />
-    <None Include="Resources\PauseMenu.txt" />
-    <None Include="Resources\SpecialPauseMenu.txt" />
+    <None Include="Resources\PauseMenu.template.txt" />
+    <None Include="Resources\SpecialPauseMenu.template.txt" />
     <Content Include="Resources\StageSetup.txt" />
     <None Include="Resources\TimeWarp.txt" />
     <Content Include="SonicCD.ico" />

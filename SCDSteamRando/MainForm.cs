@@ -972,18 +972,26 @@ namespace SCDSteamRando
 			string newpath = Path.Combine(path, @"Data\Scripts\Menu\LoadSaveMenu.txt");
 			File.WriteAllText(newpath, tmpstr);
 			vdir.AddFile("Scripts/Menu/LoadSaveMenu.txt", newpath);
+			tmpstr = Properties.Resources.PauseMenu_template;
+			tmpstr = tmpstr.Replace("//REPLACE1", $"SaveRAM[ArrayPos1]={stageids[0] + 1}");
+			tmpstr = tmpstr.Replace("//REPLACE2", $"Stage.ListPos={stageids[0]}");
+			newpath = Path.Combine(path, @"Data\Scripts\Global\PauseMenu.txt");
+			File.WriteAllText(newpath, tmpstr);
+			vdir.AddFile("Scripts/Global/PauseMenu.txt", newpath);
+			tmpstr = Properties.Resources.SpecialPauseMenu_template;
+			tmpstr = tmpstr.Replace("//REPLACE1", $"SaveRAM[ArrayPos1]={stageids[0] + 1}");
+			tmpstr = tmpstr.Replace("//REPLACE2", $"Stage.ListPos={stageids[0]}");
+			newpath = Path.Combine(path, @"Data\Scripts\Special\PauseMenu.txt");
+			File.WriteAllText(newpath, tmpstr);
+			vdir.AddFile("Scripts/Special/PauseMenu.txt", newpath);
 			newpath = Path.Combine(path, @"Data\Scripts\R8\Amy.txt");
 			File.WriteAllText(newpath, Properties.Resources.Amy);
 			vdir.AddFile("Scripts/R8/Amy.txt", newpath);
 			newpath = Path.Combine(path, @"Data\Scripts\Credits\CreditsControl.txt");
 			File.WriteAllText(newpath, Properties.Resources.CreditsControl);
 			vdir.AddFile("Scripts/Credits/CreditsControl.txt", newpath);
-			if (vdir.FileExists("Scripts/Global/StageSetup.txt"))
-				tmpstr = File.ReadAllText(vdir.GetFile("Scripts/Global/StageSetup.txt").SourcePath);
-			else
-				tmpstr = Properties.Resources.StageSetup;
 			newpath = Path.Combine(path, @"Data\Scripts\Global\StageSetup.txt");
-			File.WriteAllText(newpath, tmpstr.Replace("Transporter_Destroyed=1", "Transporter_Destroyed=0"));
+			File.WriteAllText(newpath, Properties.Resources.StageSetup);
 			vdir.AddFile("Scripts/Global/StageSetup.txt", newpath);
 			tmpstr = Properties.Resources.TailsUnlock_template;
 			tmpstr = tmpstr.Replace("//REPLACE1", $"SaveRAM[ArrayPos1]={stageids[0] + 1}");
@@ -1153,12 +1161,6 @@ namespace SCDSteamRando
 			newpath = Path.Combine(path, @"Data\Scripts\Global\DeathEvent.txt");
 			File.WriteAllText(newpath, Properties.Resources.DeathEvent);
 			vdir.AddFile("Scripts/Global/DeathEvent.txt", newpath);
-			newpath = Path.Combine(path, @"Data\Scripts\Global\PauseMenu.txt");
-			File.WriteAllText(newpath, Properties.Resources.PauseMenu);
-			vdir.AddFile("Scripts/Global/PauseMenu.txt", newpath);
-			newpath = Path.Combine(path, @"Data\Scripts\Special\PauseMenu.txt");
-			File.WriteAllText(newpath, Properties.Resources.SpecialPauseMenu);
-			vdir.AddFile("Scripts/Special/PauseMenu.txt", newpath);
 			sb.Clear();
 			switch (settings.Mode)
 			{

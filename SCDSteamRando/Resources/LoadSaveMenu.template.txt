@@ -880,6 +880,8 @@ sub ObjectMain
 			SpecialStage.TimeStones=0
 			SpecialStage.ListPos=0
 			LampPost.Check=0
+			MetalSonicKidnappedAmy=0
+			Options.SaveComplete=1
 			Stage.ActiveList=REGULAR_STAGE
 			ArrayPos0=Object.Value1
 			//REPLACE2

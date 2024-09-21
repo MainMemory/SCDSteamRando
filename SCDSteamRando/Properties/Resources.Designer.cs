@@ -372,9 +372,9 @@ namespace SCDSteamRando.Properties {
         ///		Object.InkEffect=2
         ///		Object.Alph [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string PauseMenu {
+        internal static string PauseMenu_template {
             get {
-                return ResourceManager.GetString("PauseMenu", resourceCulture);
+                return ResourceManager.GetString("PauseMenu_template", resourceCulture);
             }
         }
         
@@ -423,9 +423,9 @@ namespace SCDSteamRando.Properties {
         ///			break
         ///		case 1        /// [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string SpecialPauseMenu {
+        internal static string SpecialPauseMenu_template {
             get {
-                return ResourceManager.GetString("SpecialPauseMenu", resourceCulture);
+                return ResourceManager.GetString("SpecialPauseMenu_template", resourceCulture);
             }
         }
         
@@ -462,13 +462,12 @@ namespace SCDSteamRando.Properties {
         ///#alias 2: TYPE_STAGESETUP
         ///
         ///#alias Player.Value0:Player.Rings
+        ///#alias Player.Value1:Player.AbilityTimer
+        ///#alias Player.Value3:Player.SpeedShoes
+        ///#alias Player.Value4:Player.Invincible
+        ///#alias Player.Value5:Player.BlinkTimer
         ///#alias Player.Value6:Player.MinRollSpeed
-        ///
-        ///function StageSetup_CheckGoodFuture
-        ///	if Good_Future==1
-        ///		if Object.PropertyValue&gt;0
-        ///			ResetObjectEntity(Object.EntityNo,Flower_TypeNo,0,Object.XPos,Object.YPos)
-        ///			Object.DrawOrder= [rest of string was truncated]&quot;;.
+        ///#alias Player.Value8:Play [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string StageSetup {
             get {
