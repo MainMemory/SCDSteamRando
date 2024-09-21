@@ -171,12 +171,65 @@ sub ObjectMain
 		endif
 		break
 	case 2
-		Object.Value0++
-		switch SaveRAM[352]
-			case 0
-			if Object.Value0>320
+		if Object.Value6>10000
+			if Object.Value6>10000
+				Object.Value6-=500
+				Player.Score+=500
+			endif
+		else
+			if Object.Value6>0
+				Object.Value6-=100
+				Player.Score+=100
+			endif
+		endif
+		if Object.Value5>10000
+			if Object.Value5>10000
+				Object.Value5-=500
+				Player.Score+=500
+			endif
+		else
+			if Object.Value5>0
+				Object.Value5-=100
+				Player.Score+=100
+			endif
+		endif
+		CheckGreater(Object.Value6,0)
+		TempValue0=CheckResult
+		CheckGreater(Object.Value5,0)
+		TempValue0|=CheckResult
+		if TempValue0==1
+			Object.Value0++
+			if Object.Value0==2
+				PlaySfx(16,0)
 				Object.Value0=0
-				Object.State=3
+			endif
+		else
+			if Object.Value0>=0
+				PlaySfx(17,0)
+				if game.hasPlusDLC == 0
+					Rand(Stage.PlayerListPos, 3)
+				else
+					Rand(Stage.PlayerListPos, 4)
+				endif
+				Object.Value0=-1
+			endif
+		endif
+		Object.Value7++
+		switch SaveRAM[352]
+		case 0
+		case 1
+			if Object.Value7>169
+				Object.Value0=0
+				Object.Value7=0
+				if Object.Value5==0
+					if Object.Value6==0
+						Object.State=3
+					else
+						Object.State=4
+					endif
+				else
+					Object.State=4
+				endif
 				if Stage.PlayerListPos==0
 					if Object[24].PropertyValue==2
 						if Stage.DebugMode==0
@@ -190,10 +243,19 @@ sub ObjectMain
 				endif
 			endif
 			break
-			case 1
-			if Object.Value0>299
+		default
+			if Object.Value7>299
 				Object.Value0=0
-				Object.State=3
+				Object.Value7=0
+				if Object.Value5==0
+					if Object.Value6==0
+						Object.State=3
+					else
+						Object.State=4
+					endif
+				else
+					Object.State=4
+				endif
 				if Stage.PlayerListPos==0
 					if Object[24].PropertyValue==2
 						if Stage.DebugMode==0
@@ -208,49 +270,40 @@ sub ObjectMain
 			endif
 			break
 		endswitch
-		if SaveRAM[352]>=2
-			if Object.Value0>429
-				Object.Value0=0
-				Object.State=3
-				if Stage.PlayerListPos==0
-					if Object[24].PropertyValue==2
-						if Stage.DebugMode==0
-							if Options.GameMode==1
-								SaveRAM[259]=1
-								WriteSaveRAM()
-								SetAchievement(2,100)
-							endif
-						endif
-					endif
-				endif
-			endif
-		endif
-		if SaveRAM[352]<0
-			if Object.Value0>429
-				Object.Value0=0
-				Object.State=3
-				if Stage.PlayerListPos==0
-					if Object[24].PropertyValue==2
-						if Stage.DebugMode==0
-							if Options.GameMode==1
-								SaveRAM[259]=1
-								WriteSaveRAM()
-								SetAchievement(2,100)
-							endif
-						endif
-					endif
-				endif
+		break
+	case 3
+		Object.Value7++
+		if Object.Value7==160
+			Object.Value0=0
+			Object.Value7=0
+			Object.State=5
+			if Object[0].Type==TypeName[BlankObject]
+				PlaySfx(19,0)
 			endif
 		endif
 		break
-	case 3
-		if Object.Value6>0
-			Object.Value6-=100
-			Player.Score+=100
+	case 4		
+		if Object.Value6>10000
+			if Object.Value6>10000
+				Object.Value6-=500
+				Player.Score+=500
+			endif
+		else
+			if Object.Value6>0
+				Object.Value6-=100
+				Player.Score+=100
+			endif
 		endif
-		if Object.Value5>0
-			Object.Value5-=100
-			Player.Score+=100
+		if Object.Value5>10000
+			if Object.Value5>10000
+				Object.Value5-=500
+				Player.Score+=500
+			endif
+		else
+			if Object.Value5>0
+				Object.Value5-=100
+				Player.Score+=100
+			endif
 		endif
 		CheckGreater(Object.Value6,0)
 		TempValue0=CheckResult
@@ -263,15 +316,20 @@ sub ObjectMain
 				Object.Value0=0
 			endif
 		else
-			Object.State=4
-			Object.Value0=0
-			PlaySfx(17,0)
+			if Object.Value0>=0
+				PlaySfx(17,0)			
+				if game.hasPlusDLC == 0
+					Rand(Stage.PlayerListPos, 3)
+				else
+					Rand(Stage.PlayerListPos, 4)
+				endif
+				Object.Value0=-1
+			endif	
 		endif
-		break
-	case 4
-		Object.Value0++
-		if Object.Value0==160
+		Object.Value7++
+		if Object.Value7==160
 			Object.Value0=0
+			Object.Value7=0
 			Object.State=5
 			if Object[0].Type==TypeName[BlankObject]
 				PlaySfx(19,0)
@@ -385,15 +443,10 @@ sub ObjectMain
 						TempValue0=1
 					endif
 					if TempValue0==0
-						if game.hasPlusDLC == 0
-							Rand(Stage.PlayerListPos, 3)
-						else
-							Rand(Stage.PlayerListPos, 4)
-						endif
 						LoadStage()
 					else
 						Stage.ActiveList=PRESENTATION_STAGE
-						Stage.ListPos=11
+						Stage.ListPos=1
 						LoadStage()
 					endif
 				endif
@@ -559,15 +612,10 @@ sub ObjectMain
 							TempValue0=1
 						endif
 						if TempValue0==0
-							if game.hasPlusDLC == 0
-								Rand(Stage.PlayerListPos, 3)
-							else
-								Rand(Stage.PlayerListPos, 4)
-							endif
 							LoadStage()
 						else
 							Stage.ActiveList=PRESENTATION_STAGE
-							Stage.ListPos=11
+							Stage.ListPos=1
 							LoadStage()
 						endif
 					endif
